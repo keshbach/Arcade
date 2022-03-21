@@ -1,0 +1,19 @@
+# Compiler Output Directories
+
+Source/lib/
+Source/bin/
+
+
+# .NET Compiler Output Directories
+
+Source/AppsNet/RebaserAppNet/obj/
+Source/AppsNet/UpdateAssemblyVersionAppNet/obj/
+Source/Forms/ArcadeForms/obj/
+Source/Database/ArcadeDatabase/obj/
+
+
+# Microsoft Visual Studio generated project file
+
+Source/**/*.vcxproj.user
+Source/**/*.vcxproj.filters
+Source/**/.vs
