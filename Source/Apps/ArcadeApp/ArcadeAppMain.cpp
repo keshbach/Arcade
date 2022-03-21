@@ -1,0 +1,26 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2019-2021 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "ArcadeApp.h"
+#include "UtArcadeApp.h"
+
+int CALLBACK wWinMain(
+  _In_ HINSTANCE hInstance,
+  _In_opt_ HINSTANCE hPrevInstance,
+  _In_ LPWSTR pszCmdLine,
+  _In_ int nCmdShow)
+{
+    hPrevInstance;
+    pszCmdLine;
+    nCmdShow;
+
+    UtArcadeAppSetInstance(hInstance);
+
+    return ArcadeAppExecute(hInstance, __argc, __wargv);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2019-2021 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

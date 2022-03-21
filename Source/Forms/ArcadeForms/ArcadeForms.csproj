@@ -1,0 +1,343 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{71EB65B6-5056-4A84-90BF-E90EF530132C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Arcade.Forms</RootNamespace>
+    <AssemblyName>ArcadeForms</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <BaseAddress>537198592</BaseAddress>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <BaseAddress>537198592</BaseAddress>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <BaseAddress>17180327936</BaseAddress>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <BaseAddress>17180327936</BaseAddress>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UiCtrlsNet">
+      <HintPath>$(SolutionDir)..\bin\$(Configuration)\$(PlatformName)\UiCtrlsNet.dll</HintPath>
+    </Reference>
+    <Reference Include="UiUtilNet">
+      <HintPath>$(SolutionDir)..\bin\$(Configuration)\$(PlatformName)\UiUtilNet.dll</HintPath>
+    </Reference>
+    <Reference Include="UtilNet">
+      <HintPath>$(SolutionDir)..\bin\$(Configuration)\$(PlatformName)\UtilNet.dll</HintPath>
+    </Reference>
+    <Reference Include="ArcadeDatabase">
+      <HintPath>$(SolutionDir)..\bin\$(Configuration)\$(PlatformName)\ArcadeDatabase.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutForm.designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BoardPartDetailsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BoardPartDetailsForm.designer.cs">
+      <DependentUpon>BoardPartDetailsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BoardPartEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BoardPartEntryForm.designer.cs">
+      <DependentUpon>BoardPartEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataEntryForm.designer.cs">
+      <DependentUpon>DataEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DisplayEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DisplayEntryForm.designer.cs">
+      <DependentUpon>DisplayEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FindGameBoardForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FindGameBoardForm.Designer.cs">
+      <DependentUpon>FindGameBoardForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FindPartForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FindPartForm.designer.cs">
+      <DependentUpon>FindPartForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoardDetailsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GameBoardDetailsForm.designer.cs">
+      <DependentUpon>GameBoardDetailsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoardEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GameBoardEntryForm.designer.cs">
+      <DependentUpon>GameBoardEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GameEntryForm.designer.cs">
+      <DependentUpon>GameEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListDataForm.designer.cs">
+      <DependentUpon>ListDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListDisplaysForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListDisplaysForm.designer.cs">
+      <DependentUpon>ListDisplaysForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListGameDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListGameDataForm.designer.cs">
+      <DependentUpon>ListGameDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListGameManualsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListGameManualsForm.designer.cs">
+      <DependentUpon>ListGameManualsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListGamesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListGamesForm.designer.cs">
+      <DependentUpon>ListGamesForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListLogsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListLogsForm.Designer.cs">
+      <DependentUpon>ListLogsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListManualsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ListManualsForm.designer.cs">
+      <DependentUpon>ListManualsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LogEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogEntryForm.Designer.cs">
+      <DependentUpon>LogEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManualEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManualEntryForm.designer.cs">
+      <DependentUpon>ManualEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PartDetailsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PartDetailsForm.designer.cs">
+      <DependentUpon>PartDetailsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PartEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PartEntryForm.designer.cs">
+      <DependentUpon>PartEntryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SelectDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectDataForm.designer.cs">
+      <DependentUpon>SelectDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewGamePartLocationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewGamePartLocationForm.designer.cs">
+      <DependentUpon>ViewGamePartLocationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewPartDatasheetsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewPartDatasheetsForm.designer.cs">
+      <DependentUpon>ViewPartDatasheetsForm.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BoardPartDetailsForm.resx">
+      <DependentUpon>BoardPartDetailsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BoardPartEntryForm.resx">
+      <DependentUpon>BoardPartEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataEntryForm.resx">
+      <DependentUpon>DataEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DisplayEntryForm.resx">
+      <DependentUpon>DisplayEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FindGameBoardForm.resx">
+      <DependentUpon>FindGameBoardForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FindPartForm.resx">
+      <DependentUpon>FindPartForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GameBoardDetailsForm.resx">
+      <DependentUpon>GameBoardDetailsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GameBoardEntryForm.resx">
+      <DependentUpon>GameBoardEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GameEntryForm.resx">
+      <DependentUpon>GameEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListDataForm.resx">
+      <DependentUpon>ListDataForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListDisplaysForm.resx">
+      <DependentUpon>ListDisplaysForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListGameDataForm.resx">
+      <DependentUpon>ListGameDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListGameManualsForm.resx">
+      <DependentUpon>ListGameManualsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListGamesForm.resx">
+      <DependentUpon>ListGamesForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListLogsForm.resx">
+      <DependentUpon>ListLogsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ListManualsForm.resx">
+      <DependentUpon>ListManualsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogEntryForm.resx">
+      <DependentUpon>LogEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManualEntryForm.resx">
+      <DependentUpon>ManualEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PartDetailsForm.resx">
+      <DependentUpon>PartDetailsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PartEntryForm.resx">
+      <DependentUpon>PartEntryForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectDataForm.resx">
+      <DependentUpon>SelectDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewGamePartLocationForm.resx">
+      <DependentUpon>ViewGamePartLocationForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewPartDatasheetsForm.resx">
+      <DependentUpon>ViewPartDatasheetsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,11 @@
+;
+;  Copyright (C) 2019-2019 Kevin Eshbach
+;
+
+LIBRARY ArcadeAppHostNet BASE=0x20020000
+EXPORTS
+    ArcadeAppHostNetExecuteInAppDomain @ 1
+
+;
+;  Copyright (C) 2019-2019 Kevin Eshbach
+;

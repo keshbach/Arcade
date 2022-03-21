@@ -1,0 +1,23 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2009-2015 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
+using System;
+
+namespace Arcade
+{
+    internal sealed class GameComparer :
+        System.Collections.Generic.IComparer<DatabaseDefs.TGame>
+    {
+        public int Compare(
+            DatabaseDefs.TGame Game1,
+            DatabaseDefs.TGame Game2)
+        {
+            return System.String.Compare(Game1.sGameName, Game2.sGameName, true);
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2009-2015 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

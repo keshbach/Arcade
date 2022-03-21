@@ -1,0 +1,9 @@
+;
+;  Copyright (C) 2007-2014 Kevin Eshbach
+;
+
+LIBRARY DbAdapterAccessNet BASE=0x20080000
+
+;
+;  Copyright (C) 2007-2014 Kevin Eshbach
+;

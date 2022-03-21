@@ -1,0 +1,13 @@
+;
+;  Copyright (C) 2019-2019 Kevin Eshbach
+;
+
+LIBRARY ArcadeAppHost BASE=0x20000000
+EXPORTS
+    ArcadeAppHostInitialize @ 1
+    ArcadeAppHostUninitialize @ 2
+    ArcadeAppHostExecute @ 3
+
+;
+;  Copyright (C) 2019-2019 Kevin Eshbach
+;
