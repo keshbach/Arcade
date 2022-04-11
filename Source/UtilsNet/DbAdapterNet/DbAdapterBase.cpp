@@ -622,6 +622,12 @@ System::Boolean Common::Data::DbAdapterBase::CreateConnection(
         sErrorMessage = Exception->Message;
     }
 
+    catch (System::Exception^ Exception)
+    {
+        Connection = nullptr;
+        sErrorMessage = Exception->Message;
+    }
+
     return bResult;
 }
 
