@@ -23,34 +23,6 @@ Common::Data::DbAdapterAccess::DbAdapterAccess()
 {
 }
 
-System::Boolean Common::Data::DbAdapterAccess::ReadSettings(
-  Microsoft::Win32::RegistryKey^ RegKey,
-  System::String^% sDatabaseFile)
-{
-    System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict;
-    System::Collections::IDictionaryEnumerator^ DictEnum;
-    System::String^ sErrorMessage;
-
-    sDatabaseFile = L"";
-    
-    if (!ReadSettings(RegKey, SettingsDict, sErrorMessage))
-    {
-        return false;
-    }
-
-    DictEnum = SettingsDict->GetEnumerator();
-
-    while (DictEnum->MoveNext())
-    {
-        if ((System::String^)DictEnum->Key == CDatabaseRegValueName)
-        {
-            sDatabaseFile = (System::String^)DictEnum->Value;
-        }
-    }
-
-    return true;
-}
-
 System::Boolean Common::Data::DbAdapterAccess::InitDatabase(
   Microsoft::Win32::RegistryKey^ RegKey,
   System::String^% sErrorMessage)
@@ -188,6 +160,34 @@ System::Boolean Common::Data::DbAdapterAccess::ProvideWriteSettings(
     MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CDatabaseRegValueName, System::String, sErrorMessage)
 
     MDatabaseAdapterWriteDictionarySetting(SettingsDict, CAccessRegKeyName, RegKey, CDatabaseRegValueName, sErrorMessage)
+
+    return true;
+}
+
+System::Boolean Common::Data::DbAdapterAccess::ReadSettings(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::String^% sDatabaseFile)
+{
+    System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict;
+    System::Collections::IDictionaryEnumerator^ DictEnum;
+    System::String^ sErrorMessage;
+
+    sDatabaseFile = L"";
+
+    if (!ReadSettings(RegKey, SettingsDict, sErrorMessage))
+    {
+        return false;
+    }
+
+    DictEnum = SettingsDict->GetEnumerator();
+
+    while (DictEnum->MoveNext())
+    {
+        if ((System::String^)DictEnum->Key == CDatabaseRegValueName)
+        {
+            sDatabaseFile = (System::String^)DictEnum->Value;
+        }
+    }
 
     return true;
 }
