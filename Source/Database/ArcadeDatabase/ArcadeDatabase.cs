@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2016 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -11,6 +11,18 @@ namespace Arcade
     /// </summary>
 	public sealed class Database
     {
+        #region "Enumerations"
+        
+        public enum EDatabaseAdapter
+        {
+            Access,
+            SQLServer
+        }
+
+        #endregion
+
+        #region "Constants"
+
         // Table names
         private static System.String CManualTableName = "Manual";
         private static System.String CGameTableName = "Game";
@@ -49,6 +61,10 @@ namespace Arcade
         private static System.String CManualStorageBoxName = "Storage Box";
         private static System.String CManualPrintEditionName = "Print Edition";
         private static System.String CManualConditionName = "Condition";
+
+        #endregion
+
+        #region "Member Variables"
 
         private static Common.Data.IDbAdapter s_DbAdapter = null;
 
@@ -127,13 +143,14 @@ namespace Arcade
         private static Common.Collections.StringDictionary<System.Int32> s_ManualPropertyNameDictionary = new Common.Collections.StringDictionary<System.Int32>();
 
         private static System.Boolean s_bInitialized = false;
-        private static System.String s_sDatabasePluginFile = "";
+        private static System.String s_sDatabaseRegistryKey = "";
+
+        #endregion
 
         /// <summary>
         /// Initializes the database.
         /// <param name="sRegistryKey">
-        /// A registry path under Local Machine that contains a string
-        /// value called "Database" that contains the database file to use.
+        /// The registry path under Current User that should be used for storing settings.
         /// </param>
         /// <param name="sErrorMessage">
         /// On return will contain a message if an error occurred.
@@ -141,7 +158,9 @@ namespace Arcade
         /// </summary>
 
         public static System.Boolean Init(
+            EDatabaseAdapter DatabaseAdapter,
             System.String sRegistryKey,
+            out System.Boolean bDatabaseAvailable,
             out System.String sErrorMessage)
         {
             System.Boolean bInitSuccessful = true;
@@ -149,51 +168,39 @@ namespace Arcade
             Microsoft.Win32.RegistryKey RegKey;
             System.String sTmpErrorMessage;
 
+            bDatabaseAvailable = false;
             sErrorMessage = "";
 
-            RegKey = Common.Registry.OpenLocalMachineRegKey(sRegistryKey, false);
+            s_sDatabaseRegistryKey = sRegistryKey;
+
+            switch (DatabaseAdapter)
+            {
+                case EDatabaseAdapter.Access:
+                    s_DbAdapter = new Common.Data.DbAdapterAccess();
+                    break;
+                case EDatabaseAdapter.SQLServer:
+                    s_DbAdapter = new Common.Data.DbAdapterSQLServer();
+                    break;
+                default:
+                    sErrorMessage = "Unrecognized database adapter.";
+
+                    return false;
+            }
+
+            RegKey = Common.Registry.OpenCurrentUserRegKey(sRegistryKey, false);
                         
             if (RegKey == null)
             {
-                sErrorMessage = "The Local Machine registry key could not be opened.";
+                sErrorMessage = "The Current User registry key could not be opened.";
 
-                return false;
-            }
-
-            s_sDatabasePluginFile = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory,
-                                                           (System.String)RegKey.GetValue("Plugin"));
-
-            s_sDatabasePluginFile += ".dll";
-
-#if USE_DATABASE_PLUGIN
-            s_DbAdapter = CreateDatabasePlugin(s_sDatabasePluginFile, out sErrorMessage);
-#endif
-
-            if ((string)RegKey.GetValue("Plugin") == "DbAdapterSQLServerNet")
-            {
-                s_DbAdapter = new Common.Data.DbAdapterSQLServer();
-            }
-            else if ((string)RegKey.GetValue("Plugin") == "DbAdapterAccessNet")
-            {
-                s_DbAdapter = new Common.Data.DbAdapterAccess();
-            }
-            else
-            {
-                sErrorMessage = "Unrecognized database plugin.";
-            }
-
-            if (s_DbAdapter == null)
-            {
-                RegKey.Close();
-
-                return false;
+                return true;
             }
 
             if (false == s_DbAdapter.Initialize(RegKey, ref sErrorMessage))
             {
                 RegKey.Close();
 
-                return false;
+                return true;
             }
 
             RegKey.Close();
@@ -227,11 +234,11 @@ namespace Arcade
 
                 s_DbAdapter.Uninitialize(ref sTmpErrorMessage);
 
-                s_DbAdapter = null;
-
-                return false;
+                return true;
             }
-            
+
+            bDatabaseAvailable = true;
+
             s_bInitialized = true;
 
             return true;
@@ -255,30 +262,87 @@ namespace Arcade
             {
                 bResult = s_DbAdapter.Uninitialize(ref sErrorMessage);
 
-                s_DbAdapter = null;
-
                 s_bInitialized = false;
             }
+
+            s_DbAdapter = null;
 
             return bResult;
         }
 
-        /// <summary>
-        /// Retrieves the database plugin file being used.
-        /// </summary>
-
-        public static System.String GetDatabasePluginFile()
+        public static System.Boolean ReadSettings(
+            out System.Collections.Generic.Dictionary<System.String, System.Object> SettingsDict,
+            out System.String sErrorMessage)
         {
-            return s_sDatabasePluginFile;
+            Microsoft.Win32.RegistryKey RegKey;
+            System.Boolean bResult;
+
+            SettingsDict = new System.Collections.Generic.Dictionary<System.String, System.Object>();
+            sErrorMessage = "";
+
+            if (s_DbAdapter == null)
+            {
+                sErrorMessage = "Unrecognized database adapter.";
+
+                return false;
+            }
+
+            RegKey = Common.Registry.OpenCurrentUserRegKey(s_sDatabaseRegistryKey, false);
+
+            if (RegKey == null)
+            {
+                sErrorMessage = "Could not open current user registry key.";
+
+                return false;
+            }
+
+            bResult = s_DbAdapter.ReadSettings(RegKey, ref SettingsDict, ref sErrorMessage);
+
+            RegKey.Close();
+
+            return bResult;
+        }
+
+        public static System.Boolean WriteSettings(
+            System.Collections.Generic.Dictionary<System.String, System.Object> SettingsDict,
+            out System.String sErrorMessage)
+        {
+            Microsoft.Win32.RegistryKey RegKey;
+            System.Boolean bResult;
+
+            sErrorMessage = "";
+
+            if (s_DbAdapter == null)
+            {
+                sErrorMessage = "Unrecognized database adapter.";
+
+                return false;
+            }
+
+            RegKey = Common.Registry.OpenCurrentUserRegKey(s_sDatabaseRegistryKey, true);
+
+            if (RegKey == null)
+            {
+                return false;
+            }
+
+            bResult = s_DbAdapter.WriteSettings(RegKey, SettingsDict, ref sErrorMessage);
+
+            RegKey.Close();
+
+            return bResult;
         }
 
         /// <summary>
         /// Retrieves the default board part location.
         /// </summary>
 
-        public static System.String GetDefBoardPartLocation()
+        public static System.String DefBoardPartLocation
         {
-            return "Top (Parts)";
+            get
+            {
+                return "Top (Parts)";
+            }
         }
 
         /// <summary>
@@ -10522,82 +10586,9 @@ namespace Arcade
 
             return (System.Int32)List.GetValueList()[nIndex];
         }
-
-#if USE_DATABASE_PLUGIN
-        /// <summary>
-        /// Creates the database accessor from the given plugin.
-        /// </summary>
-
-        private static Common.Data.IDbAdapter CreateDatabasePlugin(
-            System.String sPlugin,
-            out System.String sErrorMessage)
-        {
-            System.Reflection.Assembly assembly;
-            System.Type[] types;
-            System.Object obj;
-
-            sErrorMessage = "";
-
-            try
-            {
-                assembly = System.Reflection.Assembly.LoadFile(sPlugin);
-            }
-
-            catch (System.Exception exception)
-            {
-                sErrorMessage = exception.Message;
-
-                return null;
-            }
-
-            try
-            {
-                types = assembly.GetExportedTypes();
-
-                for (System.Int32 nIndex = 0; nIndex < types.Length; ++nIndex)
-                {
-                    if (types[nIndex].IsClass == true &&
-                        types[nIndex].IsAbstract == false &&
-                        DoesDatabaseInterfaceExist(types[nIndex].GetInterfaces()))
-                    {
-                        obj = System.Activator.CreateInstance(types[nIndex], false);
-
-                        return (Common.Data.IDbAdapter)obj;
-                    }
-                }
-
-                sErrorMessage = "Object implementing the Common.Data.IDbAdapter interface was not found.";
-            }
-
-            catch (System.Exception exception)
-            {
-                sErrorMessage = exception.Message;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Checks if the database interface is present.
-        /// </summary>
-
-        private static System.Boolean DoesDatabaseInterfaceExist(
-            System.Type[] types)
-        {
-            foreach (System.Type Type in types)
-            {
-                if (Type == typeof(Common.Data.IDbAdapter))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-#endif
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2016 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

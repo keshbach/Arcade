@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2014 Kevin Eshbach
+//  Copyright (C) 2014-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -38,6 +38,34 @@ namespace Common
             virtual System::Boolean AddCommandParameter(System::Data::Common::DbCommand^ Command,
                                                         System::String^ sParameterName,
                                                         System::Object^ Value);
+            virtual System::Boolean ReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                 System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+                                                 System::String^% sErrorMessage);
+            virtual System::Boolean WriteSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                  System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+                                                  System::String^% sErrorMessage);
+
+        protected:
+            System::String^ ReadSetting(Microsoft::Win32::RegistryKey^ RegKey,
+                                        System::String^ sDatabaseRegKey,
+                                        System::String^ sSettingName,
+                                        System::String^ sDefaultValue);
+            System::UInt16 ReadSetting(Microsoft::Win32::RegistryKey^ RegKey,
+                                        System::String^ sDatabaseRegKey,
+                                        System::String^ sSettingName,
+                                        System::UInt16 nDefaultValue);
+
+            System::Boolean WriteSetting(Microsoft::Win32::RegistryKey^ RegKey, 
+                                         System::String^ sDatabaseRegKey,
+                                         System::String^ sSettingName,
+                                         System::String^ sSettingValue);
+            System::Boolean WriteSetting(Microsoft::Win32::RegistryKey^ RegKey,
+                                         System::String^ sDatabaseRegKey,
+                                         System::String^ sSettingName,
+                                         System::UInt16 nSettingValue);
+
+            System::String^ EncryptString(System::String^ sData);
+            System::String^ DecryptString(System::String^ sData);
 
         private:
             System::Boolean Close(System::String^% sErrorMessage);
@@ -68,5 +96,5 @@ namespace Common
 };
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2014 Kevin Eshbach
+//  Copyright (C) 2014-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

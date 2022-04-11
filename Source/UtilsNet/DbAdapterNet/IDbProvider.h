@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2015 Kevin Eshbach
+//  Copyright (C) 2014-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -30,10 +30,16 @@ namespace Common
             virtual System::Boolean ProvideAddCommandParameter(System::Data::Common::DbCommand^ Command,
                                                                System::String^ sParameterName,
                                                                System::Object^ Value);
+            virtual System::Boolean ProvideReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                        System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+                                                        System::String^% sErrorMessage);
+            virtual System::Boolean ProvideWriteSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                         System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+                                                         System::String^% sErrorMessage);
         };
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2015 Kevin Eshbach
+//  Copyright (C) 2014-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -17,6 +17,7 @@
 #define CRegistryKey L"Software\\Kevin Eshbach\\ArcadeApp\\3.00"
 
 #define CFormLocationsName L"FormLocations"
+#define CDatabaseName L"Database"
 
 #pragma endregion
 
@@ -24,26 +25,41 @@ Arcade::Application::Startup::Startup()
 {
 }
 
-System::UInt32 Arcade::Application::Startup::Execute()
+System::UInt32 Arcade::Application::Startup::Execute(
+  EDatabaseMode DatabaseMode)
 {
-	System::String^ sFormLocationsRegistryKey = System::String::Format(L"{0}\\{1}", CRegistryKey, CFormLocationsName);
+    System::String^ sFormLocationsRegistryKey = System::String::Format(L"{0}\\{1}", CRegistryKey, CFormLocationsName);
+    System::String^ sDatabaseRegistryKey = System::String::Format(L"{0}\\{1}", CRegistryKey, CDatabaseName);
     Arcade::Forms::MainForm^ AppForm;
+    Arcade::Forms::MainForm::DatabaseMode MainFormDatabaseMode;
 
-	if (!Common::IO::TempFileManager::Initialize())
-	{
-	}
+    switch (DatabaseMode)
+    {
+        case Arcade::Application::Startup::EDatabaseMode::Access:
+            MainFormDatabaseMode = Arcade::Forms::MainForm::DatabaseMode::Access;
+            break;
+        case Arcade::Application::Startup::EDatabaseMode::SQLServer:
+        default:
+            MainFormDatabaseMode = Arcade::Forms::MainForm::DatabaseMode::SQLServer;
+            break;
+    }
+
+    if (!Common::IO::TempFileManager::Initialize())
+    {
+    }
 
     try
     {
         System::Windows::Forms::Application::EnableVisualStyles();
         System::Windows::Forms::Application::SetCompatibleTextRenderingDefault(false);
 
-        AppForm = gcnew Arcade::Forms::MainForm(CRegistryKey, sFormLocationsRegistryKey);
+        AppForm = gcnew Arcade::Forms::MainForm(CRegistryKey, sFormLocationsRegistryKey, sDatabaseRegistryKey,
+                                                MainFormDatabaseMode);
 
-		gcnew Common::Forms::FormLocation(AppForm, sFormLocationsRegistryKey);
+        gcnew Common::Forms::FormLocation(AppForm, sFormLocationsRegistryKey);
 
         Common::Forms::Application::Run(AppForm);
-	}
+    }
     catch (System::Exception^ exception)
     {
         System::String^ sMsg;
@@ -57,13 +73,13 @@ System::UInt32 Arcade::Application::Startup::Execute()
             System::Windows::Forms::MessageBoxIcon::Error);
     }
 
-	if (!Common::IO::TempFileManager::Uninitialize())
-	{
-	}
+    if (!Common::IO::TempFileManager::Uninitialize())
+    {
+    }
 
     return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

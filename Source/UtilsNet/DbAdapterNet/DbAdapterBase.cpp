@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2014 Kevin Eshbach
+//  Copyright (C) 2014-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -10,7 +10,25 @@
 
 #include "DbAdapterBase.h"
 
+#include <UtilsNet/Includes/UtDbAdapterMacros.h>
+
 #define CMaxConnectionsAllowed 4
+
+static array<System::Byte>^ lGetEncryptionKey()
+{
+    array<System::Byte>^ Key = {0x06, 0x66, 0xba, 0x9a, 0xad, 0x7c, 0xf2, 0x72,
+                                0x3d, 0xab, 0x34, 0xc3, 0xb2, 0xa1, 0x57, 0x0f};
+
+    return Key;
+}
+
+static array<System::Byte>^ lGetEncryptionIV() 
+{
+    array<System::Byte>^ IV = {0x09, 0x07, 0x12, 0x8a, 0x76, 0x69, 0xda, 0x82,
+                               0x1a, 0xe3, 0xbe, 0xcd, 0x02, 0x9a, 0x3c, 0xbb};
+
+    return IV;
+}
 
 Common::Data::DbAdapterBase::DbAdapterBase()
 {
@@ -277,13 +295,246 @@ System::Boolean Common::Data::DbAdapterBase::GetUpdateWithParameterizedSubQueryS
 }
 
 System::Boolean Common::Data::DbAdapterBase::AddCommandParameter(
-    System::Data::Common::DbCommand^ Command,
-    System::String^ sParameterName,
-    System::Object^ Value)
+  System::Data::Common::DbCommand^ Command,
+  System::String^ sParameterName,
+  System::Object^ Value)
 {
     Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
 
     return pProvider->ProvideAddCommandParameter(Command, sParameterName, Value);
+}
+
+System::Boolean Common::Data::DbAdapterBase::ReadSettings(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+  System::String^% sErrorMessage)
+{
+    Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
+
+    return pProvider->ProvideReadSettings(RegKey, SettingsDict, sErrorMessage);
+}
+
+System::Boolean Common::Data::DbAdapterBase::WriteSettings(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+  System::String^% sErrorMessage)
+{
+    Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
+
+    return pProvider->ProvideWriteSettings(RegKey, SettingsDict, sErrorMessage);
+}
+
+System::String^ Common::Data::DbAdapterBase::ReadSetting(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::String^ sDatabaseRegKey,
+  System::String^ sSettingName,
+  System::String^ sDefaultValue)
+{
+    Microsoft::Win32::RegistryKey^ DatabaseRegKey = RegKey->OpenSubKey(sDatabaseRegKey, false);
+    System::Object^ value;
+
+    if (DatabaseRegKey == nullptr)
+    {
+        return sDefaultValue;
+    }
+
+    value = DatabaseRegKey->GetValue(sSettingName, sDefaultValue);
+
+    DatabaseRegKey->Close();
+
+    if (value->GetType() == System::String::typeid)
+    {
+        return (System::String^)value;
+    }
+
+    return sDefaultValue;
+}
+
+System::UInt16 Common::Data::DbAdapterBase::ReadSetting(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::String^ sDatabaseRegKey,
+  System::String^ sSettingName,
+  System::UInt16 nDefaultValue)
+{
+    Microsoft::Win32::RegistryKey^ DatabaseRegKey = RegKey->OpenSubKey(sDatabaseRegKey, false);
+    System::Object^ value;
+
+    if (DatabaseRegKey == nullptr)
+    {
+        return nDefaultValue;
+    }
+
+    value = DatabaseRegKey->GetValue(sSettingName, nDefaultValue);
+
+    DatabaseRegKey->Close();
+
+    if (value->GetType() == System::Int32::typeid)
+    {
+        return System::Convert::ToUInt16((System::Int32)value);
+    }
+
+    return nDefaultValue;
+}
+
+System::Boolean Common::Data::DbAdapterBase::WriteSetting(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::String^ sDatabaseRegKey,
+  System::String^ sSettingName,
+  System::String^ sSettingValue)
+{
+    System::Boolean bResult = true;
+    Microsoft::Win32::RegistryKey^ DatabaseRegKey = RegKey->CreateSubKey(sDatabaseRegKey);
+
+    if (DatabaseRegKey == nullptr)
+    {
+        return false;
+    }
+
+    try
+    {
+        DatabaseRegKey->SetValue(sSettingName, sSettingValue, Microsoft::Win32::RegistryValueKind::String);
+    }
+    catch (System::Exception^)
+    {
+        bResult = false;
+    }
+
+    DatabaseRegKey->Close();
+
+    return bResult;
+}
+
+System::Boolean Common::Data::DbAdapterBase::WriteSetting(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::String^ sDatabaseRegKey,
+  System::String^ sSettingName,
+  System::UInt16 nSettingValue)
+{
+    System::Boolean bResult = true;
+    Microsoft::Win32::RegistryKey^ DatabaseRegKey = RegKey->CreateSubKey(sDatabaseRegKey);
+
+    if (DatabaseRegKey == nullptr)
+    {
+        return false;
+    }
+
+    try
+    {
+        DatabaseRegKey->SetValue(sSettingName, nSettingValue, Microsoft::Win32::RegistryValueKind::DWord);
+    }
+    catch (System::Exception^)
+    {
+        bResult = false;
+    }
+
+    DatabaseRegKey->Close();
+
+    return bResult;
+}
+
+System::String^ Common::Data::DbAdapterBase::EncryptString(
+  System::String^ sData)
+{
+    array<System::Byte>^ Data = System::Text::UTF8Encoding::UTF8->GetBytes(sData);
+    System::Security::Cryptography::Aes^ Aes = nullptr;
+    System::IO::MemoryStream^ MemoryStream = nullptr;
+    System::Security::Cryptography::CryptoStream^ CryptoStream = nullptr;
+    System::String^ sEncryptedData = nullptr;
+
+    try
+    {
+        Aes = System::Security::Cryptography::Aes::Create();
+
+        Aes->Key = lGetEncryptionKey();
+        Aes->IV = lGetEncryptionIV();
+
+        MemoryStream = gcnew System::IO::MemoryStream();
+
+        CryptoStream = gcnew System::Security::Cryptography::CryptoStream(MemoryStream,
+                                                                          Aes->CreateEncryptor(),
+                                                                          System::Security::Cryptography::CryptoStreamMode::Write);
+
+        CryptoStream->Write(Data, 0, Data->Length);
+        CryptoStream->FlushFinalBlock();
+
+        sEncryptedData = System::Convert::ToBase64String(MemoryStream->ToArray());
+    }
+    catch (System::Exception^)
+    {
+    }
+
+    if (Aes != nullptr)
+    {
+        delete Aes;
+    }
+
+    if (MemoryStream != nullptr)
+    {
+        MemoryStream->Close();
+
+        delete MemoryStream;
+    }
+
+    if (CryptoStream != nullptr)
+    {
+        CryptoStream->Close();
+
+        delete CryptoStream;
+    }
+
+    return sEncryptedData;
+}
+
+System::String^ Common::Data::DbAdapterBase::DecryptString(
+  System::String^ sData)
+{
+    array<System::Byte>^ Data = System::Convert::FromBase64String(sData);
+    System::Security::Cryptography::Aes^ Aes = nullptr;
+    System::IO::MemoryStream^ MemoryStream = nullptr;
+    System::Security::Cryptography::CryptoStream^ CryptoStream = nullptr;
+    System::String^ sDecryptedData = nullptr;
+
+    try
+    {
+        Aes = System::Security::Cryptography::Aes::Create();
+
+        Aes->Key = lGetEncryptionKey();
+        Aes->IV = lGetEncryptionIV();
+
+        MemoryStream = gcnew System::IO::MemoryStream();
+
+        CryptoStream = gcnew System::Security::Cryptography::CryptoStream(MemoryStream,
+                                                                          Aes->CreateDecryptor(),
+                                                                          System::Security::Cryptography::CryptoStreamMode::Write);
+        CryptoStream->Write(Data, 0, Data->Length);
+        CryptoStream->FlushFinalBlock();
+
+        sDecryptedData = System::Text::Encoding::UTF8->GetString(MemoryStream->ToArray());
+    }
+    catch (System::Exception^)
+    {
+    }
+
+    if (Aes != nullptr)
+    {
+        delete Aes;
+    }
+
+    if (MemoryStream != nullptr)
+    {
+        MemoryStream->Close();
+
+        delete MemoryStream;
+    }
+
+    if (CryptoStream != nullptr)
+    {
+        CryptoStream->Close();
+
+        delete CryptoStream;
+    }
+
+    return sDecryptedData;
 }
 
 System::Boolean Common::Data::DbAdapterBase::Close(
@@ -409,5 +660,5 @@ void Common::Data::DbAdapterBase::CopySchema(
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2014 Kevin Eshbach
+//  Copyright (C) 2014-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

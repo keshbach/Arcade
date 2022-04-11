@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2014 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -173,7 +173,7 @@ namespace Arcade
                     case EBoardPartEntryFormType.AddBoardPart:
                         Text = "Add...";
 
-                        m_sPartLocation = Database.GetDefBoardPartLocation();
+                        m_sPartLocation = Database.DefBoardPartLocation;
 
                         buttonOK.Enabled = false;
                         break;
@@ -367,5 +367,5 @@ namespace Arcade
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2014 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

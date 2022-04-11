@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2008-2015 Kevin Eshbach
+//  Copyright (C) 2008-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -20,6 +20,7 @@ namespace Common
             /// On return will contain a message if an error occurred.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean Initialize(Microsoft::Win32::RegistryKey^ RegKey,
                                                System::String^% sErrorMessage);
@@ -30,6 +31,7 @@ namespace Common
             /// On return will contain a message if an error occurred.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean Uninitialize(System::String^% sErrorMessage);
 
@@ -42,6 +44,7 @@ namespace Common
             /// On return will contain a message if an error occurred.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean AllocConnection(System::Data::Common::DbConnection^% Connection,
                                                     System::String^% sErrorMessage);
@@ -55,6 +58,7 @@ namespace Common
             /// On return will contain a message if an error occurred.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean FreeConnection(System::Data::Common::DbConnection^ Connection,
                                                    System::String^% sErrorMessage);
@@ -71,6 +75,7 @@ namespace Common
             /// On return will contain a message if an error occurred.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean GetIdentityValue(System::Data::Common::DbCommand^ Command,
                                                      System::Int32% nIdentity,
@@ -88,6 +93,7 @@ namespace Common
             /// On return will contain a message if an error occurred.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean GetTableSchema(System::String^ sTableName,
                                                    System::Collections::Generic::List<Common::Data::DbTableColumn^>^% TableColumnList,
@@ -99,6 +105,7 @@ namespace Common
             /// Boolean value.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::String^ GetSQLBooleanValue(System::Boolean bValue);
 
@@ -111,6 +118,7 @@ namespace Common
             /// On return will contain a message if an error occurred.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean GetSnapshotIsolationSupported(System::Boolean% bSnapshotSupported,
                                                                   System::String^% sErrorMessage);
@@ -118,6 +126,7 @@ namespace Common
             /// <summary>
             /// Retrieves if the database supports using an parameter in a subquery of an update statement.
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean GetUpdateWithParameterizedSubQuerySupported();
 
@@ -133,14 +142,47 @@ namespace Common
             /// The value of the parameter.
             /// </param>
             /// </summary>
+            /// <returns></returns>
 
             virtual System::Boolean AddCommandParameter(System::Data::Common::DbCommand^ Command,
                                                         System::String^ sParameterName,
                                                         System::Object^ Value);
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="RegKey">
+            /// Registry key to read the database settings from.
+            /// </param>
+            /// <param name="SettingsDict"></param>
+            /// <param name="sErrorMessage">
+            /// On return will contain a message if an error occurred.
+            /// </param>
+            /// <returns></returns>
+
+            virtual System::Boolean ReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                 System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+                                                 System::String^% sErrorMessage);
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="RegKey">
+            /// Registry key to read the database settings from.
+            /// </param>
+            /// <param name="SettingsDict"></param>
+            /// <param name="sErrorMessage">
+            /// On return will contain a message if an error occurred.
+            /// </param>
+            /// <returns></returns>
+ 
+            virtual System::Boolean WriteSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                  System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+                                                  System::String^% sErrorMessage);
         };
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2008-2015 Kevin Eshbach
+//  Copyright (C) 2008-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

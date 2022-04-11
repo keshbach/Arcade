@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2008-2014 Kevin Eshbach
+//  Copyright (C) 2008-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -9,51 +9,46 @@
 #include "LoggedInUser.h"
 #include "MSAccess.h"
 
+#include <UtilsNet/Includes/UtDbAdapterMacros.h>
+
+#pragma region "Constants"
+
+#define CAccessRegKeyName L"Access"
+
 #define CDatabaseRegValueName L"Database"
+
+#pragma endregion
 
 Common::Data::DbAdapterAccess::DbAdapterAccess()
 {
-}
-
-System::Boolean Common::Data::DbAdapterAccess::SaveSettings(
-  Microsoft::Win32::RegistryKey^ RegKey,
-  System::String^ sDatabaseFile)
-{
-	System::Boolean bResult = false;
-
-	try
-	{
-		RegKey->SetValue(CDatabaseRegValueName, sDatabaseFile,
-			             Microsoft::Win32::RegistryValueKind::String);
-
-		bResult = true;
-	}
-	catch (System::Exception^)
-	{
-	}
-
-	return bResult;
 }
 
 System::Boolean Common::Data::DbAdapterAccess::ReadSettings(
   Microsoft::Win32::RegistryKey^ RegKey,
   System::String^% sDatabaseFile)
 {
-	System::Boolean bResult = false;
+    System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict;
+    System::Collections::IDictionaryEnumerator^ DictEnum;
+    System::String^ sErrorMessage;
 
-	sDatabaseFile = L"";
+    sDatabaseFile = L"";
+    
+    if (!ReadSettings(RegKey, SettingsDict, sErrorMessage))
+    {
+        return false;
+    }
 
-	try
-	{
-		sDatabaseFile = (System::String^)RegKey->GetValue(CDatabaseRegValueName);
+    DictEnum = SettingsDict->GetEnumerator();
 
-		bResult = true;
-	}
-	catch (System::Exception^)
-	{
-	}
+    while (DictEnum->MoveNext())
+    {
+        if ((System::String^)DictEnum->Key == CDatabaseRegValueName)
+        {
+            sDatabaseFile = (System::String^)DictEnum->Value;
+        }
+    }
 
-	return bResult;
+    return true;
 }
 
 System::Boolean Common::Data::DbAdapterAccess::InitDatabase(
@@ -169,6 +164,34 @@ System::Boolean Common::Data::DbAdapterAccess::ProvideAddCommandParameter(
     return true;
 }
 
+System::Boolean Common::Data::DbAdapterAccess::ProvideReadSettings(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+  System::String^% sErrorMessage)
+{
+    SettingsDict = gcnew System::Collections::Generic::Dictionary<System::String^, System::Object^>();
+
+    sErrorMessage = "";
+
+    MDatabaseAdapterReadDictionarySetting(SettingsDict, CAccessRegKeyName, RegKey, CDatabaseRegValueName, "");
+
+    return true;
+}
+
+System::Boolean Common::Data::DbAdapterAccess::ProvideWriteSettings(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+  System::String^% sErrorMessage)
+{
+    sErrorMessage = "";
+
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CDatabaseRegValueName, System::String, sErrorMessage)
+
+    MDatabaseAdapterWriteDictionarySetting(SettingsDict, CAccessRegKeyName, RegKey, CDatabaseRegValueName, sErrorMessage)
+
+    return true;
+}
+
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2008-2014 Kevin Eshbach
+//  Copyright (C) 2008-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

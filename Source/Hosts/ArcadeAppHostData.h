@@ -1,9 +1,12 @@
 /***************************************************************************/
-/*  Copyright (C) 2019-2021 Kevin Eshbach                                  */
+/*  Copyright (C) 2019-202 Kevin Eshbach                                  */
 /***************************************************************************/
 
 #if !defined(ArcadeAppHostData_H)
 #define ArcadeAppHostData_H
+
+#define CArcadeAppHostDataAccessDatabaseMode 0x01
+#define CArcadeAppHostDataSQLServerDatabaseMode 0x02
 
 #if defined(_MSC_VER)
 #if defined(_X86_)
@@ -19,6 +22,7 @@
 
 typedef struct tagTArcadeAppHostData
 {
+    INT nDatabaseMode;
     DWORD dwExitCode;
 } TArcadeAppHostData;
 
@@ -31,5 +35,5 @@ typedef struct tagTArcadeAppHostData
 #endif /* end of ArcadeAppHostData_H */
 
 /***************************************************************************/
-/*  Copyright (C) 2019-2021 Kevin Eshbach                                  */
+/*  Copyright (C) 2019-2022 Kevin Eshbach                                  */
 /***************************************************************************/

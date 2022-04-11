@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2008-2014 Kevin Eshbach
+//  Copyright (C) 2008-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -19,9 +19,6 @@ namespace Common
         public:
             DbAdapterAccess();
 
-            static System::Boolean SaveSettings(Microsoft::Win32::RegistryKey^ RegKey,
-                                                System::String^ sDatabaseFile);
-
             // Common::Data::IDbProvider overrides
         public:
             virtual System::Boolean InitDatabase(Microsoft::Win32::RegistryKey^ RegKey,
@@ -40,10 +37,16 @@ namespace Common
             virtual System::Boolean ProvideAddCommandParameter(System::Data::Common::DbCommand^ Command,
                                                                System::String^ sParameterName,
                                                                System::Object^ Value);
+            virtual System::Boolean ProvideReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                        System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+                                                        System::String^% sErrorMessage);
+            virtual System::Boolean ProvideWriteSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                         System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+                                                         System::String^% sErrorMessage);
 
         private:
-            static System::Boolean ReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
-                                                System::String^% sDatabaseFile);
+            System::Boolean ReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                         System::String^% sDatabaseFile);
 
         private:
             System::String^ m_sDatabaseFile;
@@ -52,5 +55,5 @@ namespace Common
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2008-2014 Kevin Eshbach
+//  Copyright (C) 2008-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

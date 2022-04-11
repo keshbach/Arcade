@@ -23,11 +23,19 @@ namespace Arcade
             #endregion
 
             #region "Enumerations"
+
+            public enum DatabaseMode
+            {
+                Access,
+                SQLServer
+            }
+
             private enum State
             {
                 Initialize,
                 Initializing,
-                InitializatedSuccess,
+                InitializatedSuccessDatabaseAvailable,
+                InitializatedSuccessDatabaseNotAvailable,
                 InitializatedFailed,
                 Running,
                 Uninitializing,
@@ -39,6 +47,9 @@ namespace Arcade
             #region "Member Variables"
             private System.String m_sRegistryKey;
             private System.String m_sFormLocationsRegistryKey;
+            private System.String m_sDatabaseRegistryKey;
+
+            private DatabaseMode m_DatabaseMode;
 
             private State m_State = State.Initialize;
 
@@ -54,10 +65,14 @@ namespace Arcade
 
             public MainForm(
                 System.String sRegistryKey,
-                System.String sFormLocationsRegistryKey)
+                System.String sFormLocationsRegistryKey,
+                System.String sDatabaseRegistryKey,
+                DatabaseMode DatabaseMode)
             {
                 m_sRegistryKey = sRegistryKey;
                 m_sFormLocationsRegistryKey = sFormLocationsRegistryKey;
+                m_sDatabaseRegistryKey = sDatabaseRegistryKey;
+                m_DatabaseMode = DatabaseMode;
 
                 m_DelegateUpdateState = new DelegateUpdateState(OnUpdateState);
                 m_DelegateLogMessage = new DelegateLogMessage(OnLogMessage);
@@ -69,6 +84,16 @@ namespace Arcade
             #region "MainForm Event Handlers"
             private void MainForm_Load(object sender, EventArgs e)
             {
+                switch (m_DatabaseMode)
+                {
+                    case DatabaseMode.Access:
+                        toolStripDatabaseModeStatusLabel.Text = "Access";
+                        break;
+                    case DatabaseMode.SQLServer:
+                        toolStripDatabaseModeStatusLabel.Text = "SQL Server";
+                        break;
+                }
+
                 InitImageLists();
                 InitImageKeys();
 
@@ -489,6 +514,17 @@ namespace Arcade
                 ListData.Dispose();
             }
 
+            private void menuToolsOptions_Click(object sender, EventArgs e)
+            {
+                OptionsForm Options = new OptionsForm();
+
+                new Common.Forms.FormLocation(Options, m_sFormLocationsRegistryKey);
+
+                Options.ShowDialog(this);
+
+                Options.Dispose();
+            }
+
             private void menuHelpAbout_Click(object sender, EventArgs e)
             {
                 AboutForm About = new AboutForm();
@@ -528,6 +564,10 @@ namespace Arcade
             private void OnUpdateState(State State)
             {
                 System.Windows.Forms.ToolStripItem[] NoneExcludedMenuItems = { };
+                System.Windows.Forms.ToolStripItem[] InitSuccessfulDatabaseNotAvailableExcludedMenuItems = {
+                    menuItemFileExit,
+                    menuItemToolsOptions,
+                    menuItemHelpAbout};
                 System.Windows.Forms.ToolStripItem[] InitFailedExcludedMenuItems = {
                     menuItemFileExit,
                     menuItemHelpAbout};
@@ -542,8 +582,19 @@ namespace Arcade
 
                         m_bAllowClose = false;
                         break;
-                    case State.InitializatedSuccess:
+                    case State.InitializatedSuccessDatabaseAvailable:
                         menuAppStrip.RestoreItemsEnableState();
+
+                        toolStripDatabaseConnectionStatusLabel.Text = "Connected";
+
+                        m_State = State.Running;
+                        m_bAllowClose = true;
+                        break;
+                    case State.InitializatedSuccessDatabaseNotAvailable:
+                        menuAppStrip.RestoreItemsEnableState();
+                        menuAppStrip.DisableAllItems(InitSuccessfulDatabaseNotAvailableExcludedMenuItems);
+
+                        toolStripDatabaseConnectionStatusLabel.Text = "Not Connected";
 
                         m_State = State.Running;
                         m_bAllowClose = true;
@@ -551,6 +602,8 @@ namespace Arcade
                     case State.InitializatedFailed:
                         menuAppStrip.RestoreItemsEnableState();
                         menuAppStrip.DisableAllItems(InitFailedExcludedMenuItems);
+
+                        toolStripDatabaseConnectionStatusLabel.Text = "Failed";
 
                         m_State = State.Running;
                         m_bAllowClose = true;
@@ -613,20 +666,42 @@ namespace Arcade
             private void InitDatabaseThreadProc(object obj)
             {
                 System.String sErrorMessage;
+                Database.EDatabaseAdapter DatabaseAdapter;
+                System.Boolean bDatabaseAvailable;
 
                 UpdateState(State.Initializing);
 
                 LogMessage("Initializing the database.");
 
-                if (Database.Init(m_sRegistryKey, out sErrorMessage))
+                switch (m_DatabaseMode)
                 {
-                    LogMessage("Finished initializing the database.");
+                    case DatabaseMode.Access:
+                        DatabaseAdapter = Database.EDatabaseAdapter.Access;
+                        break;
+                    case DatabaseMode.SQLServer:
+                    default:
+                        DatabaseAdapter = Database.EDatabaseAdapter.SQLServer;
+                        break;
+                }
 
-                    UpdateState(State.InitializatedSuccess);
+                if (Database.Init(DatabaseAdapter, m_sDatabaseRegistryKey, out bDatabaseAvailable, out sErrorMessage))
+                {
+                    if (bDatabaseAvailable)
+                    {
+                        LogMessage("Finished initializing the database.");
+
+                        UpdateState(State.InitializatedSuccessDatabaseAvailable);
+                    }
+                    else
+                    {
+                        LogMessage("Finished initializing but the database is not available.");
+
+                        UpdateState(State.InitializatedSuccessDatabaseNotAvailable);
+                    }
                 }
                 else
                 {
-                    LogMessage("Could not initialize the database.");
+                    LogMessage("Failed to initialize the database.");
                     LogMessage(sErrorMessage);
 
                     UpdateState(State.InitializatedFailed);

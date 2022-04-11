@@ -74,16 +74,21 @@ namespace Arcade
             this.menuItemDisplaysResolutionList = new Common.Forms.ToolStripMenuItem();
             this.menuItemDisplaysColorsList = new Common.Forms.ToolStripMenuItem();
             this.menuItemDisplaysOrientationList = new Common.Forms.ToolStripMenuItem();
+            this.menuItemTools = new Common.Forms.ToolStripMenuItem();
+            this.menuItemToolsOptions = new Common.Forms.ToolStripMenuItem();
             this.menuItemHelp = new Common.Forms.ToolStripMenuItem();
             this.menuItemHelpAbout = new Common.Forms.ToolStripMenuItem();
             this.statusStrip = new Common.Forms.StatusStrip();
+            this.toolStripDatabaseModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.textBoxMessages = new System.Windows.Forms.TextBox();
             this.contextMenuMessageWindowStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuItemCopy = new Common.Forms.ToolStripMenuItem();
             this.contextMenuItemDelete = new Common.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.contextMenuItemSelectAll = new Common.Forms.ToolStripMenuItem();
+            this.toolStripDatabaseConnectionStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuAppStrip.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.contextMenuMessageWindowStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -96,10 +101,11 @@ namespace Arcade
             this.menuItemManuals,
             this.menuItemGames,
             this.menuItemDisplays,
+            this.menuItemTools,
             this.menuItemHelp});
             this.menuAppStrip.Location = new System.Drawing.Point(0, 0);
             this.menuAppStrip.Name = "menuAppStrip";
-            this.menuAppStrip.Size = new System.Drawing.Size(384, 24);
+            this.menuAppStrip.Size = new System.Drawing.Size(430, 24);
             this.menuAppStrip.TabIndex = 0;
             this.menuAppStrip.Text = "menuAppStrip";
             // 
@@ -138,7 +144,7 @@ namespace Arcade
             this.menuItemEditCopy.HelpText = "Copy the selected message(s) into the clipboard.";
             this.menuItemEditCopy.Name = "menuItemEditCopy";
             this.menuItemEditCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.menuItemEditCopy.Size = new System.Drawing.Size(180, 22);
+            this.menuItemEditCopy.Size = new System.Drawing.Size(164, 22);
             this.menuItemEditCopy.Text = "&Copy";
             this.menuItemEditCopy.Click += new System.EventHandler(this.menuItemEditCopy_Click);
             // 
@@ -147,21 +153,21 @@ namespace Arcade
             this.menuItemEditDelete.HelpText = "Remove all messages.";
             this.menuItemEditDelete.Name = "menuItemEditDelete";
             this.menuItemEditDelete.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.menuItemEditDelete.Size = new System.Drawing.Size(180, 22);
+            this.menuItemEditDelete.Size = new System.Drawing.Size(164, 22);
             this.menuItemEditDelete.Text = "&Delete";
             this.menuItemEditDelete.Click += new System.EventHandler(this.menuItemEditDelete_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(161, 6);
             // 
             // menuItemEditSelectAll
             // 
             this.menuItemEditSelectAll.HelpText = "Select all messages.";
             this.menuItemEditSelectAll.Name = "menuItemEditSelectAll";
             this.menuItemEditSelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.menuItemEditSelectAll.Size = new System.Drawing.Size(180, 22);
+            this.menuItemEditSelectAll.Size = new System.Drawing.Size(164, 22);
             this.menuItemEditSelectAll.Text = "Select &All";
             this.menuItemEditSelectAll.Click += new System.EventHandler(this.menuItemEditSelectAll_Click);
             // 
@@ -183,7 +189,7 @@ namespace Arcade
             // 
             this.menuItemPartsFind.HelpText = null;
             this.menuItemPartsFind.Name = "menuItemPartsFind";
-            this.menuItemPartsFind.Size = new System.Drawing.Size(180, 22);
+            this.menuItemPartsFind.Size = new System.Drawing.Size(152, 22);
             this.menuItemPartsFind.Text = "&Find...";
             this.menuItemPartsFind.Click += new System.EventHandler(this.menuPartsFind_Click);
             // 
@@ -191,20 +197,20 @@ namespace Arcade
             // 
             this.menuItemPartsNewPart.HelpText = null;
             this.menuItemPartsNewPart.Name = "menuItemPartsNewPart";
-            this.menuItemPartsNewPart.Size = new System.Drawing.Size(180, 22);
+            this.menuItemPartsNewPart.Size = new System.Drawing.Size(152, 22);
             this.menuItemPartsNewPart.Text = "&New Part...";
             this.menuItemPartsNewPart.Click += new System.EventHandler(this.menuPartsNewPart_Click);
             // 
             // dividerToolStripMenuItem
             // 
             this.dividerToolStripMenuItem.Name = "dividerToolStripMenuItem";
-            this.dividerToolStripMenuItem.Size = new System.Drawing.Size(177, 6);
+            this.dividerToolStripMenuItem.Size = new System.Drawing.Size(149, 6);
             // 
             // menuItemPartsCategoryList
             // 
             this.menuItemPartsCategoryList.HelpText = null;
             this.menuItemPartsCategoryList.Name = "menuItemPartsCategoryList";
-            this.menuItemPartsCategoryList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemPartsCategoryList.Size = new System.Drawing.Size(152, 22);
             this.menuItemPartsCategoryList.Text = "&Category List...";
             this.menuItemPartsCategoryList.Click += new System.EventHandler(this.menuPartsCategoryList_Click);
             // 
@@ -212,7 +218,7 @@ namespace Arcade
             // 
             this.menuItemPartsTypeList.HelpText = null;
             this.menuItemPartsTypeList.Name = "menuItemPartsTypeList";
-            this.menuItemPartsTypeList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemPartsTypeList.Size = new System.Drawing.Size(152, 22);
             this.menuItemPartsTypeList.Text = "&Type List...";
             this.menuItemPartsTypeList.Click += new System.EventHandler(this.menuPartsTypeList_Click);
             // 
@@ -220,7 +226,7 @@ namespace Arcade
             // 
             this.menuItemPartsPackageList.HelpText = null;
             this.menuItemPartsPackageList.Name = "menuItemPartsPackageList";
-            this.menuItemPartsPackageList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemPartsPackageList.Size = new System.Drawing.Size(152, 22);
             this.menuItemPartsPackageList.Text = "&Package List...";
             this.menuItemPartsPackageList.Click += new System.EventHandler(this.menuPartsPackageList_Click);
             // 
@@ -242,20 +248,20 @@ namespace Arcade
             // 
             this.menuItemManualsFind.HelpText = null;
             this.menuItemManualsFind.Name = "menuItemManualsFind";
-            this.menuItemManualsFind.Size = new System.Drawing.Size(180, 22);
+            this.menuItemManualsFind.Size = new System.Drawing.Size(176, 22);
             this.menuItemManualsFind.Text = "&Find...";
             this.menuItemManualsFind.Click += new System.EventHandler(this.menuManualsFind_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(173, 6);
             // 
             // menuItemManualsStorageBox
             // 
             this.menuItemManualsStorageBox.HelpText = null;
             this.menuItemManualsStorageBox.Name = "menuItemManualsStorageBox";
-            this.menuItemManualsStorageBox.Size = new System.Drawing.Size(180, 22);
+            this.menuItemManualsStorageBox.Size = new System.Drawing.Size(176, 22);
             this.menuItemManualsStorageBox.Text = "&Storage Box List...";
             this.menuItemManualsStorageBox.Click += new System.EventHandler(this.menuManualsStorageBox_Click);
             // 
@@ -263,7 +269,7 @@ namespace Arcade
             // 
             this.menuItemManualsPrintEdition.HelpText = null;
             this.menuItemManualsPrintEdition.Name = "menuItemManualsPrintEdition";
-            this.menuItemManualsPrintEdition.Size = new System.Drawing.Size(180, 22);
+            this.menuItemManualsPrintEdition.Size = new System.Drawing.Size(176, 22);
             this.menuItemManualsPrintEdition.Text = "&Print Edition List...";
             this.menuItemManualsPrintEdition.Click += new System.EventHandler(this.menuManualsPrintEdition_Click);
             // 
@@ -271,7 +277,7 @@ namespace Arcade
             // 
             this.menuItemManualsCondition.HelpText = null;
             this.menuItemManualsCondition.Name = "menuItemManualsCondition";
-            this.menuItemManualsCondition.Size = new System.Drawing.Size(180, 22);
+            this.menuItemManualsCondition.Size = new System.Drawing.Size(176, 22);
             this.menuItemManualsCondition.Text = "&Condition List...";
             this.menuItemManualsCondition.Click += new System.EventHandler(this.menuManualsCondition_Click);
             // 
@@ -279,7 +285,7 @@ namespace Arcade
             // 
             this.menuItemManualsManufacturerList.HelpText = null;
             this.menuItemManualsManufacturerList.Name = "menuItemManualsManufacturerList";
-            this.menuItemManualsManufacturerList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemManualsManufacturerList.Size = new System.Drawing.Size(176, 22);
             this.menuItemManualsManufacturerList.Text = "&Manufacturer List...";
             this.menuItemManualsManufacturerList.Click += new System.EventHandler(this.menuManualsManufacturerList_Click);
             // 
@@ -414,20 +420,20 @@ namespace Arcade
             // 
             this.menuItemDisplaysFind.HelpText = null;
             this.menuItemDisplaysFind.Name = "menuItemDisplaysFind";
-            this.menuItemDisplaysFind.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDisplaysFind.Size = new System.Drawing.Size(164, 22);
             this.menuItemDisplaysFind.Text = "&Find...";
             this.menuItemDisplaysFind.Click += new System.EventHandler(this.menuDisplaysFind_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(161, 6);
             // 
             // menuItemDisplaysTypeList
             // 
             this.menuItemDisplaysTypeList.HelpText = null;
             this.menuItemDisplaysTypeList.Name = "menuItemDisplaysTypeList";
-            this.menuItemDisplaysTypeList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDisplaysTypeList.Size = new System.Drawing.Size(164, 22);
             this.menuItemDisplaysTypeList.Text = "&Type List...";
             this.menuItemDisplaysTypeList.Click += new System.EventHandler(this.menuDisplaysTypeList_Click);
             // 
@@ -435,7 +441,7 @@ namespace Arcade
             // 
             this.menuItemDisplaysResolutionList.HelpText = null;
             this.menuItemDisplaysResolutionList.Name = "menuItemDisplaysResolutionList";
-            this.menuItemDisplaysResolutionList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDisplaysResolutionList.Size = new System.Drawing.Size(164, 22);
             this.menuItemDisplaysResolutionList.Text = "&Resolution List...";
             this.menuItemDisplaysResolutionList.Click += new System.EventHandler(this.menuDisplaysResolutionList_Click);
             // 
@@ -443,7 +449,7 @@ namespace Arcade
             // 
             this.menuItemDisplaysColorsList.HelpText = null;
             this.menuItemDisplaysColorsList.Name = "menuItemDisplaysColorsList";
-            this.menuItemDisplaysColorsList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDisplaysColorsList.Size = new System.Drawing.Size(164, 22);
             this.menuItemDisplaysColorsList.Text = "&Colors List...";
             this.menuItemDisplaysColorsList.Click += new System.EventHandler(this.menuDisplaysColorsList_Click);
             // 
@@ -451,9 +457,26 @@ namespace Arcade
             // 
             this.menuItemDisplaysOrientationList.HelpText = null;
             this.menuItemDisplaysOrientationList.Name = "menuItemDisplaysOrientationList";
-            this.menuItemDisplaysOrientationList.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDisplaysOrientationList.Size = new System.Drawing.Size(164, 22);
             this.menuItemDisplaysOrientationList.Text = "&Orientation List...";
             this.menuItemDisplaysOrientationList.Click += new System.EventHandler(this.menuDisplaysOrientationList_Click);
+            // 
+            // menuItemTools
+            // 
+            this.menuItemTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemToolsOptions});
+            this.menuItemTools.HelpText = "Options for configuring the application.";
+            this.menuItemTools.Name = "menuItemTools";
+            this.menuItemTools.Size = new System.Drawing.Size(46, 20);
+            this.menuItemTools.Text = "&Tools";
+            // 
+            // menuItemToolsOptions
+            // 
+            this.menuItemToolsOptions.HelpText = null;
+            this.menuItemToolsOptions.Name = "menuItemToolsOptions";
+            this.menuItemToolsOptions.Size = new System.Drawing.Size(125, 22);
+            this.menuItemToolsOptions.Text = "&Options...";
+            this.menuItemToolsOptions.Click += new System.EventHandler(this.menuToolsOptions_Click);
             // 
             // menuItemHelp
             // 
@@ -475,10 +498,18 @@ namespace Arcade
             // statusStrip
             // 
             this.statusStrip.ActiveGroup = "";
-            this.statusStrip.Location = new System.Drawing.Point(0, 158);
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDatabaseModeStatusLabel,
+            this.toolStripDatabaseConnectionStatusLabel});
+            this.statusStrip.Location = new System.Drawing.Point(0, 159);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(384, 22);
+            this.statusStrip.Size = new System.Drawing.Size(430, 22);
             this.statusStrip.TabIndex = 2;
+            // 
+            // toolStripDatabaseModeStatusLabel
+            // 
+            this.toolStripDatabaseModeStatusLabel.Name = "toolStripDatabaseModeStatusLabel";
+            this.toolStripDatabaseModeStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
             // textBoxMessages
             // 
@@ -493,7 +524,7 @@ namespace Arcade
             this.textBoxMessages.Name = "textBoxMessages";
             this.textBoxMessages.ReadOnly = true;
             this.textBoxMessages.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxMessages.Size = new System.Drawing.Size(360, 121);
+            this.textBoxMessages.Size = new System.Drawing.Size(406, 122);
             this.textBoxMessages.TabIndex = 1;
             this.textBoxMessages.WordWrap = false;
             // 
@@ -540,16 +571,21 @@ namespace Arcade
             this.contextMenuItemSelectAll.Text = "Select &All";
             this.contextMenuItemSelectAll.Click += new System.EventHandler(this.contextMenuItemSelectAll_Click);
             // 
+            // toolStripDatabaseConnectionStatusLabel
+            // 
+            this.toolStripDatabaseConnectionStatusLabel.Name = "toolStripDatabaseConnectionStatusLabel";
+            this.toolStripDatabaseConnectionStatusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(384, 180);
+            this.ClientSize = new System.Drawing.Size(430, 181);
             this.Controls.Add(this.textBoxMessages);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuAppStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuAppStrip;
-            this.MinimumSize = new System.Drawing.Size(330, 214);
+            this.MinimumSize = new System.Drawing.Size(430, 220);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Arcade App";
@@ -558,6 +594,8 @@ namespace Arcade
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.menuAppStrip.ResumeLayout(false);
             this.menuAppStrip.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.contextMenuMessageWindowStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -611,12 +649,16 @@ namespace Arcade
             private Common.Forms.ToolStripMenuItem menuItemGamesCocktailList;
             private Common.Forms.ToolStripMenuItem menuItemGamesFindBoardName;
             private Common.Forms.ToolStripMenuItem menuItemGamesLogTypeList;
+            private Common.Forms.ToolStripMenuItem menuItemTools;
             private System.Windows.Forms.TextBox textBoxMessages;
             private System.Windows.Forms.ContextMenuStrip contextMenuMessageWindowStrip;
             private Common.Forms.ToolStripMenuItem contextMenuItemCopy;
             private Common.Forms.ToolStripMenuItem contextMenuItemDelete;
             private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
             private Common.Forms.ToolStripMenuItem contextMenuItemSelectAll;
+            private Common.Forms.ToolStripMenuItem menuItemToolsOptions;
+            private System.Windows.Forms.ToolStripStatusLabel toolStripDatabaseModeStatusLabel;
+            private System.Windows.Forms.ToolStripStatusLabel toolStripDatabaseConnectionStatusLabel;
         }
     }
 }

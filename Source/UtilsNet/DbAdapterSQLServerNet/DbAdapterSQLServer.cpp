@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2016 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -8,6 +8,12 @@
 
 #include "SQLServerOdbc.h"
 #include "SQLServerAdo.h"
+
+#include <UtilsNet/Includes/UtDbAdapterMacros.h>
+
+#pragma region "Constants"
+
+#define CSQLServerRegKeyName L"SQLServer"
 
 #define CServerRegValueName L"Server"
 #define CPortRegValueName L"Port"
@@ -19,57 +25,10 @@
 #define COleDbConnectionMode L"oledb"
 #define CODBCConnectionMode L"odbc"
 
+#pragma endregion
+
 Common::Data::DbAdapterSQLServer::DbAdapterSQLServer()
 {
-}
-
-System::Boolean Common::Data::DbAdapterSQLServer::SaveSettings(
-  Microsoft::Win32::RegistryKey^ RegKey,
-  System::String^ sServer,
-  System::Int32 nPort,
-  System::String^ sCatalog,
-  System::String^ sUserName,
-  System::String^ sPassword,
-  System::String^ sConnectionMode)
-{
-	System::Boolean bResult = false;
-	System::String^ sTmpPassword = L"";
-    System::Char nValue;
-
-	for (System::Int32 nIndex = 0; nIndex < sPassword->Length; ++nIndex)
-	{
-		nValue = sPassword[nIndex] + 1;
-
-		sTmpPassword += nValue.ToString();
-	}
-
-	try
-	{
-		RegKey->SetValue(CServerRegValueName, sServer,
-			             Microsoft::Win32::RegistryValueKind::String);
-
-		RegKey->SetValue(CPortRegValueName, nPort,
-			             Microsoft::Win32::RegistryValueKind::DWord);
-
-		RegKey->SetValue(CCatalogRegValueName, sCatalog,
-			             Microsoft::Win32::RegistryValueKind::String);
-
-		RegKey->SetValue(CUserNameRegValueName, sUserName,
-			             Microsoft::Win32::RegistryValueKind::String);
-
-		RegKey->SetValue(CPasswordRegValueName, sTmpPassword,
-			             Microsoft::Win32::RegistryValueKind::String);
-
-        RegKey->SetValue(CConnectionModeRegValueName, sConnectionMode,
-                         Microsoft::Win32::RegistryValueKind::String);
-
-		bResult = true;
-    }
-	catch (System::Exception^)
-	{
-	}
-
-	return bResult;
 }
 
 System::Boolean Common::Data::DbAdapterSQLServer::ReadSettings(
@@ -81,9 +40,9 @@ System::Boolean Common::Data::DbAdapterSQLServer::ReadSettings(
   System::String^% sPassword,
   System::String^% sConnectionMode)
 {
-	System::Boolean bResult = false;
-	System::String^ sTmpPassword = L"";
-    System::Char nValue;
+    System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict;
+    System::Collections::IDictionaryEnumerator^ DictEnum;
+    System::String^ sErrorMessage;
 
 	sServer = L"";
 	nPort = 0;
@@ -92,31 +51,42 @@ System::Boolean Common::Data::DbAdapterSQLServer::ReadSettings(
     sPassword = L"";
     sConnectionMode = L"";
 
-	try
-	{
-		sServer = (System::String^)RegKey->GetValue(CServerRegValueName);
-		nPort = (System::Int32)RegKey->GetValue(CPortRegValueName);
-		sCatalog = (System::String^)RegKey->GetValue(CCatalogRegValueName);
-		sUserName = (System::String^)RegKey->GetValue(CUserNameRegValueName);
-		sTmpPassword = (System::String^)RegKey->GetValue(CPasswordRegValueName);
-        sConnectionMode = (System::String^)RegKey->GetValue(CConnectionModeRegValueName);
+    if (!ReadSettings(RegKey, SettingsDict, sErrorMessage))
+    {
+        return false;
+    }
 
-		for (System::Int32 nIndex = 0; nIndex < sTmpPassword->Length; ++nIndex)
-		{
-			nValue = sTmpPassword[nIndex] - 1;
+    DictEnum = SettingsDict->GetEnumerator();
 
-			sPassword += nValue.ToString();
-		}
+    while (DictEnum->MoveNext())
+    {
+        if ((System::String^)DictEnum->Key == CServerRegValueName)
+        {
+            sServer = (System::String^)DictEnum->Value;
+        }
+        else if ((System::String^)DictEnum->Key == CPortRegValueName)
+        {
+            nPort = (System::UInt16)DictEnum->Value;
+        }
+        else if ((System::String^)DictEnum->Key == CCatalogRegValueName)
+        {
+            sCatalog = (System::String^)DictEnum->Value;
+        }
+        else if ((System::String^)DictEnum->Key == CUserNameRegValueName)
+        {
+            sUserName = (System::String^)DictEnum->Value;
+        }
+        else if ((System::String^)DictEnum->Key == CPasswordRegValueName)
+        {
+            sPassword = (System::String^)DictEnum->Value;
+        }
+        else if ((System::String^)DictEnum->Key == CConnectionModeRegValueName)
+        {
+            sConnectionMode = (System::String^)DictEnum->Value;
+        }
+    }
 
-		bResult = true;
-	}
-	catch (System::Exception^)
-	{
-	}
-
-    sTmpPassword = nullptr;
-
-	return bResult;
+	return true;
 }
 
 System::Boolean Common::Data::DbAdapterSQLServer::InitDatabase(
@@ -286,6 +256,62 @@ System::Boolean Common::Data::DbAdapterSQLServer::ProvideAddCommandParameter(
     return bResult;
 }
 
+System::Boolean Common::Data::DbAdapterSQLServer::ProvideReadSettings(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+  System::String^% sErrorMessage)
+{
+    SettingsDict = gcnew System::Collections::Generic::Dictionary<System::String^, System::Object^>();
+
+    sErrorMessage = "";
+
+    MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CServerRegValueName, "");
+    MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CCatalogRegValueName, "");
+    MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CPortRegValueName, 0);
+    MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CUserNameRegValueName, "");
+    MDatabaseAdapterReadEncryptedDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CPasswordRegValueName, "");
+    MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CConnectionModeRegValueName, CODBCConnectionMode);
+
+    return true;
+}
+
+System::Boolean Common::Data::DbAdapterSQLServer::ProvideWriteSettings(
+  Microsoft::Win32::RegistryKey^ RegKey,
+  System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+  System::String^% sErrorMessage)
+{
+    System::String^ Value;
+
+    sErrorMessage = "";
+
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CServerRegValueName, System::String, sErrorMessage)
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CCatalogRegValueName, System::String, sErrorMessage)
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CPortRegValueName, System::UInt16, sErrorMessage)
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CUserNameRegValueName, System::String, sErrorMessage)
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CPasswordRegValueName, System::String, sErrorMessage)
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CConnectionModeRegValueName, System::String, sErrorMessage)
+
+    Value = (System::String^)SettingsDict[CConnectionModeRegValueName];
+
+    if (Value != COleDbConnectionMode && Value != CODBCConnectionMode)
+    {
+        sErrorMessage = System::String::Format("The \"{0}\" setting must contain the value of either \"{1}\" or \"{2}\"",
+                                               CConnectionModeRegValueName, COleDbConnectionMode,
+                                               CODBCConnectionMode);
+
+        return false;
+    }
+
+    MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CServerRegValueName, sErrorMessage)
+    MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CCatalogRegValueName, sErrorMessage)
+    MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CPortRegValueName, sErrorMessage)
+    MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CUserNameRegValueName, sErrorMessage)
+    MDatabaseAdapterWriteEncryptedDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CPasswordRegValueName, sErrorMessage)
+    MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CConnectionModeRegValueName, sErrorMessage)
+
+    return true;
+}
+
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2016 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

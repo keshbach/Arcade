@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2016 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -19,14 +19,6 @@ namespace Common
         public:
             DbAdapterSQLServer();
 
-            static System::Boolean SaveSettings(Microsoft::Win32::RegistryKey^ RegKey,
-                                                System::String^ sServer,
-                                                System::Int32 nPort,
-                                                System::String^ sCatalog,
-                                                System::String^ sUserName,
-                                                System::String^ sPassword,
-                                                System::String^ sConnectionMode);
-
             // Common::Data::IDbProvider overrides
         public:
             virtual System::Boolean InitDatabase(Microsoft::Win32::RegistryKey^ RegKey,
@@ -45,15 +37,21 @@ namespace Common
             virtual System::Boolean ProvideAddCommandParameter(System::Data::Common::DbCommand^ Command,
                                                                System::String^ sParameterName,
                                                                System::Object^ Value);
+            virtual System::Boolean ProvideReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                        System::Collections::Generic::Dictionary<System::String^, System::Object^>^% SettingsDict,
+                                                        System::String^% sErrorMessage);
+            virtual System::Boolean ProvideWriteSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                                         System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict,
+                                                         System::String^% sErrorMessage);
 
         private:
-            static System::Boolean ReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
-                                                System::String^% sServer,
-                                                System::Int32% nPort,
-                                                System::String^% sCatalog,
-                                                System::String^% sUserName,
-                                                System::String^% sPassword,
-                                                System::String^% sConnectionMode);
+            System::Boolean ReadSettings(Microsoft::Win32::RegistryKey^ RegKey,
+                                         System::String^% sServer,
+                                         System::Int32% nPort,
+                                         System::String^% sCatalog,
+                                         System::String^% sUserName,
+                                         System::String^% sPassword,
+                                         System::String^% sConnectionMode);
 
         private:
             System::String^ m_sServer;
@@ -67,5 +65,5 @@ namespace Common
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2016 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -349,6 +349,7 @@ MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostUninitialize(VOID)
 }
 
 MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(
+  _In_ INT nDatabaseMode,
   _Out_ LPDWORD pdwExitCode)
 {
     DWORD dwAppDomainId = 0;
@@ -359,6 +360,17 @@ MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(
 	{
 		return FALSE;
 	}
+
+    switch (nDatabaseMode)
+    {
+        case CArcadeAppHostAccessDatabaseMode:
+            l_ArcadeAppHostData.nDatabaseMode = CArcadeAppHostDataAccessDatabaseMode;
+            break;
+        case CArcadeAppHostSQLServerDatabaseMode:
+        default:
+            l_ArcadeAppHostData.nDatabaseMode = CArcadeAppHostDataSQLServerDatabaseMode;
+            break;
+    }
 
     l_ArcadeAppHostRuntimeData.pCLRRuntimeHost->GetCurrentAppDomainId(&dwAppDomainId);
 
@@ -376,5 +388,5 @@ MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(
 #pragma endregion
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

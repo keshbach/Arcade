@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -12,8 +12,20 @@ static VOID lExecuteArcadeApp(
   _In_ TArcadeAppHostData* pArcadeAppHostData)
 {
     Arcade::Application::Startup^ Startup = gcnew Arcade::Application::Startup();
+    Arcade::Application::Startup::EDatabaseMode DatabaseMode;
 
-    pArcadeAppHostData->dwExitCode = Startup->Execute();
+    switch (pArcadeAppHostData->nDatabaseMode)
+    {
+        case CArcadeAppHostDataAccessDatabaseMode:
+            DatabaseMode = Arcade::Application::Startup::EDatabaseMode::Access;
+            break;
+        case CArcadeAppHostDataSQLServerDatabaseMode:
+        default:
+            DatabaseMode = Arcade::Application::Startup::EDatabaseMode::SQLServer;
+            break;
+    }
+
+    pArcadeAppHostData->dwExitCode = Startup->Execute(DatabaseMode);
 }
 
 extern "C"
@@ -36,5 +48,5 @@ HRESULT __stdcall ArcadeAppHostNetExecuteInAppDomain(
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

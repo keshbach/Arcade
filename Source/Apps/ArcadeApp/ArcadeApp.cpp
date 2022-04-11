@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -26,6 +26,7 @@
 // Command Line Arguments definitions
 
 #define CDisableDPIArgument L"/disabledpi"
+#define CAccessDatabaseArgument L"/accessdatabase"
 
 #pragma endregion
 
@@ -39,7 +40,7 @@ typedef BOOL (WINAPI* TSetProcessDpiAwarenessContext)(DPI_AWARENESS_CONTEXT valu
 
 typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostInitializeFunc)(VOID);
 typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostUninitializeFunc)(VOID);
-typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostExecuteFunc)(_Out_ LPDWORD pdwExitCode);
+typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostExecuteFunc)(_In_ INT nDatabaseMode, _Out_ LPDWORD pdwExitCode);
 
 typedef VOID (STDAPICALLTYPE *TPathRemoveExtensionWFunc)(_Inout_ LPWSTR pszPath);
 typedef BOOL (STDAPICALLTYPE *TPathRemoveFileSpecWFunc)(_Inout_ LPWSTR pszPath);
@@ -331,6 +332,7 @@ INT ArcadeAppExecute(
   _In_z_ LPWSTR* ppszArgs)
 {
 	TArcadeAppData* pArcadeAppData = (TArcadeAppData*)UtAllocMem(sizeof(TArcadeAppData));
+	INT nDatabaseMode = CArcadeAppHostSQLServerDatabaseMode;
 	HANDLE hThread;
 	DWORD dwThreadId, dwExitCode;
 	INT nArgIndex;
@@ -356,6 +358,12 @@ INT ArcadeAppExecute(
 		if (::lstrcmpi(ppszArgs[nArgIndex], CDisableDPIArgument) == 0)
 		{
 			bDisableDPI = TRUE;
+
+			++nArgIndex;
+		}
+		else if (::lstrcmpi(ppszArgs[nArgIndex], CAccessDatabaseArgument) == 0)
+		{
+			nDatabaseMode = CArcadeAppHostAccessDatabaseMode;
 
 			++nArgIndex;
 		}
@@ -422,7 +430,7 @@ INT ArcadeAppExecute(
 		return 1;
     }
 
-    pArcadeAppData->AppHostModuleData.pExecute(&dwExitCode);
+    pArcadeAppData->AppHostModuleData.pExecute(nDatabaseMode, &dwExitCode);
 
 	lUninitializeArcadeAppHostModuleData(&pArcadeAppData->AppHostModuleData);
 
@@ -436,5 +444,5 @@ INT ArcadeAppExecute(
 #pragma endregion
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2021 Kevin Eshbach
+//  Copyright (C) 2019-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
