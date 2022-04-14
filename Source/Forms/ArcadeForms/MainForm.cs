@@ -520,7 +520,13 @@ namespace Arcade
 
                 new Common.Forms.FormLocation(Options, m_sFormLocationsRegistryKey);
 
-                Options.ShowDialog(this);
+                if (Options.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+                {
+                    Common.Forms.MessageBox.Show(this,
+                        "Please restart the application to utilize the new database settings.",
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
+                }
 
                 Options.Dispose();
             }
