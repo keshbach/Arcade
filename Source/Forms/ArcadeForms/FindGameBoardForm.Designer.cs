@@ -33,7 +33,7 @@ namespace Arcade.Forms
         private void InitializeComponent()
         {
             this.labelKeyword = new System.Windows.Forms.Label();
-            this.textBoxKeyword = new System.Windows.Forms.TextBox();
+            this.textBoxKeyword = new Common.Forms.TextBox();
             this.listViewGames = new Common.Forms.ListView();
             this.columnHeaderGameName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buttonClose = new System.Windows.Forms.Button();
@@ -205,7 +205,7 @@ namespace Arcade.Forms
         #endregion
 
         private System.Windows.Forms.Label labelKeyword;
-        private System.Windows.Forms.TextBox textBoxKeyword;
+        private Common.Forms.TextBox textBoxKeyword;
         private Common.Forms.ListView listViewGames;
         private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.Button buttonSearch;

@@ -37,11 +37,11 @@ namespace Arcade
                 this.labelBoardType = new System.Windows.Forms.Label();
                 this.comboBoxBoardType = new System.Windows.Forms.ComboBox();
                 this.labelName = new System.Windows.Forms.Label();
-                this.textBoxName = new System.Windows.Forms.TextBox();
+                this.textBoxName = new Common.Forms.TextBox();
                 this.labelSize = new System.Windows.Forms.Label();
-                this.textBoxSize = new System.Windows.Forms.TextBox();
+                this.textBoxSize = new Common.Forms.TextBox();
                 this.label3 = new System.Windows.Forms.Label();
-                this.textBoxDescription = new System.Windows.Forms.TextBox();
+                this.textBoxDescription = new Common.Forms.TextBox();
                 this.buttonCancel = new System.Windows.Forms.Button();
                 this.buttonOK = new System.Windows.Forms.Button();
                 this.SuspendLayout();
@@ -177,11 +177,11 @@ namespace Arcade
             private System.Windows.Forms.Label labelBoardType;
             private System.Windows.Forms.ComboBox comboBoxBoardType;
             private System.Windows.Forms.Label labelName;
-            private System.Windows.Forms.TextBox textBoxName;
+            private Common.Forms.TextBox textBoxName;
             private System.Windows.Forms.Label labelSize;
-            private System.Windows.Forms.TextBox textBoxSize;
+            private Common.Forms.TextBox textBoxSize;
             private System.Windows.Forms.Label label3;
-            private System.Windows.Forms.TextBox textBoxDescription;
+            private Common.Forms.TextBox textBoxDescription;
             private System.Windows.Forms.Button buttonCancel;
             private System.Windows.Forms.Button buttonOK;
         }

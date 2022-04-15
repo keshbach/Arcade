@@ -35,7 +35,7 @@ namespace Arcade
             private void InitializeComponent()
             {
                 this.labelName = new System.Windows.Forms.Label();
-                this.textBoxName = new System.Windows.Forms.TextBox();
+                this.textBoxName = new Common.Forms.TextBox();
                 this.buttonOK = new System.Windows.Forms.Button();
                 this.buttonCancel = new System.Windows.Forms.Button();
                 this.SuspendLayout();
@@ -112,7 +112,7 @@ namespace Arcade
             #endregion
 
             private System.Windows.Forms.Label labelName;
-            private System.Windows.Forms.TextBox textBoxName;
+            private Common.Forms.TextBox textBoxName;
             private System.Windows.Forms.Button buttonOK;
             private System.Windows.Forms.Button buttonCancel;
         }

@@ -43,7 +43,7 @@ namespace Arcade.Forms
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.labelName = new System.Windows.Forms.Label();
-            this.textBoxName = new System.Windows.Forms.TextBox();
+            this.textBoxName = new Common.Forms.TextBox();
             this.SuspendLayout();
             // 
             // labelType
@@ -213,7 +213,7 @@ namespace Arcade.Forms
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Label labelName;
-        private System.Windows.Forms.TextBox textBoxName;
+        private Common.Forms.TextBox textBoxName;
     }
 }
 

@@ -34,7 +34,7 @@ namespace Arcade
             private void InitializeComponent()
             {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FindPartForm));
-            this.textBoxKeyword = new System.Windows.Forms.TextBox();
+            this.textBoxKeyword = new Common.Forms.TextBox();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.labelParts = new System.Windows.Forms.Label();
             this.listViewParts = new Common.Forms.ListView();
@@ -237,7 +237,7 @@ namespace Arcade
             }
             #endregion
 
-            private System.Windows.Forms.TextBox textBoxKeyword;
+            private Common.Forms.TextBox textBoxKeyword;
             private System.Windows.Forms.Button buttonSearch;
             private System.Windows.Forms.Label labelParts;
             private Common.Forms.ListView listViewParts;

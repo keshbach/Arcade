@@ -38,7 +38,7 @@ namespace Arcade
                 this.comboBoxStorageBox = new System.Windows.Forms.ComboBox();
                 this.labelStorageBox = new System.Windows.Forms.Label();
                 this.labelPartNumber = new System.Windows.Forms.Label();
-                this.textBoxPartNumber = new System.Windows.Forms.TextBox();
+                this.textBoxPartNumber = new Common.Forms.TextBox();
                 this.labelYearPrinted = new System.Windows.Forms.Label();
                 this.comboBoxPrintEdition = new System.Windows.Forms.ComboBox();
                 this.comboBoxCondition = new System.Windows.Forms.ComboBox();
@@ -47,13 +47,13 @@ namespace Arcade
                 this.labelCondition = new System.Windows.Forms.Label();
                 this.labelManufacturer = new System.Windows.Forms.Label();
                 this.labelDescription = new System.Windows.Forms.Label();
-                this.textBoxDescription = new System.Windows.Forms.TextBox();
-                this.textBoxName = new System.Windows.Forms.TextBox();
+                this.textBoxDescription = new Common.Forms.TextBox();
+                this.textBoxName = new Common.Forms.TextBox();
                 this.buttonCancel = new System.Windows.Forms.Button();
                 this.buttonOK = new System.Windows.Forms.Button();
                 this.checkBoxComplete = new System.Windows.Forms.CheckBox();
                 this.checkBoxOriginal = new System.Windows.Forms.CheckBox();
-                this.maskedTextBoxYearPrinted = new System.Windows.Forms.MaskedTextBox();
+                this.maskedTextBoxYearPrinted = new Common.Forms.MaskedTextBox();
                 this.SuspendLayout();
                 // 
                 // labelName
@@ -306,7 +306,7 @@ namespace Arcade
             private System.Windows.Forms.ComboBox comboBoxStorageBox;
             private System.Windows.Forms.Label labelStorageBox;
             private System.Windows.Forms.Label labelPartNumber;
-            private System.Windows.Forms.TextBox textBoxPartNumber;
+            private Common.Forms.TextBox textBoxPartNumber;
             private System.Windows.Forms.Label labelYearPrinted;
             private System.Windows.Forms.ComboBox comboBoxPrintEdition;
             private System.Windows.Forms.ComboBox comboBoxCondition;
@@ -315,13 +315,13 @@ namespace Arcade
             private System.Windows.Forms.Label labelCondition;
             private System.Windows.Forms.Label labelManufacturer;
             private System.Windows.Forms.Label labelDescription;
-            private System.Windows.Forms.TextBox textBoxDescription;
-            private System.Windows.Forms.TextBox textBoxName;
+            private Common.Forms.TextBox textBoxDescription;
+            private Common.Forms.TextBox textBoxName;
             private System.Windows.Forms.Button buttonCancel;
             private System.Windows.Forms.Button buttonOK;
             private System.Windows.Forms.CheckBox checkBoxComplete;
             private System.Windows.Forms.CheckBox checkBoxOriginal;
-            private System.Windows.Forms.MaskedTextBox maskedTextBoxYearPrinted;
+            private Common.Forms.MaskedTextBox maskedTextBoxYearPrinted;
         }
     }
 }

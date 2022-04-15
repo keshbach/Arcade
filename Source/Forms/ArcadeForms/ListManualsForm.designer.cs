@@ -47,7 +47,7 @@ namespace Arcade
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.labelKeyword = new System.Windows.Forms.Label();
-            this.textBoxKeyword = new System.Windows.Forms.TextBox();
+            this.textBoxKeyword = new Common.Forms.TextBox();
             this.buttonSearch = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -247,7 +247,7 @@ namespace Arcade
             private System.Windows.Forms.Button buttonCancel;
             private System.Windows.Forms.Button buttonOK;
             private System.Windows.Forms.Label labelKeyword;
-            private System.Windows.Forms.TextBox textBoxKeyword;
+            private Common.Forms.TextBox textBoxKeyword;
             private System.Windows.Forms.Button buttonSearch;
             private System.Windows.Forms.Button buttonClear;
         }

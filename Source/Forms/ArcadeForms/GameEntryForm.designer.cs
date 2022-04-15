@@ -35,15 +35,15 @@ namespace Arcade
             private void InitializeComponent()
             {
             this.labelName = new System.Windows.Forms.Label();
-            this.textBoxName = new System.Windows.Forms.TextBox();
+            this.textBoxName = new Common.Forms.TextBox();
             this.labelManufacturer = new System.Windows.Forms.Label();
             this.comboBoxManufacturer = new System.Windows.Forms.ComboBox();
             this.labelPinouts = new System.Windows.Forms.Label();
-            this.textBoxPinouts = new System.Windows.Forms.TextBox();
-            this.textBoxDipSwitches = new System.Windows.Forms.TextBox();
+            this.textBoxPinouts = new Common.Forms.TextBox();
+            this.textBoxDipSwitches = new Common.Forms.TextBox();
             this.labelDipSwitches = new System.Windows.Forms.Label();
             this.labelDescription = new System.Windows.Forms.Label();
-            this.textBoxDescription = new System.Windows.Forms.TextBox();
+            this.textBoxDescription = new Common.Forms.TextBox();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonBoards = new System.Windows.Forms.Button();
@@ -406,15 +406,15 @@ namespace Arcade
             #endregion
 
             private System.Windows.Forms.Label labelName;
-            private System.Windows.Forms.TextBox textBoxName;
+            private Common.Forms.TextBox textBoxName;
             private System.Windows.Forms.Label labelManufacturer;
             private System.Windows.Forms.ComboBox comboBoxManufacturer;
             private System.Windows.Forms.Label labelPinouts;
-            private System.Windows.Forms.TextBox textBoxPinouts;
-            private System.Windows.Forms.TextBox textBoxDipSwitches;
+            private Common.Forms.TextBox textBoxPinouts;
+            private Common.Forms.TextBox textBoxDipSwitches;
             private System.Windows.Forms.Label labelDipSwitches;
             private System.Windows.Forms.Label labelDescription;
-            private System.Windows.Forms.TextBox textBoxDescription;
+            private Common.Forms.TextBox textBoxDescription;
             private System.Windows.Forms.Button buttonCancel;
             private System.Windows.Forms.Button buttonOK;
             private System.Windows.Forms.Button buttonBoards;

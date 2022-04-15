@@ -42,12 +42,12 @@ namespace Arcade
             {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PartEntryForm));
             this.labelName = new System.Windows.Forms.Label();
-            this.textBoxName = new System.Windows.Forms.TextBox();
+            this.textBoxName = new Common.Forms.TextBox();
             this.labelCategory = new System.Windows.Forms.Label();
             this.labelType = new System.Windows.Forms.Label();
             this.labelPackage = new System.Windows.Forms.Label();
             this.checkBoxDefault = new System.Windows.Forms.CheckBox();
-            this.textBoxPartPinouts = new System.Windows.Forms.TextBox();
+            this.textBoxPartPinouts = new Common.Forms.TextBox();
             this.labelPinouts = new System.Windows.Forms.Label();
             this.comboBoxCategory = new Common.Forms.ComboBox();
             this.comboBoxPackage = new Common.Forms.ComboBox();
@@ -310,12 +310,12 @@ namespace Arcade
             #endregion
 
             private System.Windows.Forms.Label labelName;
-            private System.Windows.Forms.TextBox textBoxName;
+            private Common.Forms.TextBox textBoxName;
             private System.Windows.Forms.Label labelCategory;
             private System.Windows.Forms.Label labelType;
             private System.Windows.Forms.Label labelPackage;
             private System.Windows.Forms.CheckBox checkBoxDefault;
-            private System.Windows.Forms.TextBox textBoxPartPinouts;
+            private Common.Forms.TextBox textBoxPartPinouts;
             private System.Windows.Forms.Label labelPinouts;
             private Common.Forms.ComboBox comboBoxCategory;
             private Common.Forms.ComboBox comboBoxPackage;

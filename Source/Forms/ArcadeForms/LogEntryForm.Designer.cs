@@ -34,7 +34,7 @@
             this.comboBoxType = new Common.Forms.ComboBox();
             this.labelDate = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBoxDescription = new System.Windows.Forms.TextBox();
+            this.textBoxDescription = new Common.Forms.TextBox();
             this.dateTimePickerLog = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
@@ -158,7 +158,7 @@
         private Common.Forms.ComboBox comboBoxType;
         private System.Windows.Forms.Label labelDate;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBoxDescription;
+        private Common.Forms.TextBox textBoxDescription;
         private System.Windows.Forms.DateTimePicker dateTimePickerLog;
     }
 }

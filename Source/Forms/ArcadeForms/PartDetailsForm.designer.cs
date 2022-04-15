@@ -36,13 +36,13 @@ namespace Arcade
             {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PartDetailsForm));
             this.labelCategory = new System.Windows.Forms.Label();
-            this.textBoxCategory = new System.Windows.Forms.TextBox();
+            this.textBoxCategory = new Common.Forms.TextBox();
             this.labelType = new System.Windows.Forms.Label();
-            this.textBoxType = new System.Windows.Forms.TextBox();
+            this.textBoxType = new Common.Forms.TextBox();
             this.labelPackage = new System.Windows.Forms.Label();
-            this.textBoxPackage = new System.Windows.Forms.TextBox();
+            this.textBoxPackage = new Common.Forms.TextBox();
             this.labelPinouts = new System.Windows.Forms.Label();
-            this.textBoxPinouts = new System.Windows.Forms.TextBox();
+            this.textBoxPinouts = new Common.Forms.TextBox();
             this.labelParts = new System.Windows.Forms.Label();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonClose = new System.Windows.Forms.Button();
@@ -267,17 +267,17 @@ namespace Arcade
             #endregion
 
             private System.Windows.Forms.Label labelCategory;
-            private System.Windows.Forms.TextBox textBoxCategory;
+            private Common.Forms.TextBox textBoxCategory;
             private System.Windows.Forms.Label labelType;
-            private System.Windows.Forms.TextBox textBoxType;
+            private Common.Forms.TextBox textBoxType;
             private System.Windows.Forms.Label labelPackage;
-            private System.Windows.Forms.TextBox textBoxPackage;
+            private Common.Forms.TextBox textBoxPackage;
             private Common.Forms.ListView listViewKeywords;
             private System.Windows.Forms.ColumnHeader columnHeaderDataSheets;
             private System.Windows.Forms.ColumnHeader columnHeaderName;
             private System.Windows.Forms.Label labelPinouts;
             private System.Windows.Forms.Label labelParts;
-            private System.Windows.Forms.TextBox textBoxPinouts;
+            private Common.Forms.TextBox textBoxPinouts;
             private System.Windows.Forms.Button buttonAdd;
             private System.Windows.Forms.Button buttonEdit;
             private System.Windows.Forms.Button buttonDelete;

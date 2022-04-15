@@ -35,9 +35,9 @@ namespace Arcade
             private void InitializeComponent()
             {
             this.labelPosition = new System.Windows.Forms.Label();
-            this.textBoxPosition = new System.Windows.Forms.TextBox();
+            this.textBoxPosition = new Common.Forms.TextBox();
             this.labelDescription = new System.Windows.Forms.Label();
-            this.textBoxDescription = new System.Windows.Forms.TextBox();
+            this.textBoxDescription = new Common.Forms.TextBox();
             this.groupBoxPart = new System.Windows.Forms.GroupBox();
             this.labelParts = new System.Windows.Forms.Label();
             this.listViewParts = new Common.Forms.ListView();
@@ -283,9 +283,9 @@ namespace Arcade
             #endregion
 
             private System.Windows.Forms.Label labelPosition;
-            private System.Windows.Forms.TextBox textBoxPosition;
+            private Common.Forms.TextBox textBoxPosition;
             private System.Windows.Forms.Label labelDescription;
-            private System.Windows.Forms.TextBox textBoxDescription;
+            private Common.Forms.TextBox textBoxDescription;
             private System.Windows.Forms.GroupBox groupBoxPart;
             private System.Windows.Forms.Button buttonCancel;
             private System.Windows.Forms.Button buttonOK;

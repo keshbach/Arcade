@@ -80,7 +80,7 @@ namespace Arcade
             this.menuItemHelpAbout = new Common.Forms.ToolStripMenuItem();
             this.statusStrip = new Common.Forms.StatusStrip();
             this.toolStripDatabaseModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.textBoxMessages = new System.Windows.Forms.TextBox();
+            this.textBoxMessages = new Common.Forms.TextBox();
             this.contextMenuMessageWindowStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuItemCopy = new Common.Forms.ToolStripMenuItem();
             this.contextMenuItemDelete = new Common.Forms.ToolStripMenuItem();
@@ -650,7 +650,7 @@ namespace Arcade
             private Common.Forms.ToolStripMenuItem menuItemGamesFindBoardName;
             private Common.Forms.ToolStripMenuItem menuItemGamesLogTypeList;
             private Common.Forms.ToolStripMenuItem menuItemTools;
-            private System.Windows.Forms.TextBox textBoxMessages;
+            private Common.Forms.TextBox textBoxMessages;
             private System.Windows.Forms.ContextMenuStrip contextMenuMessageWindowStrip;
             private Common.Forms.ToolStripMenuItem contextMenuItemCopy;
             private Common.Forms.ToolStripMenuItem contextMenuItemDelete;
