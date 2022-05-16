@@ -1,25 +1,24 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2016-2016 Kevin Eshbach
+//  Copyright (C) 2016-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    /// <summary>
-    /// Form to allow the entry of a new log or to edit an existing log.
-    /// </summary>
     public partial class LogEntryForm : System.Windows.Forms.Form
     {
+        #region "Enumerations"
         public enum ELogEntryFormType
         {
             NewLog,
             EditLog
         };
+        #endregion
 
+        #region "Member Variables"
         private ELogEntryFormType m_LogEntryFormType = ELogEntryFormType.NewLog;
 
         private System.DateTime m_LogDateTime = new System.DateTime();
@@ -27,12 +26,16 @@ namespace Arcade.Forms
         private System.String m_sLogDescription = "";
 
         private Common.Collections.StringSortedList<System.Int32> m_LogTypeList = null;
+        #endregion
 
+        #region "Constructor"
         public LogEntryForm()
         {
             InitializeComponent();
         }
+        #endregion
 
+        #region "Properties"
         public ELogEntryFormType LogEntryFormType
         {
             set
@@ -76,7 +79,9 @@ namespace Arcade.Forms
                 m_sLogDescription = value;
             }
         }
+        #endregion
 
+        #region "Log Entry Event Handlers"
         private void LogEntryForm_Load(object sender, EventArgs e)
         {
             DatabaseDefs.TLogLens LogLens;
@@ -130,7 +135,9 @@ namespace Arcade.Forms
                 }
             }
         }
+        #endregion
 
+        #region "Combo Box Event Handlers"
         private void comboBoxType_Validating(object sender, CancelEventArgs e)
         {
             if (comboBoxType.SelectedIndex == -1)
@@ -140,12 +147,16 @@ namespace Arcade.Forms
 
             ValidateData();
         }
+        #endregion
 
+        #region "Text Box Event Handlers"
         private void textBoxDescription_TextChanged(object sender, EventArgs e)
         {
             ValidateData();
         }
+        #endregion
 
+        #region "Button Event Handlers"
         private void buttonOK_Click(object sender, EventArgs e)
         {
             m_LogDateTime = dateTimePickerLog.Value;
@@ -163,7 +174,9 @@ namespace Arcade.Forms
 
             Close();
         }
+        #endregion
 
+        #region "Internal Helpers"
         private void ValidateData()
         {
             if (comboBoxType.SelectedIndex != -1 && textBoxDescription.TextLength > 0)
@@ -175,9 +188,10 @@ namespace Arcade.Forms
                 buttonOK.Enabled = false;
             }
         }
+        #endregion
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2016-2016 Kevin Eshbach
+//  Copyright (C) 2016-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

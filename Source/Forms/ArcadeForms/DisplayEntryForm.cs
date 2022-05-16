@@ -1,25 +1,24 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2014 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
     public partial class DisplayEntryForm : System.Windows.Forms.Form
     {
+        #region "Enumerations"
         public enum EDisplayEntryFormType
         {
             NewDisplay,
             EditDisplay
         };
+        #endregion
 
+        #region "Member Variables"
         private EDisplayEntryFormType m_DisplayEntryFormType = EDisplayEntryFormType.NewDisplay;
         private System.Int32 m_nDisplayId = -1;
         private System.String m_sDisplayName = "";
@@ -32,12 +31,16 @@ namespace Arcade.Forms
         private Common.Collections.StringSortedList<System.Int32> m_DisplayResolutionList = null;
         private Common.Collections.StringSortedList<System.Int32> m_DisplayColorsList = null;
         private Common.Collections.StringSortedList<System.Int32> m_DisplayOrientationList = null;
+        #endregion
 
+        #region "Constructor"
         public DisplayEntryForm()
         {
             InitializeComponent();
         }
+        #endregion
 
+        #region "Properties"
         public EDisplayEntryFormType DisplayEntryFormType
         {
             set
@@ -113,7 +116,9 @@ namespace Arcade.Forms
                 m_sDisplayOrientation = value;
             }
         }
+        #endregion
 
+        #region "Display Entry Event Handlers"
         private void DisplayEntryForm_Load(object sender, EventArgs e)
         {
             DatabaseDefs.TDisplayLens DisplayLens;
@@ -188,7 +193,9 @@ namespace Arcade.Forms
                 buttonOK.Enabled = true;
             }
         }
+        #endregion
 
+        #region "Text Box Event Handlers"
         private void textBoxName_TextChanged(object sender, EventArgs e)
         {
             if (textBoxName.Text.Length > 0)
@@ -200,7 +207,9 @@ namespace Arcade.Forms
                 buttonOK.Enabled = false;
             }
         }
+        #endregion
 
+        #region "Combo Box Event Handlers"
         private void comboBoxType_Validating(object sender, CancelEventArgs e)
         {
             if (comboBoxType.SelectedIndex != -1)
@@ -256,7 +265,9 @@ namespace Arcade.Forms
                 buttonOK.Enabled = false;
             }
         }
+        #endregion
 
+        #region "Button Event Handlers"
         private void buttonOK_Click(object sender, EventArgs e)
         {
             m_sDisplayName = textBoxName.Text;
@@ -277,7 +288,9 @@ namespace Arcade.Forms
 
             Close();
         }
+        #endregion
 
+        #region "Internal Helpers"
         private void ValidateFields()
         {
             if (textBoxName.Text.Length > 0 &&
@@ -293,9 +306,10 @@ namespace Arcade.Forms
                 buttonOK.Enabled = false;
             }
         }
+        #endregion
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2014 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

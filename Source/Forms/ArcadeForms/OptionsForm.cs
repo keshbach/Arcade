@@ -4,20 +4,34 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class OptionsForm : System.Windows.Forms.Form
+    public partial class OptionsForm : Common.Forms.Form
     {
+        #region "Member Variables"
         private int m_nItemEdit;
+        #endregion
 
+        #region "Constructor"
         public OptionsForm()
         {
             InitializeComponent();
         }
+        #endregion
 
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlLocationSettings
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { listViewSettings };
+            }
+        }
+        #endregion
+
+        #region "Options Event Handlers"
         private void OptionsForm_Load(object sender, EventArgs e)
         {
             System.Int32[] nColumnOrder = {1, 0};
@@ -56,10 +70,11 @@ namespace Arcade.Forms
             }
 
             listViewSettings.ChangeColumnDisplayOrder(nColumnOrder);
-            listViewSettings.AutosizeColumns();
             listViewSettings.EndUpdate();
         }
+        #endregion
 
+        #region "List View Event Handlers"
         private void listViewSettings_KeyPressLabelEdit(object sender, KeyPressEventArgs e)
         {
             if ((Type)listViewSettings.Items[m_nItemEdit].Tag == typeof(System.UInt16))
@@ -88,7 +103,9 @@ namespace Arcade.Forms
         {
             m_nItemEdit = e.Item;
         }
+        #endregion
 
+        #region "Button Event Handlers"
         private void buttonOK_Click(object sender, EventArgs e)
         {
             Dictionary<string, object> SettingsDict = new Dictionary<string, object>();
@@ -131,5 +148,6 @@ namespace Arcade.Forms
         {
             Close();
         }
+        #endregion
     }
 }
