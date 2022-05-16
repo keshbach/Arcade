@@ -1,23 +1,26 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2016-2016 Kevin Eshbach
+//  Copyright (C) 2016-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class ListLogsForm : System.Windows.Forms.Form
+    public partial class ListLogsForm : Common.Forms.Form
     {
+        #region "Member Variables"
         private System.Int32 m_nGameId = -1;
+        #endregion
 
+        #region "Constructor"
         public ListLogsForm()
         {
             InitializeComponent();
         }
+        #endregion
 
+        #region "Properties"
         public System.Int32 GameId
         {
             set
@@ -25,7 +28,19 @@ namespace Arcade.Forms
                 m_nGameId = value;
             }
         }
+        #endregion
 
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlLocationSettings
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { listViewLogs };
+            }
+        }
+        #endregion
+
+        #region "List Logs Event Handlers"
         private void ListLogsForm_Load(object sender, EventArgs e)
         {
             System.Collections.Generic.List<DatabaseDefs.TLog> LogsList;
@@ -56,7 +71,6 @@ namespace Arcade.Forms
                         listViewLogs.Enabled = true;
                     }
 
-                    listViewLogs.AutosizeColumns();
                     listViewLogs.EndUpdate();
                 }
                 else
@@ -69,37 +83,41 @@ namespace Arcade.Forms
                 }
             }
         }
+        #endregion
 
+        #region "Button Event Handlers"
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            Arcade.Forms.LogEntryForm LogForm = new Arcade.Forms.LogEntryForm();
+            LogEntryForm LogEntry = new LogEntryForm();
             System.String sErrorMessage = "";
             System.Int32 nLogId;
             System.Windows.Forms.ListViewItem Item;
             DatabaseDefs.TLog Log;
 
-            LogForm.LogEntryFormType = LogEntryForm.ELogEntryFormType.NewLog;
+            new Common.Forms.FormLocation(LogEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
-            if (System.Windows.Forms.DialogResult.OK == LogForm.ShowDialog(this))
+            LogEntry.LogEntryFormType = LogEntryForm.ELogEntryFormType.NewLog;
+
+            if (System.Windows.Forms.DialogResult.OK == LogEntry.ShowDialog(this))
             {
                 using (new Common.Forms.WaitCursor(this))
                 {
-                    if (Database.AddGameLogEntry(m_nGameId, LogForm.LogDateTime, LogForm.LogType,
-                                                 LogForm.LogDescription,
+                    if (Database.AddGameLogEntry(m_nGameId, LogEntry.LogDateTime, LogEntry.LogType,
+                                                 LogEntry.LogDescription,
                                                  out nLogId, out sErrorMessage))
                     {
                         listViewLogs.BeginUpdate();
 
-                        Item = listViewLogs.Items.Add(LogForm.LogDateTime.ToShortDateString());
+                        Item = listViewLogs.Items.Add(LogEntry.LogDateTime.ToShortDateString());
 
-                        Item.SubItems.Add(LogForm.LogType);
+                        Item.SubItems.Add(LogEntry.LogType);
 
                         Log = new DatabaseDefs.TLog();
 
                         Log.nLogId = nLogId;
-                        Log.DateTime = LogForm.LogDateTime;
-                        Log.sLogDescription = LogForm.LogDescription;
-                        Log.sLogType = LogForm.LogType;
+                        Log.DateTime = LogEntry.LogDateTime;
+                        Log.sLogDescription = LogEntry.LogDescription;
+                        Log.sLogType = LogEntry.LogType;
 
                         Item.Tag = Log;
                         Item.Selected = true;
@@ -177,7 +195,9 @@ namespace Arcade.Forms
         {
             Close();
         }
+        #endregion
 
+        #region "List View Event Handlers"
         private void listViewLogs_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             buttonEdit.Enabled = true;
@@ -188,39 +208,43 @@ namespace Arcade.Forms
         {
             EditLog();
         }
+        #endregion
 
+        #region "Internal Helpers"
         private void EditLog()
         {
             System.Int32 nIndex = listViewLogs.SelectedIndices[0];
-            Arcade.Forms.LogEntryForm LogForm = new Arcade.Forms.LogEntryForm();
+            LogEntryForm LogEntry = new LogEntryForm();
             System.String sErrorMessage;
             DatabaseDefs.TLog Log;
 
+            new Common.Forms.FormLocation(LogEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
             Log = (DatabaseDefs.TLog)listViewLogs.Items[nIndex].Tag;
 
-            LogForm.LogEntryFormType = LogEntryForm.ELogEntryFormType.EditLog;
-            LogForm.LogDateTime = Log.DateTime;
-            LogForm.LogType = Log.sLogType;
-            LogForm.LogDescription = Log.sLogDescription;
+            LogEntry.LogEntryFormType = LogEntryForm.ELogEntryFormType.EditLog;
+            LogEntry.LogDateTime = Log.DateTime;
+            LogEntry.LogType = Log.sLogType;
+            LogEntry.LogDescription = Log.sLogDescription;
 
-            if (System.Windows.Forms.DialogResult.OK == LogForm.ShowDialog(this))
+            if (System.Windows.Forms.DialogResult.OK == LogEntry.ShowDialog(this))
             {
                 using (new Common.Forms.WaitCursor(this))
                 {
                     if (Database.EditGameLogEntry(Log.nLogId,
-                                                  LogForm.LogDateTime,
-                                                  LogForm.LogType,
-                                                  LogForm.LogDescription,
+                                                  LogEntry.LogDateTime,
+                                                  LogEntry.LogType,
+                                                  LogEntry.LogDescription,
                                                   out sErrorMessage))
                     {
-                        Log.DateTime = LogForm.LogDateTime;
-                        Log.sLogType = LogForm.LogType;
-                        Log.sLogDescription = LogForm.LogDescription;
+                        Log.DateTime = LogEntry.LogDateTime;
+                        Log.sLogType = LogEntry.LogType;
+                        Log.sLogDescription = LogEntry.LogDescription;
 
                         listViewLogs.BeginUpdate();
 
-                        listViewLogs.Items[nIndex].Text = LogForm.LogDateTime.ToShortDateString();
-                        listViewLogs.Items[nIndex].SubItems[1].Text = LogForm.LogType;
+                        listViewLogs.Items[nIndex].Text = LogEntry.LogDateTime.ToShortDateString();
+                        listViewLogs.Items[nIndex].SubItems[1].Text = LogEntry.LogType;
                         listViewLogs.Items[nIndex].Tag = Log;
 
                         listViewLogs.AutosizeColumns();
@@ -235,9 +259,10 @@ namespace Arcade.Forms
                 }
             }
         }
+        #endregion
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2016-2016 Kevin Eshbach
+//  Copyright (C) 2016-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

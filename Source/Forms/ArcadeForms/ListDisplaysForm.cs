@@ -1,261 +1,226 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2014 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
-namespace Arcade
+namespace Arcade.Forms
 {
-    namespace Forms
+    public partial class ListDisplaysForm : Common.Forms.Form
     {
-        public partial class ListDisplaysForm : System.Windows.Forms.Form
+        #region "Enumerations"
+        public enum EListDisplaysFormType
         {
-            public enum EListDisplaysFormType
-            {
-                ListDisplays,
-                EditDisplays
-            };
+            ListDisplays,
+            EditDisplays
+        };
+        #endregion
 
-            private EListDisplaysFormType m_ListDisplaysFormType = EListDisplaysFormType.EditDisplays;
-            private System.Int32 m_nDisplayId = -1;
-            private System.String m_sDisplayName;
-            private System.String m_sDisplayType;
-            private System.String m_sDisplayResolution;
-            private System.String m_sDisplayColors;
-            private System.String m_sDisplayOrientation;
+        #region "Member Variables"
+        private EListDisplaysFormType m_ListDisplaysFormType = EListDisplaysFormType.EditDisplays;
+        private System.Int32 m_nDisplayId = -1;
+        private System.String m_sDisplayName;
+        private System.String m_sDisplayType;
+        private System.String m_sDisplayResolution;
+        private System.String m_sDisplayColors;
+        private System.String m_sDisplayOrientation;
+        #endregion
 
-            public ListDisplaysForm()
+        #region "Constructor"
+        public ListDisplaysForm()
+        {
+            InitializeComponent();
+        }
+        #endregion
+
+        #region "Properties"
+        public EListDisplaysFormType ListDisplaysFormType
+        {
+            set
             {
-                InitializeComponent();
+                m_ListDisplaysFormType = value;
             }
+        }
 
-            public EListDisplaysFormType ListDisplaysFormType
+        public System.Int32 DisplayId
+        {
+            get
             {
-                set
-                {
-                    m_ListDisplaysFormType = value;
-                }
+                return m_nDisplayId;
             }
+        }
 
-            public System.Int32 DisplayId
+        public System.String DisplayType
+        {
+            get
             {
-                get
-                {
-                    return m_nDisplayId;
-                }
+                return m_sDisplayType;
             }
+        }
 
-            public System.String DisplayType
+        public System.String DisplayResolution
+        {
+            get
             {
-                get
-                {
-                    return m_sDisplayType;
-                }
+                return m_sDisplayResolution;
             }
+        }
 
-            public System.String DisplayResolution
+        public System.String DisplayColors
+        {
+            get
             {
-                get
-                {
-                    return m_sDisplayResolution;
-                }
+                return m_sDisplayColors;
             }
+        }
 
-            public System.String DisplayColors
+        public System.String DisplayOrientation
+        {
+            get
             {
-                get
-                {
-                    return m_sDisplayColors;
-                }
+                return m_sDisplayOrientation;
             }
+        }
+        #endregion
 
-            public System.String DisplayOrientation
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlLocationSettings
+        {
+            get
             {
-                get
-                {
-                    return m_sDisplayOrientation;
-                }
+                return new System.Windows.Forms.Control[] { listViewDisplays };
             }
+        }
+        #endregion
 
-            private void ListDisplaysForm_Load(object sender, EventArgs e)
+        #region "List Displays Event Handlers"
+        private void ListDisplaysForm_Load(object sender, EventArgs e)
+        {
+            System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplaysList;
+            System.String sErrorMessage;
+            System.Windows.Forms.ListViewItem Item;
+
+            buttonOK.Enabled = false;
+
+            using (new Common.Forms.WaitCursor(this))
             {
-                System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplaysList;
-                System.String sErrorMessage;
-                System.Windows.Forms.ListViewItem Item;
-
-                buttonOK.Enabled = false;
-
-                using (new Common.Forms.WaitCursor(this))
+                if (true == Database.GetDisplays(out DisplaysList,
+                                                 out sErrorMessage))
                 {
-                    if (true == Database.GetDisplays(out DisplaysList,
-                                                     out sErrorMessage))
+                    listViewDisplays.BeginUpdate();
+
+                    foreach (DatabaseDefs.TDisplay Display in DisplaysList)
                     {
-                        listViewDisplays.BeginUpdate();
+                        Item = listViewDisplays.Items.Add(Display.sDisplayName);
 
-                        foreach (DatabaseDefs.TDisplay Display in DisplaysList)
-                        {
-                            Item = listViewDisplays.Items.Add(Display.sDisplayName);
-
-                            Item.Tag = Display;
-                        }
-
-                        listViewDisplays.AutosizeColumns();
-                        listViewDisplays.EndUpdate();
+                        Item.Tag = Display;
                     }
-                    else
-                    {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
 
-                if (listViewDisplays.Items.Count == 0)
-                {
-                    listViewDisplays.Enabled = false;
-                }
-
-                switch (this.m_ListDisplaysFormType)
-                {
-                    case EListDisplaysFormType.ListDisplays:
-                        buttonAdd.Visible = false;
-                        buttonEdit.Visible = false;
-                        buttonDelete.Visible = false;
-                        break;
-                    case EListDisplaysFormType.EditDisplays:
-                        buttonEdit.Enabled = false;
-                        buttonDelete.Enabled = false;
-
-                        buttonOK.Visible = false;
-                        buttonCancel.Text = "Close";
-                        break;
-                    default:
-                        System.Diagnostics.Debug.Assert(false);
-                        break;
-                }
-            }
-
-            private void listViewDisplays_DoubleClick(object sender, EventArgs e)
-            {
-                if (m_ListDisplaysFormType == EListDisplaysFormType.EditDisplays)
-                {
-                    EditDisplay();
+                    listViewDisplays.EndUpdate();
                 }
                 else
                 {
-                    OnOK();
+                    Common.Forms.MessageBox.Show(this, sErrorMessage,
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
                 }
             }
 
-            private void listViewDisplays_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+            if (listViewDisplays.Items.Count == 0)
             {
-                buttonEdit.Enabled = true;
-                buttonDelete.Enabled = true;
-
-                buttonOK.Enabled = true;
+                listViewDisplays.Enabled = false;
             }
 
-            private void buttonAdd_Click(object sender, EventArgs e)
+            switch (this.m_ListDisplaysFormType)
             {
-                Arcade.Forms.DisplayEntryForm DisplayEntry = new Arcade.Forms.DisplayEntryForm();
-                System.String sErrorMessage;
-                System.Int32 nNewDisplayId;
-                DatabaseDefs.TDisplay Display;
-                System.Windows.Forms.ListViewItem Item;
+                case EListDisplaysFormType.ListDisplays:
+                    buttonAdd.Visible = false;
+                    buttonEdit.Visible = false;
+                    buttonDelete.Visible = false;
+                    break;
+                case EListDisplaysFormType.EditDisplays:
+                    buttonEdit.Enabled = false;
+                    buttonDelete.Enabled = false;
 
-                DisplayEntry.DisplayEntryFormType = Arcade.Forms.DisplayEntryForm.EDisplayEntryFormType.NewDisplay;
-
-                if (DisplayEntry.ShowDialog(this) == DialogResult.OK)
-                {
-                    using (new Common.Forms.WaitCursor(this))
-                    {
-                        if (Database.AddDisplay(DisplayEntry.DisplayName,
-                                                DisplayEntry.DisplayType,
-                                                DisplayEntry.DisplayResolution,
-                                                DisplayEntry.DisplayColors,
-                                                DisplayEntry.DisplayOrientation,
-                                                out nNewDisplayId,
-                                                out sErrorMessage))
-                        {
-                            Display = new DatabaseDefs.TDisplay();
-
-                            Display.nDisplayId = nNewDisplayId;
-                            Display.sDisplayName = DisplayEntry.DisplayName;
-                            Display.sDisplayType = DisplayEntry.DisplayType;
-                            Display.sDisplayResolution = DisplayEntry.DisplayResolution;
-                            Display.sDisplayColors = DisplayEntry.DisplayColors;
-                            Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
-
-                            listViewDisplays.Enabled = true;
-
-                            Item = listViewDisplays.Items.Add(Display.sDisplayName);
-
-                            Item.Tag = Display;
-
-                            Item.Selected = true;
-                            Item.Focused = true;
-
-                            Item.EnsureVisible();
-
-                            listViewDisplays.AutosizeColumns();
-                        }
-                        else
-                        {
-                            Common.Forms.MessageBox.Show(this, sErrorMessage,
-                                System.Windows.Forms.MessageBoxButtons.OK,
-                                System.Windows.Forms.MessageBoxIcon.Information);
-                        }
-                    }
-                }
+                    buttonOK.Visible = false;
+                    buttonCancel.Text = "Close";
+                    break;
+                default:
+                    System.Diagnostics.Debug.Assert(false);
+                    break;
             }
+        }
+        #endregion
 
-            private void buttonEdit_Click(object sender, EventArgs e)
+        #region "List View Event Handlers"
+        private void listViewDisplays_DoubleClick(object sender, EventArgs e)
+        {
+            if (m_ListDisplaysFormType == EListDisplaysFormType.EditDisplays)
             {
                 EditDisplay();
             }
-
-            private void buttonDelete_Click(object sender, EventArgs e)
+            else
             {
-                System.Int32 nIndex = listViewDisplays.SelectedIndices[0];
-                System.String sErrorMessage;
-                DatabaseDefs.TDisplay Display;
-                System.Windows.Forms.ListViewItem Item;
+                OnOK();
+            }
+        }
 
-                Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
+        private void listViewDisplays_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            buttonEdit.Enabled = true;
+            buttonDelete.Enabled = true;
 
+            buttonOK.Enabled = true;
+        }
+        #endregion
+
+        #region "Button Event Handlers"
+        private void buttonAdd_Click(object sender, EventArgs e)
+        {
+            DisplayEntryForm DisplayEntry = new DisplayEntryForm();
+            System.String sErrorMessage;
+            System.Int32 nNewDisplayId;
+            DatabaseDefs.TDisplay Display;
+            System.Windows.Forms.ListViewItem Item;
+
+            new Common.Forms.FormLocation(DisplayEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
+            DisplayEntry.DisplayEntryFormType = Arcade.Forms.DisplayEntryForm.EDisplayEntryFormType.NewDisplay;
+
+            if (DisplayEntry.ShowDialog(this) == DialogResult.OK)
+            {
                 using (new Common.Forms.WaitCursor(this))
                 {
-                    if (Database.DeleteDisplay(Display.nDisplayId, out sErrorMessage))
+                    if (Database.AddDisplay(DisplayEntry.DisplayName,
+                                            DisplayEntry.DisplayType,
+                                            DisplayEntry.DisplayResolution,
+                                            DisplayEntry.DisplayColors,
+                                            DisplayEntry.DisplayOrientation,
+                                            out nNewDisplayId,
+                                            out sErrorMessage))
                     {
-                        listViewDisplays.Items.RemoveAt(nIndex);
+                        Display = new DatabaseDefs.TDisplay();
 
-                        if (listViewDisplays.Items.Count > 0)
-                        {
-                            if (nIndex == listViewDisplays.Items.Count)
-                            {
-                                --nIndex;
-                            }
+                        Display.nDisplayId = nNewDisplayId;
+                        Display.sDisplayName = DisplayEntry.DisplayName;
+                        Display.sDisplayType = DisplayEntry.DisplayType;
+                        Display.sDisplayResolution = DisplayEntry.DisplayResolution;
+                        Display.sDisplayColors = DisplayEntry.DisplayColors;
+                        Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
 
-                            Item = listViewDisplays.Items[nIndex];
+                        listViewDisplays.Enabled = true;
 
-                            Item.Selected = true;
-                            Item.Focused = true;
+                        Item = listViewDisplays.Items.Add(Display.sDisplayName);
 
-                            Item.EnsureVisible();
-                        }
-                        else
-                        {
-                            listViewDisplays.Enabled = false;
+                        Item.Tag = Display;
 
-                            buttonEdit.Enabled = false;
-                            buttonDelete.Enabled = false;
-                        }
+                        Item.Selected = true;
+                        Item.Focused = true;
+
+                        Item.EnsureVisible();
+
+                        listViewDisplays.AutosizeColumns();
                     }
                     else
                     {
@@ -265,92 +230,148 @@ namespace Arcade
                     }
                 }
             }
+        }
 
-            private void buttonOK_Click(object sender, EventArgs e)
+        private void buttonEdit_Click(object sender, EventArgs e)
+        {
+            EditDisplay();
+        }
+
+        private void buttonDelete_Click(object sender, EventArgs e)
+        {
+            System.Int32 nIndex = listViewDisplays.SelectedIndices[0];
+            System.String sErrorMessage;
+            DatabaseDefs.TDisplay Display;
+            System.Windows.Forms.ListViewItem Item;
+
+            Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
+
+            using (new Common.Forms.WaitCursor(this))
             {
-                OnOK();
-            }
-
-            private void buttonCancel_Click(object sender, EventArgs e)
-            {
-                DialogResult = DialogResult.Cancel;
-
-                Close();
-            }
-
-            private void EditDisplay()
-            {
-                Arcade.Forms.DisplayEntryForm DisplayEntry = new Arcade.Forms.DisplayEntryForm();
-                System.Int32 nIndex = listViewDisplays.SelectedIndices[0];
-                System.String sErrorMessage;
-                DatabaseDefs.TDisplay Display;
-                System.Windows.Forms.ListViewItem Item;
-
-                Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
-
-                DisplayEntry.DisplayEntryFormType = Arcade.Forms.DisplayEntryForm.EDisplayEntryFormType.EditDisplay;
-
-                DisplayEntry.DisplayName = Display.sDisplayName;
-                DisplayEntry.DisplayType = Display.sDisplayType;
-                DisplayEntry.DisplayResolution = Display.sDisplayResolution;
-                DisplayEntry.DisplayColors = Display.sDisplayColors;
-                DisplayEntry.DisplayOrientation = Display.sDisplayOrientation;
-
-                if (DisplayEntry.ShowDialog(this) == DialogResult.OK)
+                if (Database.DeleteDisplay(Display.nDisplayId, out sErrorMessage))
                 {
-                    using (new Common.Forms.WaitCursor(this))
+                    listViewDisplays.Items.RemoveAt(nIndex);
+
+                    if (listViewDisplays.Items.Count > 0)
                     {
-                        if (Database.EditDisplay(Display.nDisplayId,
-                                                 DisplayEntry.DisplayName,
-                                                 DisplayEntry.DisplayType,
-                                                 DisplayEntry.DisplayResolution,
-                                                 DisplayEntry.DisplayColors,
-                                                 DisplayEntry.DisplayOrientation,
-                                                 out sErrorMessage))
+                        if (nIndex == listViewDisplays.Items.Count)
                         {
-                            Display.sDisplayName = DisplayEntry.DisplayName;
-                            Display.sDisplayType = DisplayEntry.DisplayType;
-                            Display.sDisplayResolution = DisplayEntry.DisplayResolution;
-                            Display.sDisplayColors = DisplayEntry.DisplayColors;
-                            Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
-
-                            Item = listViewDisplays.Items[nIndex];
-
-                            Item.Text = Display.sDisplayName;
-                            Item.Tag = Display;
+                            --nIndex;
                         }
-                        else
-                        {
-                            Common.Forms.MessageBox.Show(this, sErrorMessage,
-                                System.Windows.Forms.MessageBoxButtons.OK,
-                                System.Windows.Forms.MessageBoxIcon.Information);
-                        }
+
+                        Item = listViewDisplays.Items[nIndex];
+
+                        Item.Selected = true;
+                        Item.Focused = true;
+
+                        Item.EnsureVisible();
+                    }
+                    else
+                    {
+                        listViewDisplays.Enabled = false;
+
+                        buttonEdit.Enabled = false;
+                        buttonDelete.Enabled = false;
+                    }
+                }
+                else
+                {
+                    Common.Forms.MessageBox.Show(this, sErrorMessage,
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void buttonOK_Click(object sender, EventArgs e)
+        {
+            OnOK();
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+
+            Close();
+        }
+        #endregion
+
+        #region "Internal Helpers"
+        private void EditDisplay()
+        {
+            DisplayEntryForm DisplayEntry = new DisplayEntryForm();
+            System.Int32 nIndex = listViewDisplays.SelectedIndices[0];
+            System.String sErrorMessage;
+            DatabaseDefs.TDisplay Display;
+            System.Windows.Forms.ListViewItem Item;
+
+            new Common.Forms.FormLocation(DisplayEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
+            Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
+
+            DisplayEntry.DisplayEntryFormType = Arcade.Forms.DisplayEntryForm.EDisplayEntryFormType.EditDisplay;
+
+            DisplayEntry.DisplayName = Display.sDisplayName;
+            DisplayEntry.DisplayType = Display.sDisplayType;
+            DisplayEntry.DisplayResolution = Display.sDisplayResolution;
+            DisplayEntry.DisplayColors = Display.sDisplayColors;
+            DisplayEntry.DisplayOrientation = Display.sDisplayOrientation;
+
+            if (DisplayEntry.ShowDialog(this) == DialogResult.OK)
+            {
+                using (new Common.Forms.WaitCursor(this))
+                {
+                    if (Database.EditDisplay(Display.nDisplayId,
+                                             DisplayEntry.DisplayName,
+                                             DisplayEntry.DisplayType,
+                                             DisplayEntry.DisplayResolution,
+                                             DisplayEntry.DisplayColors,
+                                             DisplayEntry.DisplayOrientation,
+                                             out sErrorMessage))
+                    {
+                        Display.sDisplayName = DisplayEntry.DisplayName;
+                        Display.sDisplayType = DisplayEntry.DisplayType;
+                        Display.sDisplayResolution = DisplayEntry.DisplayResolution;
+                        Display.sDisplayColors = DisplayEntry.DisplayColors;
+                        Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
+
+                        Item = listViewDisplays.Items[nIndex];
+
+                        Item.Text = Display.sDisplayName;
+                        Item.Tag = Display;
+                    }
+                    else
+                    {
+                        Common.Forms.MessageBox.Show(this, sErrorMessage,
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
                     }
                 }
             }
-
-            private void OnOK()
-            {
-                System.Int32 nIndex = listViewDisplays.SelectedIndices[0];
-                DatabaseDefs.TDisplay Display;
-
-                Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
-
-                m_nDisplayId = Display.nDisplayId;
-                m_sDisplayName = Display.sDisplayName;
-                m_sDisplayType = Display.sDisplayType;
-                m_sDisplayResolution = Display.sDisplayResolution;
-                m_sDisplayColors = Display.sDisplayColors;
-                m_sDisplayOrientation = Display.sDisplayOrientation;
-
-                DialogResult = DialogResult.OK;
-
-                Close();
-            }
         }
+
+        private void OnOK()
+        {
+            System.Int32 nIndex = listViewDisplays.SelectedIndices[0];
+            DatabaseDefs.TDisplay Display;
+
+            Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
+
+            m_nDisplayId = Display.nDisplayId;
+            m_sDisplayName = Display.sDisplayName;
+            m_sDisplayType = Display.sDisplayType;
+            m_sDisplayResolution = Display.sDisplayResolution;
+            m_sDisplayColors = Display.sDisplayColors;
+            m_sDisplayOrientation = Display.sDisplayOrientation;
+
+            DialogResult = DialogResult.OK;
+
+            Close();
+        }
+        #endregion
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2014 Kevin Eshbach
+//  Copyright (C) 2009-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

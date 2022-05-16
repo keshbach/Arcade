@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2016 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -8,18 +8,22 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    /// <summary>
-    /// Form to allow the entry of a new part or to edit an existing part.
-    /// </summary>
-    public partial class PartEntryForm : System.Windows.Forms.Form
+    public partial class PartEntryForm : Common.Forms.Form
     {
+        #region "Enumerations"
         public enum EPartEntryFormType
         {
             AddPartName,
             NewPart,
             EditPart
         };
+        #endregion
 
+        #region "Constants"
+        private const string CFileOpenDialogAllFilesClientGuid = "{76E8474E-6999-41CC-A3F3-F815AF424886}";
+        #endregion
+
+        #region "Member Variables"
         private EPartEntryFormType m_PartEntryFormType = EPartEntryFormType.AddPartName;
         private System.String m_sPartName = "";
         private System.String m_sPartCategoryName = "";
@@ -34,15 +38,16 @@ namespace Arcade.Forms
         private Common.Collections.StringSortedList<System.Int32> m_PartPackageList = null;
 
         private System.Boolean m_IgnoreChange = false;
+        #endregion
 
+        #region "Constructor"
         public PartEntryForm()
         {
-            //
-            // Required for Windows Form Designer support
-            //
             InitializeComponent();
         }
+        #endregion
 
+        #region "Properties"
         public EPartEntryFormType PartEntryFormType
         {
             set
@@ -141,7 +146,19 @@ namespace Arcade.Forms
                 }
             }
         }
+        #endregion
 
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlLocationSettings
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { listViewDatasheets };
+            }
+        }
+        #endregion
+
+        #region "Part Entry Event Handlers"
         private void PartEntryForm_Load(object sender, EventArgs e)
         {
             DatabaseDefs.TPartLens PartLens;
@@ -237,14 +254,7 @@ namespace Arcade.Forms
 
                         listViewDatasheets.EndUpdate();
 
-                        if (m_PartDatasheetColl.Count > 0)
-                        {
-                            listViewDatasheets.AutosizeColumns();
-                        }
-                        else
-                        {
-                            listViewDatasheets.Enabled = false;
-                        }
+                        listViewDatasheets.Enabled = (m_PartDatasheetColl.Count > 0);
                         break;
                     default:
                         System.Diagnostics.Debug.Assert(false);
@@ -265,7 +275,9 @@ namespace Arcade.Forms
                 m_IgnoreChange = false;
             }
         }
+        #endregion
 
+        #region "Button Event Handlers"
         private void buttonOK_Click(object sender, EventArgs e)
         {
             m_sPartName = textBoxName.Text;
@@ -276,100 +288,37 @@ namespace Arcade.Forms
             m_sPartTypeName = (System.String)comboBoxType.SelectedItem;
             m_sPartPackageName = (System.String)comboBoxPackage.SelectedItem;
 
-            DialogResult = DialogResult.OK;
-
             Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
-
             Close();
-        }
-
-        private void textBoxName_TextChanged(object sender, EventArgs e)
-        {
-            UpdateOKButton();
-        }
-
-        private void textBoxName_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            switch (e.KeyChar)
-            {
-                case '\'':
-                case '\"':
-                case '*':
-                    e.Handled = true;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void textBoxPartPinouts_TextChanged(object sender, EventArgs e)
-        {
-            UpdateOKButton();
-        }
-
-        private void comboBoxCategory_Validating(object sender, CancelEventArgs e)
-        {
-            if (comboBoxCategory.SelectedIndex == -1)
-            {
-                e.Cancel = true;
-            }
-
-            UpdateOKButton();
-        }
-
-        private void comboBoxType_Validating(object sender, CancelEventArgs e)
-        {
-            if (comboBoxType.SelectedIndex == -1)
-            {
-                e.Cancel = true;
-            }
-
-            UpdateOKButton();
-        }
-
-        private void comboBoxPackage_Validating(object sender, CancelEventArgs e)
-        {
-            if (comboBoxPackage.SelectedIndex == -1)
-            {
-                e.Cancel = true;
-            }
-
-            UpdateOKButton();
-        }
-
-        private void checkBoxDefault_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateOKButton();
-        }
-
-        private void listViewDatasheets_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
-        {
-            buttonDeleteDatasheet.Enabled = true;
-            buttonViewDatasheet.Enabled = true;
-        }
-
-        private void listViewDatasheets_DoubleClick(object sender, EventArgs e)
-        {
-            ViewDatasheet();
         }
 
         private void buttonAddDatasheet_Click(object sender, EventArgs e)
         {
+            Common.Forms.FileOpenDialog OpenFileDlg = new Common.Forms.FileOpenDialog();
             System.Boolean bStringFound = false;
             System.Windows.Forms.ListViewItem Item;
 
-            if (System.Windows.Forms.DialogResult.OK == openFileDialog.ShowDialog(this))
+            OpenFileDlg.Title = "Add...";
+            OpenFileDlg.AddToRecentList = false;
+            OpenFileDlg.AllowReadOnly = false;
+            OpenFileDlg.FileTypes = BuildFileTypeList();
+            OpenFileDlg.PickFolders = false;
+            OpenFileDlg.SelectedFileType = 1;
+            OpenFileDlg.SelectMultipleItems = false;
+            OpenFileDlg.ShowHidden = false;
+            OpenFileDlg.ClientGuid = System.Guid.ParseExact(CFileOpenDialogAllFilesClientGuid, "B");
+
+            if (OpenFileDlg.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
             {
                 for (System.Int32 nIndex = 0; nIndex < listViewDatasheets.Items.Count;
                         ++nIndex)
                 {
                     if (0 == System.String.Compare(listViewDatasheets.Items[nIndex].Text,
-                                                    openFileDialog.FileName, true))
+                                                   OpenFileDlg.FileName, true))
                     {
                         bStringFound = true;
                     }
@@ -379,9 +328,9 @@ namespace Arcade.Forms
                 {
                     listViewDatasheets.Enabled = true;
 
-                    Item = listViewDatasheets.Items.Add(openFileDialog.FileName);
+                    Item = listViewDatasheets.Items.Add(OpenFileDlg.FileName);
 
-                    m_PartDatasheetColl.Add(openFileDialog.FileName);
+                    m_PartDatasheetColl.Add(OpenFileDlg.FileName);
 
                     listViewDatasheets.AutosizeColumns();
 
@@ -440,7 +389,87 @@ namespace Arcade.Forms
         {
             ViewDatasheet();
         }
+        #endregion
 
+        #region "Text Box Event Handlers"
+        private void textBoxName_TextChanged(object sender, EventArgs e)
+        {
+            UpdateOKButton();
+        }
+
+        private void textBoxName_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            switch (e.KeyChar)
+            {
+                case '\'':
+                case '\"':
+                case '*':
+                    e.Handled = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void textBoxPartPinouts_TextChanged(object sender, EventArgs e)
+        {
+            UpdateOKButton();
+        }
+        #endregion
+
+        #region "Combo Box Event Handlers"
+        private void comboBoxCategory_Validating(object sender, CancelEventArgs e)
+        {
+            if (comboBoxCategory.SelectedIndex == -1)
+            {
+                e.Cancel = true;
+            }
+
+            UpdateOKButton();
+        }
+
+        private void comboBoxType_Validating(object sender, CancelEventArgs e)
+        {
+            if (comboBoxType.SelectedIndex == -1)
+            {
+                e.Cancel = true;
+            }
+
+            UpdateOKButton();
+        }
+
+        private void comboBoxPackage_Validating(object sender, CancelEventArgs e)
+        {
+            if (comboBoxPackage.SelectedIndex == -1)
+            {
+                e.Cancel = true;
+            }
+
+            UpdateOKButton();
+        }
+        #endregion
+
+        #region "Check Box Event Handlers"
+        private void checkBoxDefault_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateOKButton();
+        }
+        #endregion
+
+        #region "List View Event Handlers"
+        private void listViewDatasheets_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            buttonDeleteDatasheet.Enabled = true;
+            buttonViewDatasheet.Enabled = true;
+        }
+
+        private void listViewDatasheets_DoubleClick(object sender, EventArgs e)
+        {
+            ViewDatasheet();
+        }
+        #endregion
+
+        #region "Internal Helpers"
         private void ViewDatasheet()
         {
             System.Int32 nIndex = listViewDatasheets.SelectedIndices[0];
@@ -479,9 +508,30 @@ namespace Arcade.Forms
 
             buttonOK.Enabled = bEnabled;
         }
+
+        private System.Collections.Generic.List<Common.Forms.FileTypeItem> BuildFileTypeList()
+        {
+            System.Collections.Generic.List<Common.Forms.FileTypeItem> FileTypeList = new System.Collections.Generic.List<Common.Forms.FileTypeItem>();
+            Common.Forms.FileTypeItem FileTypeItem;
+
+            FileTypeItem = new Common.Forms.FileTypeItem("Adobe PDF Files", "*.pdf");
+
+            FileTypeList.Add(FileTypeItem);
+
+            FileTypeItem = new Common.Forms.FileTypeItem("Text Files", "*.txt");
+
+            FileTypeList.Add(FileTypeItem);
+
+            FileTypeItem = new Common.Forms.FileTypeItem("All Files", "*.*");
+
+            FileTypeList.Add(FileTypeItem);
+
+            return FileTypeList;
+        }
+        #endregion
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2016 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

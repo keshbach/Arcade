@@ -1,39 +1,37 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2014 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
-namespace Arcade
+namespace Arcade.Forms
 {
-    namespace Forms
+    public partial class PartDetailsForm
     {
-        public partial class PartDetailsForm
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
         {
-            /// <summary>
-            /// Required designer variable.
-            /// </summary>
-            private System.ComponentModel.IContainer components = null;
-
-            /// <summary>
-            /// Clean up any resources being used.
-            /// </summary>
-            /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-            protected override void Dispose(bool disposing)
+            if (disposing && (components != null))
             {
-                if (disposing && (components != null))
-                {
-                    components.Dispose();
-                }
-                base.Dispose(disposing);
+                components.Dispose();
             }
+            base.Dispose(disposing);
+        }
 
-            #region Windows Form Designer generated code
+        #region Windows Form Designer generated code
 
-            /// <summary>
-            /// Required method for Designer support - do not modify
-            /// the contents of this method with the code editor.
-            /// </summary>
-            private void InitializeComponent()
-            {
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PartDetailsForm));
             this.labelCategory = new System.Windows.Forms.Label();
             this.textBoxCategory = new Common.Forms.TextBox();
@@ -118,8 +116,8 @@ namespace Arcade
             // 
             // textBoxPinouts
             // 
-            this.textBoxPinouts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBoxPinouts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxPinouts.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxPinouts.HideSelection = false;
@@ -164,12 +162,12 @@ namespace Arcade
             // 
             // listViewKeywords
             // 
-            this.listViewKeywords.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.listViewKeywords.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)));
             this.listViewKeywords.AutoArrange = false;
             this.listViewKeywords.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeaderName,
-            this.columnHeaderDataSheets});
+        this.columnHeaderName,
+        this.columnHeaderDataSheets});
             this.listViewKeywords.ComboBoxItems = ((System.Collections.Specialized.StringCollection)(resources.GetObject("listViewKeywords.ComboBoxItems")));
             this.listViewKeywords.FullRowSelect = true;
             this.listViewKeywords.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -263,30 +261,29 @@ namespace Arcade
             this.ResumeLayout(false);
             this.PerformLayout();
 
-            }
-            #endregion
-
-            private System.Windows.Forms.Label labelCategory;
-            private Common.Forms.TextBox textBoxCategory;
-            private System.Windows.Forms.Label labelType;
-            private Common.Forms.TextBox textBoxType;
-            private System.Windows.Forms.Label labelPackage;
-            private Common.Forms.TextBox textBoxPackage;
-            private Common.Forms.ListView listViewKeywords;
-            private System.Windows.Forms.ColumnHeader columnHeaderDataSheets;
-            private System.Windows.Forms.ColumnHeader columnHeaderName;
-            private System.Windows.Forms.Label labelPinouts;
-            private System.Windows.Forms.Label labelParts;
-            private Common.Forms.TextBox textBoxPinouts;
-            private System.Windows.Forms.Button buttonAdd;
-            private System.Windows.Forms.Button buttonEdit;
-            private System.Windows.Forms.Button buttonDelete;
-            private System.Windows.Forms.Button buttonDatasheets;
-            private System.Windows.Forms.Button buttonClose;
         }
+        #endregion
+
+        private System.Windows.Forms.Label labelCategory;
+        private Common.Forms.TextBox textBoxCategory;
+        private System.Windows.Forms.Label labelType;
+        private Common.Forms.TextBox textBoxType;
+        private System.Windows.Forms.Label labelPackage;
+        private Common.Forms.TextBox textBoxPackage;
+        private Common.Forms.ListView listViewKeywords;
+        private System.Windows.Forms.ColumnHeader columnHeaderDataSheets;
+        private System.Windows.Forms.ColumnHeader columnHeaderName;
+        private System.Windows.Forms.Label labelPinouts;
+        private System.Windows.Forms.Label labelParts;
+        private Common.Forms.TextBox textBoxPinouts;
+        private System.Windows.Forms.Button buttonAdd;
+        private System.Windows.Forms.Button buttonEdit;
+        private System.Windows.Forms.Button buttonDelete;
+        private System.Windows.Forms.Button buttonDatasheets;
+        private System.Windows.Forms.Button buttonClose;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2014 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

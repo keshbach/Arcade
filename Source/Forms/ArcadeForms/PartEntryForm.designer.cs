@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2014 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -8,38 +8,36 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace Arcade
+namespace Arcade.Forms
 {
-    namespace Forms
+    public partial class PartEntryForm
     {
-        public partial class PartEntryForm
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
         {
-            /// <summary>
-            /// Required designer variable.
-            /// </summary>
-            private System.ComponentModel.IContainer components = null;
-
-            /// <summary>
-            /// Clean up any resources being used.
-            /// </summary>
-            /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-            protected override void Dispose(bool disposing)
+            if (disposing && (components != null))
             {
-                if (disposing && (components != null))
-                {
-                    components.Dispose();
-                }
-                base.Dispose(disposing);
+                components.Dispose();
             }
+            base.Dispose(disposing);
+        }
 
-            #region Windows Form Designer generated code
+        #region Windows Form Designer generated code
 
-            /// <summary>
-            /// Required method for Designer support - do not modify
-            /// the contents of this method with the code editor.
-            /// </summary>
-            private void InitializeComponent()
-            {
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PartEntryForm));
             this.labelName = new System.Windows.Forms.Label();
             this.textBoxName = new Common.Forms.TextBox();
@@ -54,7 +52,6 @@ namespace Arcade
             this.comboBoxType = new Common.Forms.ComboBox();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.buttonAddDatasheet = new System.Windows.Forms.Button();
             this.buttonDeleteDatasheet = new System.Windows.Forms.Button();
             this.buttonViewDatasheet = new System.Windows.Forms.Button();
@@ -180,6 +177,7 @@ namespace Arcade
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.buttonOK.Location = new System.Drawing.Point(546, 352);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
@@ -199,11 +197,6 @@ namespace Arcade
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
-            // 
-            // openFileDialog
-            // 
-            this.openFileDialog.Filter = "Adobe PDF Files (*.pdf)|*.pdf|Text files (*.txt)|*.txt|All files (*.*)|*.*";
-            this.openFileDialog.Title = "Add...";
             // 
             // buttonAddDatasheet
             // 
@@ -306,33 +299,31 @@ namespace Arcade
             this.ResumeLayout(false);
             this.PerformLayout();
 
-            }
-            #endregion
-
-            private System.Windows.Forms.Label labelName;
-            private Common.Forms.TextBox textBoxName;
-            private System.Windows.Forms.Label labelCategory;
-            private System.Windows.Forms.Label labelType;
-            private System.Windows.Forms.Label labelPackage;
-            private System.Windows.Forms.CheckBox checkBoxDefault;
-            private Common.Forms.TextBox textBoxPartPinouts;
-            private System.Windows.Forms.Label labelPinouts;
-            private Common.Forms.ComboBox comboBoxCategory;
-            private Common.Forms.ComboBox comboBoxPackage;
-            private Common.Forms.ComboBox comboBoxType;
-            private System.Windows.Forms.Button buttonOK;
-            private System.Windows.Forms.Button buttonCancel;
-            private System.Windows.Forms.OpenFileDialog openFileDialog;
-            private System.Windows.Forms.Button buttonAddDatasheet;
-            private System.Windows.Forms.Button buttonDeleteDatasheet;
-            private System.Windows.Forms.Button buttonViewDatasheet;
-            private System.Windows.Forms.GroupBox groupBoxDatasheets;
-            private Common.Forms.ListView listViewDatasheets;
-            private System.Windows.Forms.ColumnHeader columnHeaderFile;
         }
+        #endregion
+
+        private System.Windows.Forms.Label labelName;
+        private Common.Forms.TextBox textBoxName;
+        private System.Windows.Forms.Label labelCategory;
+        private System.Windows.Forms.Label labelType;
+        private System.Windows.Forms.Label labelPackage;
+        private System.Windows.Forms.CheckBox checkBoxDefault;
+        private Common.Forms.TextBox textBoxPartPinouts;
+        private System.Windows.Forms.Label labelPinouts;
+        private Common.Forms.ComboBox comboBoxCategory;
+        private Common.Forms.ComboBox comboBoxPackage;
+        private Common.Forms.ComboBox comboBoxType;
+        private System.Windows.Forms.Button buttonOK;
+        private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Button buttonAddDatasheet;
+        private System.Windows.Forms.Button buttonDeleteDatasheet;
+        private System.Windows.Forms.Button buttonViewDatasheet;
+        private System.Windows.Forms.GroupBox groupBoxDatasheets;
+        private Common.Forms.ListView listViewDatasheets;
+        private System.Windows.Forms.ColumnHeader columnHeaderFile;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2014 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
