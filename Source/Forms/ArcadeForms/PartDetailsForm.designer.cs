@@ -50,12 +50,17 @@ namespace Arcade.Forms
             this.buttonEdit = new System.Windows.Forms.Button();
             this.buttonDelete = new System.Windows.Forms.Button();
             this.buttonDatasheets = new System.Windows.Forms.Button();
+            this.splitContainerPart = new System.Windows.Forms.SplitContainer();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerPart)).BeginInit();
+            this.splitContainerPart.Panel1.SuspendLayout();
+            this.splitContainerPart.Panel2.SuspendLayout();
+            this.splitContainerPart.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelCategory
             // 
             this.labelCategory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelCategory.Location = new System.Drawing.Point(8, 170);
+            this.labelCategory.Location = new System.Drawing.Point(0, 158);
             this.labelCategory.Name = "labelCategory";
             this.labelCategory.Size = new System.Drawing.Size(56, 16);
             this.labelCategory.TabIndex = 2;
@@ -63,17 +68,18 @@ namespace Arcade.Forms
             // 
             // textBoxCategory
             // 
-            this.textBoxCategory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.textBoxCategory.Location = new System.Drawing.Point(64, 168);
+            this.textBoxCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCategory.Location = new System.Drawing.Point(59, 155);
             this.textBoxCategory.Name = "textBoxCategory";
             this.textBoxCategory.ReadOnly = true;
-            this.textBoxCategory.Size = new System.Drawing.Size(216, 20);
+            this.textBoxCategory.Size = new System.Drawing.Size(212, 20);
             this.textBoxCategory.TabIndex = 3;
             // 
             // labelType
             // 
             this.labelType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelType.Location = new System.Drawing.Point(8, 194);
+            this.labelType.Location = new System.Drawing.Point(0, 184);
             this.labelType.Name = "labelType";
             this.labelType.Size = new System.Drawing.Size(32, 16);
             this.labelType.TabIndex = 4;
@@ -81,17 +87,18 @@ namespace Arcade.Forms
             // 
             // textBoxType
             // 
-            this.textBoxType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.textBoxType.Location = new System.Drawing.Point(64, 192);
+            this.textBoxType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxType.Location = new System.Drawing.Point(59, 181);
             this.textBoxType.Name = "textBoxType";
             this.textBoxType.ReadOnly = true;
-            this.textBoxType.Size = new System.Drawing.Size(216, 20);
+            this.textBoxType.Size = new System.Drawing.Size(212, 20);
             this.textBoxType.TabIndex = 5;
             // 
             // labelPackage
             // 
             this.labelPackage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelPackage.Location = new System.Drawing.Point(8, 218);
+            this.labelPackage.Location = new System.Drawing.Point(0, 210);
             this.labelPackage.Name = "labelPackage";
             this.labelPackage.Size = new System.Drawing.Size(56, 16);
             this.labelPackage.TabIndex = 6;
@@ -99,41 +106,42 @@ namespace Arcade.Forms
             // 
             // textBoxPackage
             // 
-            this.textBoxPackage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.textBoxPackage.Location = new System.Drawing.Point(64, 216);
+            this.textBoxPackage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxPackage.Location = new System.Drawing.Point(59, 207);
             this.textBoxPackage.Name = "textBoxPackage";
             this.textBoxPackage.ReadOnly = true;
-            this.textBoxPackage.Size = new System.Drawing.Size(216, 20);
+            this.textBoxPackage.Size = new System.Drawing.Size(212, 20);
             this.textBoxPackage.TabIndex = 7;
             // 
             // labelPinouts
             // 
-            this.labelPinouts.Location = new System.Drawing.Point(285, 7);
+            this.labelPinouts.Location = new System.Drawing.Point(0, 0);
             this.labelPinouts.Name = "labelPinouts";
             this.labelPinouts.Size = new System.Drawing.Size(48, 16);
-            this.labelPinouts.TabIndex = 12;
+            this.labelPinouts.TabIndex = 0;
             this.labelPinouts.Text = "P&inouts:";
             // 
             // textBoxPinouts
             // 
-            this.textBoxPinouts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.textBoxPinouts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxPinouts.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxPinouts.HideSelection = false;
-            this.textBoxPinouts.Location = new System.Drawing.Point(288, 24);
+            this.textBoxPinouts.Location = new System.Drawing.Point(3, 19);
             this.textBoxPinouts.MaxLength = 1000000;
             this.textBoxPinouts.Multiline = true;
             this.textBoxPinouts.Name = "textBoxPinouts";
             this.textBoxPinouts.ReadOnly = true;
             this.textBoxPinouts.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxPinouts.Size = new System.Drawing.Size(368, 216);
-            this.textBoxPinouts.TabIndex = 13;
+            this.textBoxPinouts.Size = new System.Drawing.Size(363, 208);
+            this.textBoxPinouts.TabIndex = 1;
             this.textBoxPinouts.WordWrap = false;
             // 
             // labelParts
             // 
-            this.labelParts.Location = new System.Drawing.Point(6, 8);
+            this.labelParts.Location = new System.Drawing.Point(0, 0);
             this.labelParts.Name = "labelParts";
             this.labelParts.Size = new System.Drawing.Size(40, 16);
             this.labelParts.TabIndex = 0;
@@ -145,7 +153,7 @@ namespace Arcade.Forms
             this.buttonAdd.Location = new System.Drawing.Point(8, 248);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(75, 23);
-            this.buttonAdd.TabIndex = 8;
+            this.buttonAdd.TabIndex = 1;
             this.buttonAdd.Text = "&Add...";
             this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
             // 
@@ -156,28 +164,29 @@ namespace Arcade.Forms
             this.buttonClose.Location = new System.Drawing.Point(584, 248);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(75, 23);
-            this.buttonClose.TabIndex = 14;
+            this.buttonClose.TabIndex = 5;
             this.buttonClose.Text = "Close";
             this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
             // listViewKeywords
             // 
-            this.listViewKeywords.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.listViewKeywords.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listViewKeywords.AutoArrange = false;
             this.listViewKeywords.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-        this.columnHeaderName,
-        this.columnHeaderDataSheets});
+            this.columnHeaderName,
+            this.columnHeaderDataSheets});
             this.listViewKeywords.ComboBoxItems = ((System.Collections.Specialized.StringCollection)(resources.GetObject("listViewKeywords.ComboBoxItems")));
             this.listViewKeywords.FullRowSelect = true;
             this.listViewKeywords.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listViewKeywords.HideSelection = false;
             this.listViewKeywords.LabelEditor = Common.Forms.ListView.ELabelEditor.None;
             this.listViewKeywords.LabelWrap = false;
-            this.listViewKeywords.Location = new System.Drawing.Point(8, 24);
+            this.listViewKeywords.Location = new System.Drawing.Point(3, 19);
             this.listViewKeywords.MultiSelect = false;
             this.listViewKeywords.Name = "listViewKeywords";
-            this.listViewKeywords.Size = new System.Drawing.Size(272, 136);
+            this.listViewKeywords.Size = new System.Drawing.Size(268, 130);
             this.listViewKeywords.SortArrow = Common.Forms.ListView.ESortArrow.None;
             this.listViewKeywords.Sorting = Common.Forms.ListView.ESortOrder.GroupSequential;
             this.listViewKeywords.TabIndex = 1;
@@ -201,7 +210,7 @@ namespace Arcade.Forms
             this.buttonEdit.Location = new System.Drawing.Point(89, 248);
             this.buttonEdit.Name = "buttonEdit";
             this.buttonEdit.Size = new System.Drawing.Size(75, 23);
-            this.buttonEdit.TabIndex = 9;
+            this.buttonEdit.TabIndex = 2;
             this.buttonEdit.Text = "&Edit...";
             this.buttonEdit.UseVisualStyleBackColor = true;
             this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
@@ -212,7 +221,7 @@ namespace Arcade.Forms
             this.buttonDelete.Location = new System.Drawing.Point(170, 248);
             this.buttonDelete.Name = "buttonDelete";
             this.buttonDelete.Size = new System.Drawing.Size(75, 23);
-            this.buttonDelete.TabIndex = 10;
+            this.buttonDelete.TabIndex = 3;
             this.buttonDelete.Text = "&Delete";
             this.buttonDelete.UseVisualStyleBackColor = true;
             this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
@@ -223,10 +232,37 @@ namespace Arcade.Forms
             this.buttonDatasheets.Location = new System.Drawing.Point(252, 248);
             this.buttonDatasheets.Name = "buttonDatasheets";
             this.buttonDatasheets.Size = new System.Drawing.Size(80, 23);
-            this.buttonDatasheets.TabIndex = 11;
+            this.buttonDatasheets.TabIndex = 4;
             this.buttonDatasheets.Text = "Datasheets...";
             this.buttonDatasheets.UseVisualStyleBackColor = true;
             this.buttonDatasheets.Click += new System.EventHandler(this.buttonDatasheets_Click);
+            // 
+            // splitContainerPart
+            // 
+            this.splitContainerPart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainerPart.Location = new System.Drawing.Point(8, 12);
+            this.splitContainerPart.Name = "splitContainerPart";
+            // 
+            // splitContainerPart.Panel1
+            // 
+            this.splitContainerPart.Panel1.Controls.Add(this.labelParts);
+            this.splitContainerPart.Panel1.Controls.Add(this.listViewKeywords);
+            this.splitContainerPart.Panel1.Controls.Add(this.textBoxType);
+            this.splitContainerPart.Panel1.Controls.Add(this.labelCategory);
+            this.splitContainerPart.Panel1.Controls.Add(this.labelType);
+            this.splitContainerPart.Panel1.Controls.Add(this.labelPackage);
+            this.splitContainerPart.Panel1.Controls.Add(this.textBoxPackage);
+            this.splitContainerPart.Panel1.Controls.Add(this.textBoxCategory);
+            // 
+            // splitContainerPart.Panel2
+            // 
+            this.splitContainerPart.Panel2.Controls.Add(this.labelPinouts);
+            this.splitContainerPart.Panel2.Controls.Add(this.textBoxPinouts);
+            this.splitContainerPart.Size = new System.Drawing.Size(648, 230);
+            this.splitContainerPart.SplitterDistance = 274;
+            this.splitContainerPart.TabIndex = 0;
             // 
             // PartDetailsForm
             // 
@@ -234,21 +270,12 @@ namespace Arcade.Forms
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.buttonClose;
             this.ClientSize = new System.Drawing.Size(664, 278);
+            this.Controls.Add(this.splitContainerPart);
             this.Controls.Add(this.buttonDatasheets);
             this.Controls.Add(this.buttonDelete);
             this.Controls.Add(this.buttonEdit);
-            this.Controls.Add(this.listViewKeywords);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.buttonAdd);
-            this.Controls.Add(this.labelParts);
-            this.Controls.Add(this.textBoxPinouts);
-            this.Controls.Add(this.textBoxPackage);
-            this.Controls.Add(this.textBoxType);
-            this.Controls.Add(this.textBoxCategory);
-            this.Controls.Add(this.labelPinouts);
-            this.Controls.Add(this.labelPackage);
-            this.Controls.Add(this.labelType);
-            this.Controls.Add(this.labelCategory);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(672, 312);
@@ -258,8 +285,13 @@ namespace Arcade.Forms
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Details...";
             this.Load += new System.EventHandler(this.PartDetailsForm_Load);
+            this.splitContainerPart.Panel1.ResumeLayout(false);
+            this.splitContainerPart.Panel1.PerformLayout();
+            this.splitContainerPart.Panel2.ResumeLayout(false);
+            this.splitContainerPart.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerPart)).EndInit();
+            this.splitContainerPart.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
         #endregion
@@ -281,6 +313,7 @@ namespace Arcade.Forms
         private System.Windows.Forms.Button buttonDelete;
         private System.Windows.Forms.Button buttonDatasheets;
         private System.Windows.Forms.Button buttonClose;
+        private System.Windows.Forms.SplitContainer splitContainerPart;
     }
 }
 

@@ -35,7 +35,7 @@ namespace Arcade.Forms
         {
             get
             {
-                return new System.Windows.Forms.Control[] { listViewGames, listViewBoard, listViewPositionsAndLocations, checkBoxIncludeAllParts };
+                return new System.Windows.Forms.Control[] { listViewGames, listViewBoard, listViewPositionsAndLocations, checkBoxIncludeAllParts, splitContainerLeft, splitContainerRight };
             }
         }
         #endregion

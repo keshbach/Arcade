@@ -153,7 +153,7 @@ namespace Arcade.Forms
         {
             get
             {
-                return new System.Windows.Forms.Control[] { listViewDatasheets };
+                return new System.Windows.Forms.Control[] { listViewDatasheets, splitContainerParts };
             }
         }
         #endregion

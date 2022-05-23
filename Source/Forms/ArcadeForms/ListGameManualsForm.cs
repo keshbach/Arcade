@@ -234,6 +234,8 @@ namespace Arcade.Forms
 
             Manual = (DatabaseDefs.TManual)listViewManuals.Items[nIndex].Tag;
 
+            new Common.Forms.FormLocation(ManualEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
             ManualEntry.ManualEntryFormType = ManualEntryForm.EManualEntryFormType.ViewManual;
             ManualEntry.ManualName = Manual.sManualName;
             ManualEntry.StorageBox = Manual.sManualStorageBox;

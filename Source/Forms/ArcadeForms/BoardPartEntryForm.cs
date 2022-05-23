@@ -136,7 +136,7 @@ namespace Arcade.Forms
         {
             get
             {
-                return new System.Windows.Forms.Control[] { listViewParts };
+                return new System.Windows.Forms.Control[] { listViewParts, splitContainerBoardPart };
             }
         }
 
@@ -211,6 +211,8 @@ namespace Arcade.Forms
         {
             FindPartForm PartForm = new FindPartForm();
 
+            new Common.Forms.FormLocation(PartForm, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
             PartForm.ShowDialog(this);
 
             FindPartsFromPartName();
@@ -223,6 +225,8 @@ namespace Arcade.Forms
             Arcade.Forms.PartEntryForm PartEntry = new Arcade.Forms.PartEntryForm();
             System.Int32 nPartId;
             System.String sErrorMessage;
+
+            new Common.Forms.FormLocation(PartEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
             PartEntry.PartEntryFormType = Arcade.Forms.PartEntryForm.EPartEntryFormType.NewPart;
 

@@ -85,47 +85,49 @@ namespace Arcade.Forms
         #region "Button Event Handlers"
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            Arcade.Forms.GameEntryForm GameForm = new Arcade.Forms.GameEntryForm();
+            Arcade.Forms.GameEntryForm GameEntry = new Arcade.Forms.GameEntryForm();
             System.Int32 nNewGameId;
             System.String sErrorMessage;
             DatabaseDefs.TGame Game;
             System.Windows.Forms.ListViewItem Item;
 
-            GameForm.GameEntryFormType = Arcade.Forms.GameEntryForm.EGameEntryFormType.NewGame;
+            new Common.Forms.FormLocation(GameEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
-            if (System.Windows.Forms.DialogResult.OK == GameForm.ShowDialog(this))
+            GameEntry.GameEntryFormType = Arcade.Forms.GameEntryForm.EGameEntryFormType.NewGame;
+
+            if (System.Windows.Forms.DialogResult.OK == GameEntry.ShowDialog(this))
             {
                 using (new Common.Forms.WaitCursor(this))
                 {
-                    if (Database.AddGame(GameForm.GameName,
-                                         GameForm.Manufacturer,
-                                         GameForm.GameWiringHarness,
-                                         GameForm.GameHaveWiringHarness,
-                                         GameForm.GameNeedPowerOnReset,
-                                         GameForm.GameCocktail,
-                                         GameForm.GameDescription,
-                                         GameForm.GamePinouts,
-                                         GameForm.GameDipSwitches,
-                                         GameForm.GameAudioColl,
-                                         GameForm.GameVideoColl,
-                                         GameForm.GameControlsColl,
+                    if (Database.AddGame(GameEntry.GameName,
+                                         GameEntry.Manufacturer,
+                                         GameEntry.GameWiringHarness,
+                                         GameEntry.GameHaveWiringHarness,
+                                         GameEntry.GameNeedPowerOnReset,
+                                         GameEntry.GameCocktail,
+                                         GameEntry.GameDescription,
+                                         GameEntry.GamePinouts,
+                                         GameEntry.GameDipSwitches,
+                                         GameEntry.GameAudioColl,
+                                         GameEntry.GameVideoColl,
+                                         GameEntry.GameControlsColl,
                                          out nNewGameId,
                                          out sErrorMessage))
                     {
                         Game = new DatabaseDefs.TGame();
 
                         Game.nGameId = nNewGameId;
-                        Game.sGameName = GameForm.GameName;
-                        Game.sManufacturer = GameForm.Manufacturer;
-                        Game.sGameWiringHarness = GameForm.GameWiringHarness;
-                        Game.bGameHaveWiringHarness = GameForm.GameHaveWiringHarness;
-                        Game.sGameCocktail = GameForm.GameCocktail;
-                        Game.sGameDescription = GameForm.GameDescription;
-                        Game.sGamePinouts = GameForm.GamePinouts;
-                        Game.sGameDipSwitches = GameForm.GameDipSwitches;
-                        Game.GameAudioColl = GameForm.GameAudioColl;
-                        Game.GameVideoColl = GameForm.GameVideoColl;
-                        Game.GameControlsColl = GameForm.GameControlsColl;
+                        Game.sGameName = GameEntry.GameName;
+                        Game.sManufacturer = GameEntry.Manufacturer;
+                        Game.sGameWiringHarness = GameEntry.GameWiringHarness;
+                        Game.bGameHaveWiringHarness = GameEntry.GameHaveWiringHarness;
+                        Game.sGameCocktail = GameEntry.GameCocktail;
+                        Game.sGameDescription = GameEntry.GameDescription;
+                        Game.sGamePinouts = GameEntry.GamePinouts;
+                        Game.sGameDipSwitches = GameEntry.GameDipSwitches;
+                        Game.GameAudioColl = GameEntry.GameAudioColl;
+                        Game.GameVideoColl = GameEntry.GameVideoColl;
+                        Game.GameControlsColl = GameEntry.GameControlsColl;
 
                         listViewGames.Enabled = true;
 
@@ -207,60 +209,62 @@ namespace Arcade.Forms
         private void EditGame()
         {
             System.Int32 nIndex = listViewGames.SelectedIndices[0];
-            Arcade.Forms.GameEntryForm GameForm = new Arcade.Forms.GameEntryForm();
+            Arcade.Forms.GameEntryForm GameEntry = new Arcade.Forms.GameEntryForm();
             System.String sErrorMessage;
             DatabaseDefs.TGame Game;
 
+            new Common.Forms.FormLocation(GameEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
             Game = (DatabaseDefs.TGame)listViewGames.Items[nIndex].Tag;
 
-            GameForm.GameEntryFormType = Arcade.Forms.GameEntryForm.EGameEntryFormType.EditGame;
-            GameForm.GameId = Game.nGameId;
-            GameForm.GameName = Game.sGameName;
-            GameForm.Manufacturer = Game.sManufacturer;
-            GameForm.GameWiringHarness = Game.sGameWiringHarness;
-            GameForm.GameHaveWiringHarness = Game.bGameHaveWiringHarness;
-            GameForm.GameNeedPowerOnReset = Game.bGameNeedPowerOnReset;
-            GameForm.GameCocktail = Game.sGameCocktail;
-            GameForm.GameDescription = Game.sGameDescription;
-            GameForm.GamePinouts = Game.sGamePinouts;
-            GameForm.GameDipSwitches = Game.sGameDipSwitches;
-            GameForm.GameAudioColl = Game.GameAudioColl;
-            GameForm.GameVideoColl = Game.GameVideoColl;
-            GameForm.GameControlsColl = Game.GameControlsColl;
+            GameEntry.GameEntryFormType = Arcade.Forms.GameEntryForm.EGameEntryFormType.EditGame;
+            GameEntry.GameId = Game.nGameId;
+            GameEntry.GameName = Game.sGameName;
+            GameEntry.Manufacturer = Game.sManufacturer;
+            GameEntry.GameWiringHarness = Game.sGameWiringHarness;
+            GameEntry.GameHaveWiringHarness = Game.bGameHaveWiringHarness;
+            GameEntry.GameNeedPowerOnReset = Game.bGameNeedPowerOnReset;
+            GameEntry.GameCocktail = Game.sGameCocktail;
+            GameEntry.GameDescription = Game.sGameDescription;
+            GameEntry.GamePinouts = Game.sGamePinouts;
+            GameEntry.GameDipSwitches = Game.sGameDipSwitches;
+            GameEntry.GameAudioColl = Game.GameAudioColl;
+            GameEntry.GameVideoColl = Game.GameVideoColl;
+            GameEntry.GameControlsColl = Game.GameControlsColl;
 
-            if (System.Windows.Forms.DialogResult.OK == GameForm.ShowDialog(this))
+            if (System.Windows.Forms.DialogResult.OK == GameEntry.ShowDialog(this))
             {
                 using (new Common.Forms.WaitCursor(this))
                 {
                     if (Database.EditGame(Game.nGameId,
-                                          GameForm.GameName,
-                                          GameForm.Manufacturer,
-                                          GameForm.GameWiringHarness,
-                                          GameForm.GameHaveWiringHarness,
-                                          GameForm.GameNeedPowerOnReset,
-                                          GameForm.GameCocktail,
-                                          GameForm.GameDescription,
-                                          GameForm.GamePinouts,
-                                          GameForm.GameDipSwitches,
-                                          GameForm.GameAudioColl,
-                                          GameForm.GameVideoColl,
-                                          GameForm.GameControlsColl,
+                                          GameEntry.GameName,
+                                          GameEntry.Manufacturer,
+                                          GameEntry.GameWiringHarness,
+                                          GameEntry.GameHaveWiringHarness,
+                                          GameEntry.GameNeedPowerOnReset,
+                                          GameEntry.GameCocktail,
+                                          GameEntry.GameDescription,
+                                          GameEntry.GamePinouts,
+                                          GameEntry.GameDipSwitches,
+                                          GameEntry.GameAudioColl,
+                                          GameEntry.GameVideoColl,
+                                          GameEntry.GameControlsColl,
                                           out sErrorMessage))
                     {
-                        Game.sGameName = GameForm.GameName;
-                        Game.sManufacturer = GameForm.Manufacturer;
-                        Game.sGameWiringHarness = GameForm.GameWiringHarness;
-                        Game.bGameHaveWiringHarness = GameForm.GameHaveWiringHarness;
-                        Game.bGameNeedPowerOnReset = GameForm.GameNeedPowerOnReset;
-                        Game.sGameCocktail = GameForm.GameCocktail;
-                        Game.sGameDescription = GameForm.GameDescription;
-                        Game.sGamePinouts = GameForm.GamePinouts;
-                        Game.sGameDipSwitches = GameForm.GameDipSwitches;
-                        Game.GameAudioColl = GameForm.GameAudioColl;
-                        Game.GameVideoColl = GameForm.GameVideoColl;
-                        Game.GameControlsColl = GameForm.GameControlsColl;
+                        Game.sGameName = GameEntry.GameName;
+                        Game.sManufacturer = GameEntry.Manufacturer;
+                        Game.sGameWiringHarness = GameEntry.GameWiringHarness;
+                        Game.bGameHaveWiringHarness = GameEntry.GameHaveWiringHarness;
+                        Game.bGameNeedPowerOnReset = GameEntry.GameNeedPowerOnReset;
+                        Game.sGameCocktail = GameEntry.GameCocktail;
+                        Game.sGameDescription = GameEntry.GameDescription;
+                        Game.sGamePinouts = GameEntry.GamePinouts;
+                        Game.sGameDipSwitches = GameEntry.GameDipSwitches;
+                        Game.GameAudioColl = GameEntry.GameAudioColl;
+                        Game.GameVideoColl = GameEntry.GameVideoColl;
+                        Game.GameControlsColl = GameEntry.GameControlsColl;
 
-                        listViewGames.Items[nIndex].Text = GameForm.GameName;
+                        listViewGames.Items[nIndex].Text = GameEntry.GameName;
                         listViewGames.Items[nIndex].Tag = Game;
 
                         listViewGames.AutosizeColumns();

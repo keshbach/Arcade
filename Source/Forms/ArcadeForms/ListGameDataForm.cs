@@ -201,6 +201,8 @@ namespace Arcade.Forms
                     break;
             }
 
+            new Common.Forms.FormLocation(SelectData, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
             if (SelectData.ShowDialog(this) == DialogResult.OK)
             {
                 m_GamePropertiesColl.Add(SelectData.SelectedData);

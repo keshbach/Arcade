@@ -21,7 +21,7 @@ namespace Arcade.Forms
         {
             get
             {
-                return new System.Windows.Forms.Control[] { listViewGames, listViewBoard };
+                return new System.Windows.Forms.Control[] { listViewGames, listViewBoard, splitContainerGameBoards };
             }
         }
         #endregion

@@ -134,12 +134,14 @@ namespace Arcade.Forms
             // 
             // comboBoxManufacturer
             // 
+            this.comboBoxManufacturer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxManufacturer.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.comboBoxManufacturer.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.comboBoxManufacturer.FormattingEnabled = true;
             this.comboBoxManufacturer.Location = new System.Drawing.Point(80, 180);
             this.comboBoxManufacturer.Name = "comboBoxManufacturer";
-            this.comboBoxManufacturer.Size = new System.Drawing.Size(160, 21);
+            this.comboBoxManufacturer.Size = new System.Drawing.Size(300, 21);
             this.comboBoxManufacturer.TabIndex = 13;
             this.comboBoxManufacturer.Validating += new System.ComponentModel.CancelEventHandler(this.comboBoxManufacturer_Validating);
             // 
@@ -172,7 +174,6 @@ namespace Arcade.Forms
             // 
             // labelDescription
             // 
-            this.labelDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelDescription.AutoSize = true;
             this.labelDescription.Location = new System.Drawing.Point(6, 238);
             this.labelDescription.Name = "labelDescription";
@@ -183,8 +184,9 @@ namespace Arcade.Forms
             // textBoxDescription
             // 
             this.textBoxDescription.AcceptsReturn = true;
-            this.textBoxDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxDescription.HideSelection = false;
             this.textBoxDescription.Location = new System.Drawing.Point(9, 255);
             this.textBoxDescription.MaxLength = 2000000;
@@ -196,6 +198,8 @@ namespace Arcade.Forms
             // 
             // textBoxName
             // 
+            this.textBoxName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxName.HideSelection = false;
             this.textBoxName.Location = new System.Drawing.Point(80, 14);
             this.textBoxName.MaxLength = 10;
@@ -284,9 +288,9 @@ namespace Arcade.Forms
             this.Controls.Add(this.labelStorageBox);
             this.Controls.Add(this.comboBoxStorageBox);
             this.Controls.Add(this.labelName);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(406, 423);
             this.Name = "ManualEntryForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

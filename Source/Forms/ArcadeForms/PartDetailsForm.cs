@@ -45,7 +45,7 @@ namespace Arcade.Forms
         {
             get
             {
-                return new System.Windows.Forms.Control[] { listViewKeywords };
+                return new System.Windows.Forms.Control[] { listViewKeywords, splitContainerPart };
             }
         }
         #endregion

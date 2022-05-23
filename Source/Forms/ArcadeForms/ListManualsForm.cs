@@ -241,6 +241,8 @@ namespace Arcade.Forms
             DatabaseDefs.TManual Manual;
             System.Windows.Forms.ListViewItem Item;
 
+            new Common.Forms.FormLocation(ManualEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
+
             ManualEntry.ManualEntryFormType = ManualEntryForm.EManualEntryFormType.NewManual;
 
             if (ManualEntry.ShowDialog(this) == DialogResult.OK)
@@ -369,6 +371,8 @@ namespace Arcade.Forms
             System.Windows.Forms.ListViewItem Item;
 
             Manual = (DatabaseDefs.TManual)listViewManuals.Items[nIndex].Tag;
+
+            new Common.Forms.FormLocation(ManualEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
             ManualEntry.ManualEntryFormType = ManualEntryForm.EManualEntryFormType.EditManual;
 

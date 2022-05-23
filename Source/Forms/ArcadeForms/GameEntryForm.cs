@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class GameEntryForm : System.Windows.Forms.Form
+    public partial class GameEntryForm : Common.Forms.Form
     {
         #region "Enumerations"
         public enum EGameEntryFormType
@@ -209,6 +209,16 @@ namespace Arcade.Forms
             set
             {
                 m_sGameDipSwitches = value;
+            }
+        }
+        #endregion
+
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlLocationSettings
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { splitContainerTop, splitContainerBottom, splitContainerTopBottom };
             }
         }
         #endregion

@@ -109,6 +109,9 @@ namespace Arcade.Forms
             // textBoxDescription
             // 
             this.textBoxDescription.AcceptsReturn = true;
+            this.textBoxDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxDescription.Location = new System.Drawing.Point(7, 109);
             this.textBoxDescription.Multiline = true;
             this.textBoxDescription.Name = "textBoxDescription";
@@ -119,6 +122,7 @@ namespace Arcade.Forms
             // 
             // buttonCancel
             // 
+            this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(274, 219);
             this.buttonCancel.Name = "buttonCancel";
@@ -130,6 +134,7 @@ namespace Arcade.Forms
             // 
             // buttonOK
             // 
+            this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.buttonOK.Location = new System.Drawing.Point(193, 219);
             this.buttonOK.Name = "buttonOK";
@@ -156,7 +161,6 @@ namespace Arcade.Forms
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.comboBoxBoardType);
             this.Controls.Add(this.labelBoardType);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "GameBoardEntryForm";
