@@ -221,6 +221,14 @@ namespace Arcade.Forms
                 return new System.Windows.Forms.Control[] { splitContainerTop, splitContainerBottom, splitContainerTopBottom };
             }
         }
+
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxName, textBoxDescription, textBoxDipSwitches, textBoxPinouts, comboBoxManufacturer };
+            }
+        }
         #endregion
 
         #region "Game Entry Event Handlers"

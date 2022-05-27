@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class GameBoardEntryForm : System.Windows.Forms.Form
+    public partial class GameBoardEntryForm : Common.Forms.Form
     {
         #region "Enumerations"
         public enum EGameBoardEntryFormType
@@ -87,6 +87,16 @@ namespace Arcade.Forms
             set
             {
                 m_sBoardDescription = value;
+            }
+        }
+        #endregion
+
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxName, textBoxSize, textBoxDescription };
             }
         }
         #endregion

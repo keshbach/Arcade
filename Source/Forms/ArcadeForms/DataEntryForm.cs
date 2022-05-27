@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class DataEntryForm : System.Windows.Forms.Form
+    public partial class DataEntryForm : Common.Forms.Form
     {
         #region "Enumerations"
         public enum EDataEntryFormType
@@ -56,6 +56,16 @@ namespace Arcade.Forms
             set
             {
                 m_nMaxDataNameLen = value;
+            }
+        }
+        #endregion
+
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxName };
             }
         }
         #endregion

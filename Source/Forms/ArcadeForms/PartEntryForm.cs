@@ -156,6 +156,14 @@ namespace Arcade.Forms
                 return new System.Windows.Forms.Control[] { listViewDatasheets, splitContainerParts };
             }
         }
+
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxName, textBoxPartPinouts, comboBoxCategory, comboBoxType, comboBoxPackage };
+            }
+        }
         #endregion
 
         #region "Part Entry Event Handlers"

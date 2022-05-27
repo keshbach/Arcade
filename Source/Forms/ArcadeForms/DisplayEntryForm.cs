@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class DisplayEntryForm : System.Windows.Forms.Form
+    public partial class DisplayEntryForm : Common.Forms.Form
     {
         #region "Enumerations"
         public enum EDisplayEntryFormType
@@ -114,6 +114,16 @@ namespace Arcade.Forms
             set
             {
                 m_sDisplayOrientation = value;
+            }
+        }
+        #endregion
+
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxName };
             }
         }
         #endregion

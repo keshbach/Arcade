@@ -140,6 +140,14 @@ namespace Arcade.Forms
             }
         }
 
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxPosition, textBoxDescription, textBoxTimerFind };
+            }
+        }
+
         protected override Common.Forms.ListView.ESortOrder GetListViewDefaultSortOrderFormLocationSetting(
             Common.Forms.ListView ListView)
         {

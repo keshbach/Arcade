@@ -48,6 +48,14 @@ namespace Arcade.Forms
                 return new System.Windows.Forms.Control[] { listViewKeywords, splitContainerPart };
             }
         }
+
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxCategory, textBoxType, textBoxPackage, textBoxPinouts };
+            }
+        }
         #endregion
 
         #region "Part Details Event Handlers"

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class LogEntryForm : System.Windows.Forms.Form
+    public partial class LogEntryForm : Common.Forms.Form
     {
         #region "Enumerations"
         public enum ELogEntryFormType
@@ -77,6 +77,16 @@ namespace Arcade.Forms
             set
             {
                 m_sLogDescription = value;
+            }
+        }
+        #endregion
+
+        #region "Common.Forms.Form Overrides"
+        protected override System.Windows.Forms.Control[] ControlClearSelection
+        {
+            get
+            {
+                return new System.Windows.Forms.Control[] { textBoxDescription };
             }
         }
         #endregion
