@@ -1,0 +1,473 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CBED243E-37FE-4822-B784-F0548F8F1109}</ProjectGuid>
+    <RootNamespace>UiArcadeCtrlsNet</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+    <ProjectName>UiArcadeCtrlsNet</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+    <SpectreMitigation>false</SpectreMitigation>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v142</PlatformToolset>
+    <SpectreMitigation>false</SpectreMitigation>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <PlatformToolset>v142</PlatformToolset>
+    <SpectreMitigation>false</SpectreMitigation>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <PlatformToolset>v142</PlatformToolset>
+    <SpectreMitigation>false</SpectreMitigation>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\lib\$(Configuration)\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\lib\$(Configuration)\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Configuration)\$(PlatformTarget)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Configuration)\$(PlatformTarget)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <StringPooling>true</StringPooling>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>ptrustmd.lib;ole32.lib;user32.lib;gdi32.lib;D2d1.lib;windowscodecs.lib;gdiplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>msvcmrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ModuleDefinitionFile>UiArcadeCtrlsNet.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug>true</AssemblyDebug>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</AdditionalLibraryDirectories>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <BuildLog>
+      <Path>$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <StringPooling>true</StringPooling>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>ptrustmd.lib;ole32.lib;user32.lib;gdi32.lib;D2d1.lib;windowscodecs.lib;gdiplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>msvcmrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ModuleDefinitionFile>UiArcadeCtrlsNet64.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug>true</AssemblyDebug>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</AdditionalLibraryDirectories>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <BuildLog>
+      <Path>$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <StringPooling>true</StringPooling>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>ptrustm.lib;ole32.lib;user32.lib;gdi32.lib;D2d1.lib;windowscodecs.lib;gdiplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>msvcmrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ModuleDefinitionFile>UiArcadeCtrlsNet.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <BuildLog>
+      <Path>$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <StringPooling>true</StringPooling>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>ptrustm.lib;ole32.lib;user32.lib;gdi32.lib;D2d1.lib;windowscodecs.lib;gdiplus.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>msvcmrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ModuleDefinitionFile>UiArcadeCtrlsNet64.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EntryPointSymbol>DllMain</EntryPointSymbol>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\bin\$(Configuration)\$(PlatformTarget)\</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>../..</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <BuildLog>
+      <Path>$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Data">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Design" />
+    <Reference Include="System.Xml">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="UiCtrlsNet">
+      <HintPath>$(SolutionDir)..\bin\$(Configuration)\$(PlatformName)\UiCtrlsNet.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Form.cpp" />
+    <ClCompile Include="ImageStream.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UiArcadeCtrlsNetDllMain.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+    </ClCompile>
+    <ClCompile Include="UiArcadeCtrlsUtil.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="UiArcadeCtrlsNet.def" />
+    <None Include="UiArcadeCtrlsNet64.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Form.h" />
+    <ClInclude Include="ImageStream.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="UiArcadeCtrlsUtil.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Spinner-100px\Spinner-100px_1.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_10.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_11.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_12.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_13.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_14.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_15.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_16.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_17.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_18.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_19.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_2.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_20.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_21.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_22.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_23.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_24.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_25.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_26.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_27.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_28.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_29.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_3.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_30.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_4.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_5.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_6.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_7.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_8.bmp" />
+    <Image Include="Spinner-100px\Spinner-100px_9.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_1.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_10.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_11.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_12.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_13.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_14.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_15.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_16.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_17.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_18.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_19.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_2.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_20.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_21.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_22.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_23.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_24.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_25.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_26.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_27.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_28.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_29.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_3.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_30.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_4.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_5.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_6.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_7.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_8.bmp" />
+    <Image Include="Spinner-150px\Spinner-150px_9.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_1.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_10.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_11.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_12.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_13.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_14.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_15.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_16.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_17.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_18.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_19.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_2.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_20.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_21.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_22.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_23.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_24.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_25.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_26.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_27.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_28.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_29.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_3.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_30.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_4.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_5.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_6.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_7.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_8.bmp" />
+    <Image Include="Spinner-200px\Spinner-200px_9.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_1.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_10.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_11.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_12.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_13.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_14.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_15.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_16.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_17.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_18.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_19.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_2.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_20.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_21.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_22.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_23.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_24.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_25.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_26.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_27.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_28.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_29.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_3.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_30.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_4.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_5.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_6.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_7.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_8.bmp" />
+    <Image Include="Spinner-50px\Spinner-50px_9.bmp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

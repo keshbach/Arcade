@@ -1,0 +1,187 @@
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2010-2022 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
+#include <windows.h>
+
+#include "resource.h"
+
+#include <Includes/UtVersion.h>
+
+#ifdef RC_INVOKED
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Transparent Bitmaps (Cannot use BITMAP resource type because the resource compiler does not support bitmaps with an alpha channel.)
+//
+
+IDB_SPINNER_50_PX_1 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_1.bmp"
+IDB_SPINNER_50_PX_2 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_2.bmp"
+IDB_SPINNER_50_PX_3 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_3.bmp"
+IDB_SPINNER_50_PX_4 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_4.bmp"
+IDB_SPINNER_50_PX_5 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_5.bmp"
+IDB_SPINNER_50_PX_6 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_6.bmp"
+IDB_SPINNER_50_PX_7 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_7.bmp"
+IDB_SPINNER_50_PX_8 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_8.bmp"
+IDB_SPINNER_50_PX_9 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_9.bmp"
+IDB_SPINNER_50_PX_10 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_10.bmp"
+IDB_SPINNER_50_PX_11 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_11.bmp"
+IDB_SPINNER_50_PX_12 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_12.bmp"
+IDB_SPINNER_50_PX_13 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_13.bmp"
+IDB_SPINNER_50_PX_14 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_14.bmp"
+IDB_SPINNER_50_PX_15 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_15.bmp"
+IDB_SPINNER_50_PX_16 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_16.bmp"
+IDB_SPINNER_50_PX_17 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_17.bmp"
+IDB_SPINNER_50_PX_18 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_18.bmp"
+IDB_SPINNER_50_PX_19 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_19.bmp"
+IDB_SPINNER_50_PX_20 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_20.bmp"
+IDB_SPINNER_50_PX_21 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_21.bmp"
+IDB_SPINNER_50_PX_22 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_22.bmp"
+IDB_SPINNER_50_PX_23 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_23.bmp"
+IDB_SPINNER_50_PX_24 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_24.bmp"
+IDB_SPINNER_50_PX_25 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_25.bmp"
+IDB_SPINNER_50_PX_26 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_26.bmp"
+IDB_SPINNER_50_PX_27 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_27.bmp"
+IDB_SPINNER_50_PX_28 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_28.bmp"
+IDB_SPINNER_50_PX_29 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_29.bmp"
+IDB_SPINNER_50_PX_30 RT_TRANSPARENTBITMAP "Spinner-50px/Spinner-50px_30.bmp"
+
+IDB_SPINNER_100_PX_1 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_1.bmp"
+IDB_SPINNER_100_PX_2 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_2.bmp"
+IDB_SPINNER_100_PX_3 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_3.bmp"
+IDB_SPINNER_100_PX_4 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_4.bmp"
+IDB_SPINNER_100_PX_5 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_5.bmp"
+IDB_SPINNER_100_PX_6 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_6.bmp"
+IDB_SPINNER_100_PX_7 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_7.bmp"
+IDB_SPINNER_100_PX_8 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_8.bmp"
+IDB_SPINNER_100_PX_9 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_9.bmp"
+IDB_SPINNER_100_PX_10 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_10.bmp"
+IDB_SPINNER_100_PX_11 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_11.bmp"
+IDB_SPINNER_100_PX_12 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_12.bmp"
+IDB_SPINNER_100_PX_13 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_13.bmp"
+IDB_SPINNER_100_PX_14 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_14.bmp"
+IDB_SPINNER_100_PX_15 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_15.bmp"
+IDB_SPINNER_100_PX_16 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_16.bmp"
+IDB_SPINNER_100_PX_17 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_17.bmp"
+IDB_SPINNER_100_PX_18 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_18.bmp"
+IDB_SPINNER_100_PX_19 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_19.bmp"
+IDB_SPINNER_100_PX_20 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_20.bmp"
+IDB_SPINNER_100_PX_21 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_21.bmp"
+IDB_SPINNER_100_PX_22 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_22.bmp"
+IDB_SPINNER_100_PX_23 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_23.bmp"
+IDB_SPINNER_100_PX_24 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_24.bmp"
+IDB_SPINNER_100_PX_25 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_25.bmp"
+IDB_SPINNER_100_PX_26 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_26.bmp"
+IDB_SPINNER_100_PX_27 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_27.bmp"
+IDB_SPINNER_100_PX_28 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_28.bmp"
+IDB_SPINNER_100_PX_29 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_29.bmp"
+IDB_SPINNER_100_PX_30 RT_TRANSPARENTBITMAP "Spinner-100px/Spinner-100px_30.bmp"
+
+IDB_SPINNER_150_PX_1 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_1.bmp"
+IDB_SPINNER_150_PX_2 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_2.bmp"
+IDB_SPINNER_150_PX_3 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_3.bmp"
+IDB_SPINNER_150_PX_4 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_4.bmp"
+IDB_SPINNER_150_PX_5 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_5.bmp"
+IDB_SPINNER_150_PX_6 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_6.bmp"
+IDB_SPINNER_150_PX_7 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_7.bmp"
+IDB_SPINNER_150_PX_8 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_8.bmp"
+IDB_SPINNER_150_PX_9 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_9.bmp"
+IDB_SPINNER_150_PX_10 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_10.bmp"
+IDB_SPINNER_150_PX_11 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_11.bmp"
+IDB_SPINNER_150_PX_12 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_12.bmp"
+IDB_SPINNER_150_PX_13 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_13.bmp"
+IDB_SPINNER_150_PX_14 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_14.bmp"
+IDB_SPINNER_150_PX_15 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_15.bmp"
+IDB_SPINNER_150_PX_16 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_16.bmp"
+IDB_SPINNER_150_PX_17 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_17.bmp"
+IDB_SPINNER_150_PX_18 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_18.bmp"
+IDB_SPINNER_150_PX_19 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_19.bmp"
+IDB_SPINNER_150_PX_20 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_20.bmp"
+IDB_SPINNER_150_PX_21 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_21.bmp"
+IDB_SPINNER_150_PX_22 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_22.bmp"
+IDB_SPINNER_150_PX_23 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_23.bmp"
+IDB_SPINNER_150_PX_24 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_24.bmp"
+IDB_SPINNER_150_PX_25 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_25.bmp"
+IDB_SPINNER_150_PX_26 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_26.bmp"
+IDB_SPINNER_150_PX_27 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_27.bmp"
+IDB_SPINNER_150_PX_28 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_28.bmp"
+IDB_SPINNER_150_PX_29 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_29.bmp"
+IDB_SPINNER_150_PX_30 RT_TRANSPARENTBITMAP "Spinner-150px/Spinner-150px_30.bmp"
+
+IDB_SPINNER_200_PX_1 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_1.bmp"
+IDB_SPINNER_200_PX_2 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_2.bmp"
+IDB_SPINNER_200_PX_3 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_3.bmp"
+IDB_SPINNER_200_PX_4 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_4.bmp"
+IDB_SPINNER_200_PX_5 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_5.bmp"
+IDB_SPINNER_200_PX_6 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_6.bmp"
+IDB_SPINNER_200_PX_7 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_7.bmp"
+IDB_SPINNER_200_PX_8 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_8.bmp"
+IDB_SPINNER_200_PX_9 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_9.bmp"
+IDB_SPINNER_200_PX_10 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_10.bmp"
+IDB_SPINNER_200_PX_11 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_11.bmp"
+IDB_SPINNER_200_PX_12 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_12.bmp"
+IDB_SPINNER_200_PX_13 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_13.bmp"
+IDB_SPINNER_200_PX_14 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_14.bmp"
+IDB_SPINNER_200_PX_15 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_15.bmp"
+IDB_SPINNER_200_PX_16 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_16.bmp"
+IDB_SPINNER_200_PX_17 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_17.bmp"
+IDB_SPINNER_200_PX_18 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_18.bmp"
+IDB_SPINNER_200_PX_19 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_19.bmp"
+IDB_SPINNER_200_PX_20 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_20.bmp"
+IDB_SPINNER_200_PX_21 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_21.bmp"
+IDB_SPINNER_200_PX_22 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_22.bmp"
+IDB_SPINNER_200_PX_23 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_23.bmp"
+IDB_SPINNER_200_PX_24 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_24.bmp"
+IDB_SPINNER_200_PX_25 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_25.bmp"
+IDB_SPINNER_200_PX_26 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_26.bmp"
+IDB_SPINNER_200_PX_27 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_27.bmp"
+IDB_SPINNER_200_PX_28 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_28.bmp"
+IDB_SPINNER_200_PX_29 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_29.bmp"
+IDB_SPINNER_200_PX_30 RT_TRANSPARENTBITMAP "Spinner-200px/Spinner-200px_30.bmp"
+
+#if DBG
+#define VER_DBG VS_FF_DEBUG
+#else
+#define VER_DBG 0
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION    CUtMajorVersion, CUtMinorVersion, 0, 0
+PRODUCTVERSION CUtMajorVersion, CUtMinorVersion, 0, 0
+FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+FILEFLAGS      VER_DBG
+FILEOS         VOS_NT
+FILETYPE       VFT_DLL
+FILESUBTYPE    VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "Comments",         "Ui Arcade .Net Controls v" CUtVersionString
+            VALUE "CompanyName",      "Kevin Eshbach"
+            VALUE "FileDescription",  "Ui Arcade .Net Controls"
+            VALUE "FileVersion",      CUtVersionString
+            VALUE "InternalName",     "UiArcadeCtrlsNet"
+            VALUE "LegalCopyright",   CUtCopyrightString
+            VALUE "OriginalFilename", "UiArcadeCtrlsNet.dll"
+            VALUE "ProductName",      "Ui Arcade.Net Controls v" CUtVersionString
+            VALUE "ProductVersion",   "v" CUtVersionString
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif /* end of RC_INVOKED */
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2010-2022 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

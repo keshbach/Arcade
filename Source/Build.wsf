@@ -31,6 +31,7 @@
     <resource id="Projects">
         Utils
         UtilsNet
+        UtilsArcadeNet
         Database
         Forms
         Hosts
