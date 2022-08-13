@@ -314,6 +314,7 @@ void Arcade::Forms::Form::SetBusyVisible(
   System::Boolean bVisible)
 {
 	HBITMAP hBitmap;
+	HDWP hDeferWindowPos, hTempDeferWindowPos;
 
 	if (bVisible)
 	{
@@ -335,11 +336,40 @@ void Arcade::Forms::Form::SetBusyVisible(
 
 		m_hFocusedControl = ::GetFocus();
 
+		hDeferWindowPos = ::BeginDeferWindowPos(this->Controls->Count);
+
 		for each (System::Windows::Forms::Control^ Control in this->Controls)
 		{
 			m_ControlVisibleDict->Add(Control, Control->Visible);
 
-			Control->Visible = false;
+			if (hDeferWindowPos && Control->Visible)
+			{
+				hTempDeferWindowPos = ::DeferWindowPos(hDeferWindowPos,
+                                                       (HWND)Control->Handle.ToPointer(),
+					                                   NULL, 0, 0, 0, 0,
+					                                   SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER |
+					                                       SWP_NOSIZE | SWP_NOZORDER | SWP_HIDEWINDOW);
+
+				if (hTempDeferWindowPos)
+				{
+					hDeferWindowPos = hTempDeferWindowPos;
+				}
+				else
+				{
+					hDeferWindowPos = NULL;
+
+					Control->Visible = false;
+				}
+			}
+			else
+			{
+				Control->Visible = false;
+			}
+		}
+
+		if (hDeferWindowPos)
+		{
+			::EndDeferWindowPos(hDeferWindowPos);
 		}
 
 		UiArcadeCtrlsStartup();
@@ -387,9 +417,38 @@ void Arcade::Forms::Form::SetBusyVisible(
 		m_hBitmap = NULL;
 		m_bBusyVisible = false;
 
+		hDeferWindowPos = ::BeginDeferWindowPos(m_ControlVisibleDict->Count);
+
 		for each (System::Collections::Generic::KeyValuePair<System::Windows::Forms::Control^, System::Boolean> ControlVisiblePair in m_ControlVisibleDict)
 		{
-			ControlVisiblePair.Key->Visible = ControlVisiblePair.Value;
+			if (hDeferWindowPos && ControlVisiblePair.Value)
+			{
+				hTempDeferWindowPos = ::DeferWindowPos(hDeferWindowPos,
+                                                       (HWND)ControlVisiblePair.Key->Handle.ToPointer(),
+					                                   NULL, 0, 0, 0, 0,
+                                                       SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER |
+                                                           SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
+
+				if (hTempDeferWindowPos)
+				{
+					hDeferWindowPos = hTempDeferWindowPos;
+				}
+				else
+				{
+					hDeferWindowPos = NULL;
+
+					ControlVisiblePair.Key->Visible = ControlVisiblePair.Value;
+				}
+			}
+			else
+			{
+				ControlVisiblePair.Key->Visible = ControlVisiblePair.Value;
+			}
+		}
+
+		if (hDeferWindowPos)
+		{
+			::EndDeferWindowPos(hDeferWindowPos);
 		}
 
 		m_ControlVisibleDict->Clear();
