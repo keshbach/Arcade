@@ -194,7 +194,7 @@ namespace Arcade.Forms
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DisplayEntryForm";
-            this.Load += new System.EventHandler(this.DisplayEntryForm_Load);
+            this.Shown += new System.EventHandler(this.DisplayEntryForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class GameEntryForm : Common.Forms.Form
+    public partial class GameEntryForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EGameEntryFormType
@@ -232,116 +232,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Game Entry Event Handlers"
-        private void GameEntryForm_Load(object sender, EventArgs e)
+        private void GameEntryForm_Shown(object sender, EventArgs e)
         {
-            System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplayList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
-            System.Collections.SortedList GamePropertyList = new System.Collections.SortedList();
-            DatabaseDefs.TGameLens GameLens;
-            System.String sErrorMessage;
+            this.BusyControlVisible = true;
 
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (Database.GetGameMaxLens(out GameLens))
+                InitializeControls();
+
+                RunOnUIThreadWait(() =>
                 {
-                    textBoxName.MaxLength = GameLens.nGameNameLen;
-                    textBoxDescription.MaxLength = GameLens.nGameDescriptionLen;
-                    textBoxPinouts.MaxLength = GameLens.nGamePinoutsLen;
-                    textBoxDipSwitches.MaxLength = GameLens.nGameDipSwitchesLen;
-                }
-
-                Database.GetManufacturerList(out m_ManufacturerList);
-                Database.GetGameCategoryList(DatabaseDefs.EGameDataType.WiringHarness,
-                                                out m_GameWiringHarnessList);
-                Database.GetGameCategoryList(DatabaseDefs.EGameDataType.Cocktail,
-                                                out m_GameCocktailList);
-
-                comboBoxManufacturer.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManufacturerList)
-                {
-                    comboBoxManufacturer.Items.Add(Pair.Key);
-                }
-
-                comboBoxManufacturer.EndUpdate();
-
-                comboBoxWiringHarness.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_GameWiringHarnessList)
-                {
-                    if (Pair.Key != CJAMMAWiringHarness)
-                    {
-                        comboBoxWiringHarness.Items.Add(Pair.Key);
-                    }
-                }
-
-                comboBoxWiringHarness.EndUpdate();
-
-                comboBoxCocktail.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_GameCocktailList)
-                {
-                    comboBoxCocktail.Items.Add(Pair.Key);
-                }
-
-                comboBoxCocktail.EndUpdate();
-
-                textBoxName.Text = m_sGameName;
-                textBoxDescription.Text = m_sGameDescription;
-                textBoxPinouts.Text = m_sGamePinouts;
-                textBoxDipSwitches.Text = m_sGameDipSwitches;
-
-                if (m_sGameWiringHarness == CJAMMAWiringHarness)
-                {
-                    checkBoxNotJAMMA.Checked = false;
-                    checkBoxHaveWiringHarness.Enabled = false;
-                    checkBoxNeedPowerOnReset.Enabled = false;
-                    comboBoxWiringHarness.Enabled = false;
-                }
-                else
-                {
-                    checkBoxNotJAMMA.Checked = true;
-                }
-
-                checkBoxHaveWiringHarness.Checked = m_bGameHaveWiringHarness;
-                checkBoxNeedPowerOnReset.Checked = m_bGameNeedPowerOnReset;
-
-                if (m_GameEntryFormType == EGameEntryFormType.NewGame)
-                {
-                    Text = "Add...";
-
-                    buttonBoards.Enabled = false;
-                    buttonManuals.Enabled = false;
-                    buttonControls.Enabled = false;
-                    buttonVideo.Enabled = false;
-                    buttonAudio.Enabled = false;
-                    buttonDisplays.Enabled = false;
-                    buttonLogs.Enabled = false;
-                    buttonOK.Enabled = false;
-                }
-                else
-                {
-                    Text = "Edit...";
-
-                    comboBoxManufacturer.SelectedIndex = m_ManufacturerList.IndexOfKey(m_sManufacturer);
-                    comboBoxCocktail.SelectedIndex = m_GameCocktailList.IndexOfKey(m_sGameCocktail);
-
-                    if (m_sGameWiringHarness != CJAMMAWiringHarness)
-                    {
-                        comboBoxWiringHarness.SelectedItem = m_sGameWiringHarness;
-                    }
-
-                    buttonOK.Enabled = true;
-
-                    if (Database.GetDisplaysForGame(m_nGameId, out DisplayList,
-                                                    out sErrorMessage))
-                    {
-                        foreach (DatabaseDefs.TDisplay Display in DisplayList)
-                        {
-                            m_GameDisplaysColl.Add(Display.sDisplayName);
-                        }
-                    }
-                }
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "Game Entry Form Initialize Thread");
         }
         #endregion
 
@@ -447,6 +350,8 @@ namespace Arcade.Forms
             GameBoardDetails.GameId = m_nGameId;
 
             GameBoardDetails.ShowDialog(this);
+
+            GameBoardDetails.Dispose();
         }
 
         private void buttonManuals_Click(object sender, EventArgs e)
@@ -458,6 +363,8 @@ namespace Arcade.Forms
             ListGameManuals.GameId = m_nGameId;
 
             ListGameManuals.ShowDialog(this);
+
+            ListGameManuals.Dispose();
         }
 
         private void buttonControls_Click(object sender, EventArgs e)
@@ -489,6 +396,8 @@ namespace Arcade.Forms
             ListLogs.GameId = m_nGameId;
 
             ListLogs.ShowDialog();
+
+            ListLogs.Dispose();
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -529,6 +438,8 @@ namespace Arcade.Forms
         {
             System.Boolean bWiringHarnessValid = false;
 
+            Common.Debug.Thread.IsUIThread();
+
             if (checkBoxNotJAMMA.Checked == true &&
                 comboBoxWiringHarness.SelectedIndex != -1)
             {
@@ -557,6 +468,9 @@ namespace Arcade.Forms
         {
             ListGameDataForm ListGameData = new ListGameDataForm();
             System.String sErrorMessage;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsUIThread();
 
             new Common.Forms.FormLocation(ListGameData, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -609,43 +523,175 @@ namespace Arcade.Forms
                         break;
                 }
 
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
                     if (ListGameDataFormType != ListGameDataForm.EListGameDataFormType.GameDisplay)
                     {
-                        if (false == Database.EditGame(m_nGameId,
-                                                        m_sGameName,
-                                                        m_sManufacturer,
-                                                        m_sGameWiringHarness,
-                                                        m_bGameHaveWiringHarness,
-                                                        m_bGameNeedPowerOnReset,
-                                                        m_sGameCocktail,
-                                                        m_sGameDescription,
-                                                        m_sGamePinouts,
-                                                        m_sGameDipSwitches,
-                                                        m_GameAudioColl,
-                                                        m_GameVideoColl,
-                                                        m_GameControlsColl,
-                                                        out sErrorMessage))
-                        {
-                            Common.Forms.MessageBox.Show(this, sErrorMessage,
-                                System.Windows.Forms.MessageBoxButtons.OK,
-                                System.Windows.Forms.MessageBoxIcon.Information);
-                        }
+                        bResult = Database.EditGame(m_nGameId,
+                                                    m_sGameName,
+                                                    m_sManufacturer,
+                                                    m_sGameWiringHarness,
+                                                    m_bGameHaveWiringHarness,
+                                                    m_bGameNeedPowerOnReset,
+                                                    m_sGameCocktail,
+                                                    m_sGameDescription,
+                                                    m_sGamePinouts,
+                                                    m_sGameDipSwitches,
+                                                    m_GameAudioColl,
+                                                    m_GameVideoColl,
+                                                    m_GameControlsColl,
+                                                    out sErrorMessage);
                     }
                     else
                     {
-                        if (false == Database.EditGameDisplays(m_nGameId,
-                                                                m_GameDisplaysColl,
-                                                                out sErrorMessage))
+                        bResult = Database.EditGameDisplays(m_nGameId,
+                                                            m_GameDisplaysColl,
+                                                            out sErrorMessage);
+                    }
+
+                    RunOnUIThreadWait(() =>
+                    {
+                        if (!bResult)
                         {
                             Common.Forms.MessageBox.Show(this, sErrorMessage,
                                 System.Windows.Forms.MessageBoxButtons.OK,
                                 System.Windows.Forms.MessageBoxIcon.Information);
                         }
+
+                        this.BusyControlVisible = false;
+
+                        ListGameData.Dispose();
+                    });
+                }, "Game Entry Form Edit Thread");
+            }
+            else
+            {
+                ListGameData.Dispose();
+            }
+        }
+
+        private void InitializeControls()
+        {
+            System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplayList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
+            System.Collections.SortedList GamePropertyList = new System.Collections.SortedList();
+            DatabaseDefs.TGameLens GameLens;
+            System.Boolean bResult;
+            System.String sErrorMessage;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            bResult = Database.GetGameMaxLens(out GameLens);
+
+            Database.GetManufacturerList(out m_ManufacturerList);
+            Database.GetGameCategoryList(DatabaseDefs.EGameDataType.WiringHarness,
+                                         out m_GameWiringHarnessList);
+            Database.GetGameCategoryList(DatabaseDefs.EGameDataType.Cocktail,
+                                         out m_GameCocktailList);
+
+            if (m_GameEntryFormType == EGameEntryFormType.EditGame)
+            {
+                bResult &= Database.GetDisplaysForGame(m_nGameId, out DisplayList,
+                                                       out sErrorMessage);
+            }
+
+            RunOnUIThreadWait(() =>
+            {
+                if (bResult)
+                {
+                    textBoxName.MaxLength = GameLens.nGameNameLen;
+                    textBoxDescription.MaxLength = GameLens.nGameDescriptionLen;
+                    textBoxPinouts.MaxLength = GameLens.nGamePinoutsLen;
+                    textBoxDipSwitches.MaxLength = GameLens.nGameDipSwitchesLen;
+                }
+
+                comboBoxManufacturer.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManufacturerList)
+                {
+                    comboBoxManufacturer.Items.Add(Pair.Key);
+                }
+
+                comboBoxManufacturer.EndUpdate();
+
+                comboBoxWiringHarness.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_GameWiringHarnessList)
+                {
+                    if (Pair.Key != CJAMMAWiringHarness)
+                    {
+                        comboBoxWiringHarness.Items.Add(Pair.Key);
                     }
                 }
-            }
+
+                comboBoxWiringHarness.EndUpdate();
+
+                comboBoxCocktail.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_GameCocktailList)
+                {
+                    comboBoxCocktail.Items.Add(Pair.Key);
+                }
+
+                comboBoxCocktail.EndUpdate();
+
+                textBoxName.Text = m_sGameName;
+                textBoxDescription.Text = m_sGameDescription;
+                textBoxPinouts.Text = m_sGamePinouts;
+                textBoxDipSwitches.Text = m_sGameDipSwitches;
+
+                if (m_sGameWiringHarness == CJAMMAWiringHarness)
+                {
+                    checkBoxNotJAMMA.Checked = false;
+                    checkBoxHaveWiringHarness.Enabled = false;
+                    checkBoxNeedPowerOnReset.Enabled = false;
+                    comboBoxWiringHarness.Enabled = false;
+                }
+                else
+                {
+                    checkBoxNotJAMMA.Checked = true;
+                }
+
+                checkBoxHaveWiringHarness.Checked = m_bGameHaveWiringHarness;
+                checkBoxNeedPowerOnReset.Checked = m_bGameNeedPowerOnReset;
+
+                if (m_GameEntryFormType == EGameEntryFormType.NewGame)
+                {
+                    Text = "Add...";
+
+                    buttonBoards.Enabled = false;
+                    buttonManuals.Enabled = false;
+                    buttonControls.Enabled = false;
+                    buttonVideo.Enabled = false;
+                    buttonAudio.Enabled = false;
+                    buttonDisplays.Enabled = false;
+                    buttonLogs.Enabled = false;
+                    buttonOK.Enabled = false;
+                }
+                else
+                {
+                    Text = "Edit...";
+
+                    comboBoxManufacturer.SelectedIndex = m_ManufacturerList.IndexOfKey(m_sManufacturer);
+                    comboBoxCocktail.SelectedIndex = m_GameCocktailList.IndexOfKey(m_sGameCocktail);
+
+                    if (m_sGameWiringHarness != CJAMMAWiringHarness)
+                    {
+                        comboBoxWiringHarness.SelectedItem = m_sGameWiringHarness;
+                    }
+
+                    buttonOK.Enabled = true;
+
+                    if (bResult)
+                    {
+                        foreach (DatabaseDefs.TDisplay Display in DisplayList)
+                        {
+                            m_GameDisplaysColl.Add(Display.sDisplayName);
+                        }
+                    }
+                }
+            });
         }
         #endregion
     }

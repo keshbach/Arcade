@@ -144,7 +144,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "LogEntryForm";
-            this.Load += new System.EventHandler(this.LogEntryForm_Load);
+            this.Shown += new System.EventHandler(this.LogEntryForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class ListGameDataForm : Common.Forms.Form
+    public partial class ListGameDataForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EListGameDataFormType
@@ -75,81 +75,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "List Game Data Event Handlers"
-        private void ListGameDataForm_Load(object sender, EventArgs e)
+        private void ListGameDataForm_Shown(object sender, EventArgs e)
         {
-            Common.Collections.StringSortedList<System.Int32> GameDataList = new Common.Collections.StringSortedList<System.Int32>();
-            System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplayList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
-            System.String sErrorMessage;
+            this.BusyControlVisible = true;
 
-            listViewGameData.BeginUpdate();
-
-            foreach (System.String sValue in m_GamePropertiesColl)
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                listViewGameData.Items.Add(sValue);
-            }
+                InitializeControls();
 
-            listViewGameData.AutosizeColumns();
-            listViewGameData.EndUpdate();
-
-            if (listViewGameData.Items.Count == 0)
-            {
-                listViewGameData.Enabled = false;
-            }
-
-            buttonDelete.Enabled = false;
-
-            switch (m_ListGameDataFormType)
-            {
-                case EListGameDataFormType.GameControls:
-                    Text = "Controls";
-
-                    labelGameData.Text = "&Controls:";
-
-                    Database.GetGameCategoryList(DatabaseDefs.EGameDataType.ControlProperty,
-                                                    out GameDataList);
-                    break;
-                case EListGameDataFormType.GameAudio:
-                    Text = "Audio";
-
-                    labelGameData.Text = "&Audio:";
-
-                    Database.GetGameCategoryList(DatabaseDefs.EGameDataType.AudioProperty,
-                                                    out GameDataList);
-                    break;
-                case EListGameDataFormType.GameVideo:
-                    Text = "Video";
-
-                    labelGameData.Text = "&Video:";
-
-                    Database.GetGameCategoryList(DatabaseDefs.EGameDataType.VideoProperty,
-                                                    out GameDataList);
-                    break;
-                case EListGameDataFormType.GameDisplay:
-                    Text = "Displays";
-
-                    labelGameData.Text = "&Displays:";
-
-                    Database.GetDisplays(out DisplayList, out sErrorMessage);
-                    break;
-                default:
-                    System.Diagnostics.Debug.Assert(false);
-                    break;
-            }
-
-            if (GameDataList.Count > 0)
-            {
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in GameDataList)
+                RunOnUIThreadWait(() =>
                 {
-                    m_GameDataColl.Add(Pair.Key);
-                }
-            }
-            else if (DisplayList.Count > 0)
-            {
-                foreach (DatabaseDefs.TDisplay Display in DisplayList)
-                {
-                    m_GameDataColl.Add(Display.sDisplayName);
-                }
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "List Game Data Form Initialize Thread");
         }
         #endregion
 
@@ -210,12 +148,13 @@ namespace Arcade.Forms
                 listViewGameData.BeginUpdate();
 
                 listViewGameData.Items.Add(SelectData.SelectedData);
-                listViewGameData.AutosizeColumns();
 
                 listViewGameData.Enabled = true;
 
                 listViewGameData.EndUpdate();
             }
+
+            SelectData.Dispose();
         }
 
         private void buttonDelete_Click(object sender, EventArgs e)
@@ -253,6 +192,98 @@ namespace Arcade.Forms
             }
 
             buttonDelete.Enabled = false;
+        }
+
+        private void InitializeControls()
+        {
+            Common.Collections.StringSortedList<System.Int32> GameDataList = new Common.Collections.StringSortedList<System.Int32>();
+            System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplayList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
+            System.String sErrorMessage;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            switch (m_ListGameDataFormType)
+            {
+                case EListGameDataFormType.GameControls:
+                    Database.GetGameCategoryList(DatabaseDefs.EGameDataType.ControlProperty,
+                                                 out GameDataList);
+                    break;
+                case EListGameDataFormType.GameAudio:
+                    Database.GetGameCategoryList(DatabaseDefs.EGameDataType.AudioProperty,
+                                                 out GameDataList);
+                    break;
+                case EListGameDataFormType.GameVideo:
+                    Database.GetGameCategoryList(DatabaseDefs.EGameDataType.VideoProperty,
+                                                 out GameDataList);
+                    break;
+                case EListGameDataFormType.GameDisplay:
+                    Database.GetDisplays(out DisplayList, out sErrorMessage);
+                    break;
+                default:
+                    System.Diagnostics.Debug.Assert(false);
+                    break;
+            }
+
+            RunOnUIThreadWait(() =>
+            {
+                listViewGameData.BeginUpdate();
+
+                foreach (System.String sValue in m_GamePropertiesColl)
+                {
+                    listViewGameData.Items.Add(sValue);
+                }
+
+                listViewGameData.EndUpdate();
+
+                if (listViewGameData.Items.Count == 0)
+                {
+                    listViewGameData.Enabled = false;
+                }
+
+                buttonDelete.Enabled = false;
+
+                switch (m_ListGameDataFormType)
+                {
+                    case EListGameDataFormType.GameControls:
+                        Text = "Controls";
+
+                        labelGameData.Text = "&Controls:";
+                        break;
+                    case EListGameDataFormType.GameAudio:
+                        Text = "Audio";
+
+                        labelGameData.Text = "&Audio:";
+                        break;
+                    case EListGameDataFormType.GameVideo:
+                        Text = "Video";
+
+                        labelGameData.Text = "&Video:";
+                        break;
+                    case EListGameDataFormType.GameDisplay:
+                        Text = "Displays";
+
+                        labelGameData.Text = "&Displays:";
+                        break;
+                    default:
+                        System.Diagnostics.Debug.Assert(false);
+                        break;
+                }
+
+                if (GameDataList.Count > 0)
+                {
+                    foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in GameDataList)
+                    {
+                        m_GameDataColl.Add(Pair.Key);
+                    }
+                }
+                else if (DisplayList.Count > 0)
+                {
+                    foreach (DatabaseDefs.TDisplay Display in DisplayList)
+                    {
+                        m_GameDataColl.Add(Display.sDisplayName);
+                    }
+                }
+            });
         }
         #endregion
     }

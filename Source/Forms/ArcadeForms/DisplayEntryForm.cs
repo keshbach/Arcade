@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class DisplayEntryForm : Common.Forms.Form
+    public partial class DisplayEntryForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EDisplayEntryFormType
@@ -129,79 +129,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Display Entry Event Handlers"
-        private void DisplayEntryForm_Load(object sender, EventArgs e)
+        private void DisplayEntryForm_Shown(object sender, EventArgs e)
         {
-            DatabaseDefs.TDisplayLens DisplayLens;
+            this.BusyControlVisible = true;
 
-            if (Database.GetDisplayMaxLens(out DisplayLens))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                textBoxName.MaxLength = DisplayLens.nDisplayNameLen;
-            }
+                InitializeControls();
 
-            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Type,
-                                            out m_DisplayTypeList);
-            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Resolution,
-                                            out m_DisplayResolutionList);
-            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Colors,
-                                            out m_DisplayColorsList);
-            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Orientation,
-                                            out m_DisplayOrientationList);
-
-            comboBoxType.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayTypeList)
-            {
-                comboBoxType.Items.Add(Pair.Key);
-            }
-
-            comboBoxType.EndUpdate();
-
-            comboBoxResolution.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayResolutionList)
-            {
-                comboBoxResolution.Items.Add(Pair.Key);
-            }
-
-            comboBoxResolution.EndUpdate();
-
-            comboBoxColors.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayColorsList)
-            {
-                comboBoxColors.Items.Add(Pair.Key);
-            }
-
-            comboBoxColors.EndUpdate();
-
-            comboBoxOrientation.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayOrientationList)
-            {
-                comboBoxOrientation.Items.Add(Pair.Key);
-            }
-
-            comboBoxOrientation.EndUpdate();
-
-            textBoxName.Text = m_sDisplayName;
-
-            if (m_DisplayEntryFormType == EDisplayEntryFormType.NewDisplay)
-            {
-                Text = "Add...";
-
-                buttonOK.Enabled = false;
-            }
-            else
-            {
-                comboBoxType.SelectedIndex = m_DisplayTypeList.IndexOfKey(m_sDisplayType);
-                comboBoxResolution.SelectedIndex = m_DisplayResolutionList.IndexOfKey(m_sDisplayResolution);
-                comboBoxColors.SelectedIndex = m_DisplayColorsList.IndexOfKey(m_sDisplayColors);
-                comboBoxOrientation.SelectedIndex = m_DisplayOrientationList.IndexOfKey(m_sDisplayOrientation);
-
-                Text = "Edit...";
-
-                buttonOK.Enabled = true;
-            }
+                RunOnUIThreadWait(() =>
+                {
+                    this.BusyControlVisible = false;
+                });
+            }, "Display Entry Form Initialize Thread");
         }
         #endregion
 
@@ -315,6 +255,89 @@ namespace Arcade.Forms
             {
                 buttonOK.Enabled = false;
             }
+        }
+
+        private void InitializeControls()
+        {
+            DatabaseDefs.TDisplayLens DisplayLens;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            if (Database.GetDisplayMaxLens(out DisplayLens))
+            {
+                RunOnUIThreadWait(() =>
+                {
+                    textBoxName.MaxLength = DisplayLens.nDisplayNameLen;
+                });
+            }
+
+            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Type,
+                                            out m_DisplayTypeList);
+            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Resolution,
+                                            out m_DisplayResolutionList);
+            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Colors,
+                                            out m_DisplayColorsList);
+            Database.GetDisplayCategoryList(DatabaseDefs.EDisplayDataType.Orientation,
+                                            out m_DisplayOrientationList);
+
+            RunOnUIThreadWait(() =>
+            {
+                comboBoxType.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayTypeList)
+                {
+                    comboBoxType.Items.Add(Pair.Key);
+                }
+
+                comboBoxType.EndUpdate();
+
+                comboBoxResolution.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayResolutionList)
+                {
+                    comboBoxResolution.Items.Add(Pair.Key);
+                }
+
+                comboBoxResolution.EndUpdate();
+
+                comboBoxColors.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayColorsList)
+                {
+                    comboBoxColors.Items.Add(Pair.Key);
+                }
+
+                comboBoxColors.EndUpdate();
+
+                comboBoxOrientation.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_DisplayOrientationList)
+                {
+                    comboBoxOrientation.Items.Add(Pair.Key);
+                }
+
+                comboBoxOrientation.EndUpdate();
+
+                textBoxName.Text = m_sDisplayName;
+
+                if (m_DisplayEntryFormType == EDisplayEntryFormType.NewDisplay)
+                {
+                    Text = "Add...";
+
+                    buttonOK.Enabled = false;
+                }
+                else
+                {
+                    comboBoxType.SelectedIndex = m_DisplayTypeList.IndexOfKey(m_sDisplayType);
+                    comboBoxResolution.SelectedIndex = m_DisplayResolutionList.IndexOfKey(m_sDisplayResolution);
+                    comboBoxColors.SelectedIndex = m_DisplayColorsList.IndexOfKey(m_sDisplayColors);
+                    comboBoxOrientation.SelectedIndex = m_DisplayOrientationList.IndexOfKey(m_sDisplayOrientation);
+
+                    Text = "Edit...";
+
+                    buttonOK.Enabled = true;
+                }
+            });
         }
         #endregion
     }

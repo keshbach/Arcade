@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class FindPartForm : Common.Forms.Form
+    public partial class FindPartForm : Arcade.Forms.Form
     {
         #region "Constructor"
         public FindPartForm()
@@ -47,36 +47,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Find Part Event Handlers"
-        private void FindPartForm_Load(object sender, System.EventArgs e)
+        private void FindPartForm_Shown(object sender, EventArgs e)
         {
-            Common.Collections.StringSortedList<System.Int32> PartTypeList;
-            DatabaseDefs.TPartLens PartLens;
+            this.BusyControlVisible = true;
 
-            if (Database.GetPartMaxLens(out PartLens))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                textBoxKeyword.MaxLength = PartLens.nPartNameLen;
-            }
+                InitializeControls();
 
-            Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Type,
-                                         out PartTypeList);
-
-            comboBoxType.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in PartTypeList)
-            {
-                comboBoxType.Items.Add(Pair.Key);
-            }
-
-            comboBoxType.EndUpdate();
-
-            comboBoxType.AutosizeDropDown();
-
-            radioButtonKeyword.Checked = true;
-            comboBoxType.Enabled = false;
-            buttonSearch.Enabled = false;
-            listViewParts.Enabled = false;
-            buttonDetails.Enabled = false;
-            buttonGames.Enabled = false;
+                RunOnUIThreadWait(() =>
+                {
+                    this.BusyControlVisible = false;
+                });
+            }, "Find Part Form Initialize Thread");
         }
         #endregion
 
@@ -149,75 +132,101 @@ namespace Arcade.Forms
         private void buttonSearch_Click(object sender, System.EventArgs e)
         {
             System.Collections.Generic.List<DatabaseDefs.TPart> PartList;
-            System.String sErrorMessage;
+            System.String sKeyword, sPartType, sErrorMessage;
             System.Windows.Forms.ListViewItem Item;
-            System.Boolean bResult;
+            System.Boolean bKeywordSearch, bResult;
 
             listViewParts.Items.Clear();
 
             buttonDetails.Enabled = false;
             buttonGames.Enabled = false;
 
-            using (new Common.Forms.WaitCursor(this))
+            if (radioButtonKeyword.Checked)
             {
-                if (radioButtonKeyword.Checked == true)
+                bKeywordSearch = true;
+
+                sKeyword = textBoxKeyword.Text;
+                sPartType = "";
+            }
+            else
+            {
+                bKeywordSearch = false;
+
+                sKeyword = "";
+                sPartType = (System.String)comboBoxType.SelectedItem;
+            }
+
+            this.BusyControlVisible = true;
+
+            Common.Threading.Thread.RunWorkerThread(() =>
+            {
+                if (bKeywordSearch)
                 {
-                    bResult = Database.GetPartsMatchingKeyword(textBoxKeyword.Text,
+                    bResult = Database.GetPartsMatchingKeyword(sKeyword,
                                                                DatabaseDefs.EKeywordMatchingCriteria.Anywhere,
                                                                out PartList,
                                                                out sErrorMessage);
                 }
                 else
                 {
-                    bResult = Database.GetPartsMatchingType((System.String)comboBoxType.SelectedItem,
+                    bResult = Database.GetPartsMatchingType(sPartType,
                                                             out PartList,
                                                             out sErrorMessage);
                 }
 
-                if (bResult == true)
+                RunOnUIThreadWait(() =>
                 {
-                    if (PartList.Count > 0)
+                    if (bResult)
                     {
-                        listViewParts.Enabled = true;
-
-                        listViewParts.BeginUpdate();
-
-                        foreach (DatabaseDefs.TPart Part in PartList)
+                        if (PartList.Count > 0)
                         {
-                            Item = new System.Windows.Forms.ListViewItem();
+                            listViewParts.Enabled = true;
 
-                            Item.Text = Part.sPartName;
-                            Item.Tag = Part;
+                            listViewParts.BeginUpdate();
 
-                            Item.SubItems.Add(Part.sPartCategoryName);
-                            Item.SubItems.Add(Part.sPartTypeName);
-                            Item.SubItems.Add(Part.sPartPackageName);
+                            foreach (DatabaseDefs.TPart Part in PartList)
+                            {
+                                Item = new System.Windows.Forms.ListViewItem();
 
-                            listViewParts.Items.Add(Item);
+                                Item.Text = Part.sPartName;
+                                Item.Tag = Part;
+
+                                Item.SubItems.Add(Part.sPartCategoryName);
+                                Item.SubItems.Add(Part.sPartTypeName);
+                                Item.SubItems.Add(Part.sPartPackageName);
+
+                                listViewParts.Items.Add(Item);
+                            }
+
+                            listViewParts.EndUpdate();
+
+                            this.BusyControlVisible = false;
                         }
+                        else
+                        {
+                            listViewParts.Enabled = false;
 
-                        listViewParts.EndUpdate();
+                            Common.Forms.MessageBox.Show(this,
+                                "No parts were found that match the given search criteria.",
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information,
+                                System.Windows.Forms.MessageBoxDefaultButton.Button1);
+
+                            this.BusyControlVisible = false;
+
+                            textBoxKeyword.Focus();
+                        }
                     }
                     else
                     {
-                        listViewParts.Enabled = false;
-
-                        Common.Forms.MessageBox.Show(this,
-                            "No parts were found that match the given search criteria.",
+                        Common.Forms.MessageBox.Show(this, sErrorMessage,
                             System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information,
-                            System.Windows.Forms.MessageBoxDefaultButton.Button1);
+                            System.Windows.Forms.MessageBoxIcon.Information);
 
-                        textBoxKeyword.Focus();
+                        this.BusyControlVisible = false;
                     }
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-            }
+                });
+            }, "Find Part Form Search Thread");
         }
 
         private void buttonDetails_Click(object sender, System.EventArgs e)
@@ -238,6 +247,8 @@ namespace Arcade.Forms
             ViewGamePartLocation.PartId = Part.nPartId;
 
             ViewGamePartLocation.ShowDialog(this);
+
+            ViewGamePartLocation.Dispose();
         }
 
         private void buttonClose_Click(object sender, System.EventArgs e)
@@ -261,6 +272,8 @@ namespace Arcade.Forms
             PartDetails.SelectedPartName = Part.sPartName;
 
             PartDetails.ShowDialog(this);
+
+            PartDetails.Dispose();
         }
 
         private void ValidateKeywordTextBox()
@@ -273,6 +286,46 @@ namespace Arcade.Forms
             {
                 buttonSearch.Enabled = false;
             }
+        }
+
+        private void InitializeControls()
+        {
+            Common.Collections.StringSortedList<System.Int32> PartTypeList;
+            DatabaseDefs.TPartLens PartLens;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            if (Database.GetPartMaxLens(out PartLens))
+            {
+                RunOnUIThreadWait(() =>
+                {
+                    textBoxKeyword.MaxLength = PartLens.nPartNameLen;
+                });
+            }
+
+            Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Type,
+                                         out PartTypeList);
+
+            RunOnUIThreadWait(() =>
+            {
+                comboBoxType.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in PartTypeList)
+                {
+                    comboBoxType.Items.Add(Pair.Key);
+                }
+
+                comboBoxType.EndUpdate();
+
+                comboBoxType.AutosizeDropDown();
+
+                radioButtonKeyword.Checked = true;
+                comboBoxType.Enabled = false;
+                buttonSearch.Enabled = false;
+                listViewParts.Enabled = false;
+                buttonDetails.Enabled = false;
+                buttonGames.Enabled = false;
+            });
         }
         #endregion
     }

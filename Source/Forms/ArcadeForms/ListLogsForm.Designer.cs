@@ -153,7 +153,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Find Log...";
-            this.Load += new System.EventHandler(this.ListLogsForm_Load);
+            this.Shown += new System.EventHandler(this.ListLogsForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

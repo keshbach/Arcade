@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class PartDetailsForm : Common.Forms.Form
+    public partial class PartDetailsForm : Arcade.Forms.Form
     {
         #region "Member Variables"
         private System.Int32 m_nPartId = -1;
@@ -59,102 +59,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Part Details Event Handlers"
-        private void PartDetailsForm_Load(object sender, System.EventArgs e)
+        private void PartDetailsForm_Shown(object sender, EventArgs e)
         {
-            System.Windows.Forms.ListViewItem SelectedItem = null;
-            System.Int32 nPartPinoutId;
-            System.String sErrorMessage, sPartPinouts;
-            System.Collections.Generic.List<DatabaseDefs.TPart> PartList;
-            System.Windows.Forms.ListViewItem Item;
-            DatabaseDefs.TPartLens PartLens;
+            this.BusyControlVisible = true;
 
-            if (Database.GetPartMaxLens(out PartLens))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                textBoxPinouts.MaxLength = PartLens.nPartPinoutsLen;
-            }
+                InitializeControls();
 
-            using (new Common.Forms.WaitCursor(this))
-            {
-                if (Database.GetPartPinouts(m_nPartId, out nPartPinoutId,
-                                            out sPartPinouts, out sErrorMessage))
+                RunOnUIThreadWait(() =>
                 {
-                    textBoxPinouts.Text = sPartPinouts;
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-
-                    buttonAdd.Enabled = false;
-                    buttonEdit.Enabled = false;
-                    buttonDelete.Enabled = false;
-                    buttonDatasheets.Enabled = false;
-
-                    return;
-                }
-
-                if (Database.GetPartsWithSamePinouts(m_nPartId, out PartList,
-                                                        out sErrorMessage))
-                {
-                    listViewKeywords.BeginUpdate();
-
-                    foreach (DatabaseDefs.TPart Part in PartList)
-                    {
-                        Item = new System.Windows.Forms.ListViewItem();
-
-                        if (Part.bPartIsDefault)
-                        {
-                            Item.Font = new System.Drawing.Font(Item.Font, FontStyle.Bold);
-                        }
-
-                        Item.Text = Part.sPartName;
-                        Item.Tag = Part;
-
-                        if (Part.PartDatasheetColl.Count > 0)
-                        {
-                            Item.SubItems.Add("*");
-                        }
-                        else
-                        {
-                            Item.SubItems.Add("");
-                        }
-
-                        listViewKeywords.Items.Add(Item);
-
-                        if (Part.sPartName == m_sSelectedPartName)
-                        {
-                            SelectedItem = Item;
-                        }
-                    }
-
-                    if (SelectedItem == null && listViewKeywords.Items.Count > 0)
-                    {
-                        SelectedItem = listViewKeywords.Items[0];
-                    }
-
-                    listViewKeywords.EndUpdate();
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-
-                    buttonAdd.Enabled = false;
-                    buttonEdit.Enabled = false;
-                    buttonDelete.Enabled = false;
-                    buttonDatasheets.Enabled = false;
-                }
-            }
-
-            if (SelectedItem != null)
-            {
-                SelectedItem.Selected = true;
-                SelectedItem.Focused = true;
-
-                SelectedItem.EnsureVisible();
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "Part Details Form Initialize Thread");
         }
         #endregion
 
@@ -372,8 +289,11 @@ namespace Arcade.Forms
         {
             PartEntryForm PartEntry = new PartEntryForm();
             System.Int32 nIndex = listViewKeywords.SelectedIndices[0];
+            System.Boolean bResult;
             System.String sErrorMessage;
             DatabaseDefs.TPart Part, TmpPart;
+
+            Common.Debug.Thread.IsUIThread();
 
             new Common.Forms.FormLocation(PartEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -390,75 +310,207 @@ namespace Arcade.Forms
 
             if (System.Windows.Forms.DialogResult.OK == PartEntry.ShowDialog(this))
             {
-                if (Database.EditPart(Part.nPartId, PartEntry.PartName,
-                                      PartEntry.PartCategoryName,
-                                      PartEntry.PartTypeName,
-                                      PartEntry.PartPackageName,
-                                      PartEntry.PartPinouts,
-                                      PartEntry.DefaultPartName,
-                                      PartEntry.PartDatasheetColl,
-                                      out sErrorMessage))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (Part.bPartIsDefault == false &&
-                        PartEntry.DefaultPartName == true)
+                    bResult = Database.EditPart(Part.nPartId, PartEntry.PartName,
+                                                PartEntry.PartCategoryName,
+                                                PartEntry.PartTypeName,
+                                                PartEntry.PartPackageName,
+                                                PartEntry.PartPinouts,
+                                                PartEntry.DefaultPartName,
+                                                PartEntry.PartDatasheetColl,
+                                                out sErrorMessage);
+
+                    RunOnUIThreadWait(() =>
                     {
-                        for (System.Int32 nItemIndex = 0;
-                                nItemIndex < listViewKeywords.Items.Count;
-                                ++nItemIndex)
+                        if (bResult)
                         {
-                            if (nItemIndex != nIndex)
+                            if (Part.bPartIsDefault == false &&
+                                PartEntry.DefaultPartName == true)
                             {
-                                TmpPart = (DatabaseDefs.TPart)listViewKeywords.Items[nItemIndex].Tag;
+                                for (System.Int32 nItemIndex = 0;
+                                     nItemIndex < listViewKeywords.Items.Count;
+                                     ++nItemIndex)
+                                {
+                                    if (nItemIndex != nIndex)
+                                    {
+                                        TmpPart = (DatabaseDefs.TPart)listViewKeywords.Items[nItemIndex].Tag;
 
-                                TmpPart.bPartIsDefault = false;
+                                        TmpPart.bPartIsDefault = false;
 
-                                listViewKeywords.Items[nItemIndex].Font = new System.Drawing.Font(listViewKeywords.Items[nItemIndex].Font,
-                                                                                                  FontStyle.Regular);
-                                listViewKeywords.Items[nItemIndex].Tag = TmpPart;
+                                        listViewKeywords.Items[nItemIndex].Font = new System.Drawing.Font(listViewKeywords.Items[nItemIndex].Font,
+                                                                                                          FontStyle.Regular);
+                                        listViewKeywords.Items[nItemIndex].Tag = TmpPart;
+                                    }
+                                    else
+                                    {
+                                        listViewKeywords.Items[nItemIndex].Font = new System.Drawing.Font(listViewKeywords.Items[nItemIndex].Font,
+                                                                                                          FontStyle.Bold);
+                                    }
+                                }
+                            }
+
+                            Part.sPartName = PartEntry.PartName;
+                            Part.sPartCategoryName = PartEntry.PartCategoryName;
+                            Part.sPartTypeName = PartEntry.PartTypeName;
+                            Part.sPartPackageName = PartEntry.PartPackageName;
+                            Part.bPartIsDefault = PartEntry.DefaultPartName;
+                            Part.PartDatasheetColl = PartEntry.PartDatasheetColl;
+
+                            textBoxCategory.Text = PartEntry.PartCategoryName;
+                            textBoxType.Text = PartEntry.PartTypeName;
+                            textBoxPackage.Text = PartEntry.PartPackageName;
+                            textBoxPinouts.Text = PartEntry.PartPinouts;
+
+                            listViewKeywords.Items[nIndex].Text = PartEntry.PartName;
+                            listViewKeywords.Items[nIndex].Tag = Part;
+
+                            if (PartEntry.PartDatasheetColl.Count > 0)
+                            {
+                                listViewKeywords.Items[nIndex].SubItems[1].Text = "*";
+
+                                buttonDatasheets.Enabled = true;
                             }
                             else
                             {
-                                listViewKeywords.Items[nItemIndex].Font = new System.Drawing.Font(listViewKeywords.Items[nItemIndex].Font,
-                                                                                                  FontStyle.Bold);
+                                listViewKeywords.Items[nIndex].SubItems[1].Text = "";
+
+                                buttonDatasheets.Enabled = false;
                             }
                         }
-                    }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
 
-                    Part.sPartName = PartEntry.PartName;
-                    Part.sPartCategoryName = PartEntry.PartCategoryName;
-                    Part.sPartTypeName = PartEntry.PartTypeName;
-                    Part.sPartPackageName = PartEntry.PartPackageName;
-                    Part.bPartIsDefault = PartEntry.DefaultPartName;
-                    Part.PartDatasheetColl = PartEntry.PartDatasheetColl;
+                        this.BusyControlVisible = false;
 
-                    textBoxCategory.Text = PartEntry.PartCategoryName;
-                    textBoxType.Text = PartEntry.PartTypeName;
-                    textBoxPackage.Text = PartEntry.PartPackageName;
-                    textBoxPinouts.Text = PartEntry.PartPinouts;
+                        PartEntry.Dispose();
+                    });
+                }, "Part Details Form Edit Thread");
+            }
+            else
+            {
+                PartEntry.Dispose();
+            }
+        }
 
-                    listViewKeywords.Items[nIndex].Text = PartEntry.PartName;
-                    listViewKeywords.Items[nIndex].Tag = Part;
+        private void InitializeControls()
+        {
+            System.Windows.Forms.ListViewItem SelectedItem = null;
+            System.Int32 nPartPinoutId;
+            System.String sErrorMessage, sPartPinouts;
+            System.Collections.Generic.List<DatabaseDefs.TPart> PartList;
+            System.Windows.Forms.ListViewItem Item;
+            DatabaseDefs.TPartLens PartLens;
+            System.Boolean bPartMaxLensResult, bGetPartPinoutsResult, bGetPartsWithSamePinoutsResult;
 
-                    if (PartEntry.PartDatasheetColl.Count > 0)
-                    {
-                        listViewKeywords.Items[nIndex].SubItems[1].Text = "*";
+            Common.Debug.Thread.IsWorkerThread();
 
-                        buttonDatasheets.Enabled = true;
-                    }
-                    else
-                    {
-                        listViewKeywords.Items[nIndex].SubItems[1].Text = "";
+            bPartMaxLensResult = Database.GetPartMaxLens(out PartLens);
+            bGetPartPinoutsResult = Database.GetPartPinouts(m_nPartId, out nPartPinoutId,
+                                                            out sPartPinouts, out sErrorMessage);
 
-                        buttonDatasheets.Enabled = false;
-                    }
+            if (bGetPartPinoutsResult)
+            {
+                bGetPartsWithSamePinoutsResult = Database.GetPartsWithSamePinouts(m_nPartId, out PartList,
+                                                                                  out sErrorMessage);
+            }
+            else
+            {
+                bGetPartsWithSamePinoutsResult = false;
+                PartList = new System.Collections.Generic.List<DatabaseDefs.TPart>();
+            }
+
+            RunOnUIThreadWait(() =>
+            {
+                if (bPartMaxLensResult)
+                {
+                    textBoxPinouts.MaxLength = PartLens.nPartPinoutsLen;
+                }
+
+                if (bGetPartPinoutsResult)
+                {
+                    textBoxPinouts.Text = sPartPinouts;
                 }
                 else
                 {
                     Common.Forms.MessageBox.Show(this, sErrorMessage,
                         System.Windows.Forms.MessageBoxButtons.OK,
                         System.Windows.Forms.MessageBoxIcon.Information);
+
+                    buttonAdd.Enabled = false;
+                    buttonEdit.Enabled = false;
+                    buttonDelete.Enabled = false;
+                    buttonDatasheets.Enabled = false;
+
+                    return;
                 }
-            }
+
+                if (bGetPartsWithSamePinoutsResult)
+                {
+                    listViewKeywords.BeginUpdate();
+
+                    foreach (DatabaseDefs.TPart Part in PartList)
+                    {
+                        Item = new System.Windows.Forms.ListViewItem();
+
+                        if (Part.bPartIsDefault)
+                        {
+                            Item.Font = new System.Drawing.Font(Item.Font, FontStyle.Bold);
+                        }
+
+                        Item.Text = Part.sPartName;
+                        Item.Tag = Part;
+
+                        if (Part.PartDatasheetColl.Count > 0)
+                        {
+                            Item.SubItems.Add("*");
+                        }
+                        else
+                        {
+                            Item.SubItems.Add("");
+                        }
+
+                        listViewKeywords.Items.Add(Item);
+
+                        if (Part.sPartName == m_sSelectedPartName)
+                        {
+                            SelectedItem = Item;
+                        }
+                    }
+
+                    if (SelectedItem == null && listViewKeywords.Items.Count > 0)
+                    {
+                        SelectedItem = listViewKeywords.Items[0];
+                    }
+
+                    listViewKeywords.EndUpdate();
+                }
+                else
+                {
+                    Common.Forms.MessageBox.Show(this, sErrorMessage,
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
+
+                    buttonAdd.Enabled = false;
+                    buttonEdit.Enabled = false;
+                    buttonDelete.Enabled = false;
+                    buttonDatasheets.Enabled = false;
+                }
+
+                if (SelectedItem != null)
+                {
+                    SelectedItem.Selected = true;
+                    SelectedItem.Focused = true;
+
+                    SelectedItem.EnsureVisible();
+                }
+            });
         }
         #endregion
     }

@@ -284,7 +284,7 @@ namespace Arcade.Forms
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Details...";
-            this.Load += new System.EventHandler(this.PartDetailsForm_Load);
+            this.Shown += new System.EventHandler(this.PartDetailsForm_Shown);
             this.splitContainerPart.Panel1.ResumeLayout(false);
             this.splitContainerPart.Panel1.PerformLayout();
             this.splitContainerPart.Panel2.ResumeLayout(false);

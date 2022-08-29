@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class FindGameBoardForm : Common.Forms.Form
+    public partial class FindGameBoardForm : Arcade.Forms.Form
     {
         #region "Constructor"
         public FindGameBoardForm()
@@ -73,48 +73,57 @@ namespace Arcade.Forms
         #region "Button Event Handlers"
         private void buttonSearch_Click(object sender, EventArgs e)
         {
+            System.String sKeyword = textBoxKeyword.Text;
             System.Collections.Generic.Dictionary<System.String, System.Collections.Generic.List<DatabaseDefs.TBoard>> GameBoardListDict;
             System.Collections.Generic.Dictionary<System.String, System.Collections.Generic.List<DatabaseDefs.TBoard>>.Enumerator Enum;
             System.String sErrorMessage;
             System.Windows.Forms.ListViewItem ListViewItem;
+            System.Boolean bResult;
 
-            listViewGames.BeginUpdate();
-            listViewBoard.BeginUpdate();
+            this.BusyControlVisible = true;
 
-            listViewGames.Items.Clear();
-            listViewBoard.Items.Clear();
-
-            listViewBoard.Enabled = false;
-
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (Database.GetGameBoardsMatchingKeyword(textBoxKeyword.Text,
-                                                          out GameBoardListDict,
-                                                          out sErrorMessage))
+                bResult = Database.GetGameBoardsMatchingKeyword(sKeyword,
+                                                                out GameBoardListDict,
+                                                                out sErrorMessage);
+
+                RunOnUIThreadWait(() =>
                 {
-                    Enum = GameBoardListDict.GetEnumerator();
+                    listViewGames.BeginUpdate();
+                    listViewBoard.BeginUpdate();
 
-                    while (Enum.MoveNext())
+                    listViewGames.Items.Clear();
+                    listViewBoard.Items.Clear();
+
+                    listViewBoard.Enabled = false;
+
+                    if (bResult)
                     {
-                        ListViewItem = listViewGames.Items.Add(Enum.Current.Key);
+                        Enum = GameBoardListDict.GetEnumerator();
 
-                        ListViewItem.Tag = Enum.Current.Value;
+                        while (Enum.MoveNext())
+                        {
+                            ListViewItem = listViewGames.Items.Add(Enum.Current.Key);
+
+                            ListViewItem.Tag = Enum.Current.Value;
+                        }
+                    }
+                    else
+                    {
+                        Common.Forms.MessageBox.Show(this, sErrorMessage,
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
                     }
 
-                    listViewGames.AutosizeColumns();
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-            }
+                    listViewGames.Enabled = (listViewGames.Items.Count > 0) ? true : false;
 
-            listViewGames.Enabled = (listViewGames.Items.Count > 0) ? true : false;
+                    listViewGames.EndUpdate();
+                    listViewBoard.EndUpdate();
 
-            listViewGames.EndUpdate();
-            listViewBoard.EndUpdate();
+                    this.BusyControlVisible = false;
+                });
+            }, "Find Game Board Form Search Thread");
         }
         #endregion
     }

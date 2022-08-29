@@ -282,6 +282,7 @@ namespace Arcade.Forms
             this.buttonViewDatasheet.TabIndex = 3;
             this.buttonViewDatasheet.Text = "&View";
             this.buttonViewDatasheet.UseVisualStyleBackColor = true;
+            this.buttonViewDatasheet.Click += new System.EventHandler(this.buttonViewDatasheet_Click);
             // 
             // buttonAddDatasheet
             // 
@@ -333,7 +334,7 @@ namespace Arcade.Forms
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Add...";
-            this.Load += new System.EventHandler(this.PartEntryForm_Load);
+            this.Shown += new System.EventHandler(this.PartEntryForm_Shown);
             this.splitContainerParts.Panel1.ResumeLayout(false);
             this.splitContainerParts.Panel1.PerformLayout();
             this.splitContainerParts.Panel2.ResumeLayout(false);

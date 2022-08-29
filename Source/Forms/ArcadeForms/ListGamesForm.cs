@@ -10,7 +10,7 @@ namespace Arcade.Forms
     /// <summary>
     /// Summary description for ListGamesForm.
     /// </summary>
-    public partial class ListGamesForm : Common.Forms.Form
+    public partial class ListGamesForm : Arcade.Forms.Form
     {
         #region "Constructor"
         public ListGamesForm()
@@ -30,42 +30,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "List Games Event Handlers"
-        private void ListGamesForm_Load(object sender, EventArgs e)
+        private void ListGamesForm_Shown(object sender, EventArgs e)
         {
-            System.Collections.Generic.List<DatabaseDefs.TGame> GamesList;
-            System.String sErrorMessage;
-            System.Windows.Forms.ListViewItem Item;
+            this.BusyControlVisible = true;
 
-            buttonEdit.Enabled = false;
-            buttonDelete.Enabled = false;
-
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (Database.GetGames(out GamesList, out sErrorMessage))
+                InitializeControls();
+
+                RunOnUIThreadWait(() =>
                 {
-                    listViewGames.BeginUpdate();
-
-                    foreach (DatabaseDefs.TGame Game in GamesList)
-                    {
-                        Item = listViewGames.Items.Add(Game.sGameName);
-
-                        Item.Tag = Game;
-                    }
-
-                    listViewGames.EndUpdate();
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-            }
-
-            if (listViewGames.Items.Count == 0)
-            {
-                listViewGames.Enabled = false;
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "List Games Form Initialize Thread");
         }
         #endregion
 
@@ -90,6 +67,7 @@ namespace Arcade.Forms
             System.String sErrorMessage;
             DatabaseDefs.TGame Game;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
             new Common.Forms.FormLocation(GameEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -97,57 +75,64 @@ namespace Arcade.Forms
 
             if (System.Windows.Forms.DialogResult.OK == GameEntry.ShowDialog(this))
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (Database.AddGame(GameEntry.GameName,
-                                         GameEntry.Manufacturer,
-                                         GameEntry.GameWiringHarness,
-                                         GameEntry.GameHaveWiringHarness,
-                                         GameEntry.GameNeedPowerOnReset,
-                                         GameEntry.GameCocktail,
-                                         GameEntry.GameDescription,
-                                         GameEntry.GamePinouts,
-                                         GameEntry.GameDipSwitches,
-                                         GameEntry.GameAudioColl,
-                                         GameEntry.GameVideoColl,
-                                         GameEntry.GameControlsColl,
-                                         out nNewGameId,
-                                         out sErrorMessage))
+                    bResult = Database.AddGame(GameEntry.GameName,
+                                               GameEntry.Manufacturer,
+                                               GameEntry.GameWiringHarness,
+                                               GameEntry.GameHaveWiringHarness,
+                                               GameEntry.GameNeedPowerOnReset,
+                                               GameEntry.GameCocktail,
+                                               GameEntry.GameDescription,
+                                               GameEntry.GamePinouts,
+                                               GameEntry.GameDipSwitches,
+                                               GameEntry.GameAudioColl,
+                                               GameEntry.GameVideoColl,
+                                               GameEntry.GameControlsColl,
+                                               out nNewGameId,
+                                               out sErrorMessage);
+
+                    RunOnUIThreadWait(() =>
                     {
-                        Game = new DatabaseDefs.TGame();
+                        if (bResult)
+                        {
+                            Game = new DatabaseDefs.TGame();
 
-                        Game.nGameId = nNewGameId;
-                        Game.sGameName = GameEntry.GameName;
-                        Game.sManufacturer = GameEntry.Manufacturer;
-                        Game.sGameWiringHarness = GameEntry.GameWiringHarness;
-                        Game.bGameHaveWiringHarness = GameEntry.GameHaveWiringHarness;
-                        Game.sGameCocktail = GameEntry.GameCocktail;
-                        Game.sGameDescription = GameEntry.GameDescription;
-                        Game.sGamePinouts = GameEntry.GamePinouts;
-                        Game.sGameDipSwitches = GameEntry.GameDipSwitches;
-                        Game.GameAudioColl = GameEntry.GameAudioColl;
-                        Game.GameVideoColl = GameEntry.GameVideoColl;
-                        Game.GameControlsColl = GameEntry.GameControlsColl;
+                            Game.nGameId = nNewGameId;
+                            Game.sGameName = GameEntry.GameName;
+                            Game.sManufacturer = GameEntry.Manufacturer;
+                            Game.sGameWiringHarness = GameEntry.GameWiringHarness;
+                            Game.bGameHaveWiringHarness = GameEntry.GameHaveWiringHarness;
+                            Game.sGameCocktail = GameEntry.GameCocktail;
+                            Game.sGameDescription = GameEntry.GameDescription;
+                            Game.sGamePinouts = GameEntry.GamePinouts;
+                            Game.sGameDipSwitches = GameEntry.GameDipSwitches;
+                            Game.GameAudioColl = GameEntry.GameAudioColl;
+                            Game.GameVideoColl = GameEntry.GameVideoColl;
+                            Game.GameControlsColl = GameEntry.GameControlsColl;
 
-                        listViewGames.Enabled = true;
+                            listViewGames.Enabled = true;
 
-                        Item = listViewGames.Items.Add(Game.sGameName);
+                            Item = listViewGames.Items.Add(Game.sGameName);
 
-                        Item.Tag = Game;
-                        Item.Selected = true;
-                        Item.Focused = true;
+                            Item.Tag = Game;
+                            Item.Selected = true;
+                            Item.Focused = true;
 
-                        Item.EnsureVisible();
+                            Item.EnsureVisible();
+                        }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
 
-                        listViewGames.AutosizeColumns();
-                    }
-                    else
-                    {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
+                        this.BusyControlVisible = false;
+                    });
+                }, "List Games Form Add Thread");
             }
         }
 
@@ -159,44 +144,52 @@ namespace Arcade.Forms
         private void buttonDelete_Click(object sender, EventArgs e)
         {
             System.Int32 nIndex = listViewGames.SelectedIndices[0];
+            DatabaseDefs.TGame Game = (DatabaseDefs.TGame)listViewGames.Items[nIndex].Tag;
             System.String sErrorMessage;
-            DatabaseDefs.TGame Game;
+            System.Boolean bResult;
 
-            Game = (DatabaseDefs.TGame)listViewGames.Items[nIndex].Tag;
+            this.BusyControlVisible = true;
 
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (Database.DeleteGame(Game.nGameId, out sErrorMessage))
+                bResult = Database.DeleteGame(Game.nGameId, out sErrorMessage);
+
+                RunOnUIThreadWait(() =>
                 {
-                    listViewGames.Items.RemoveAt(nIndex);
-
-                    if (listViewGames.Items.Count > 0)
+                    if (bResult)
                     {
-                        if (listViewGames.Items.Count == nIndex)
+                        listViewGames.Items.RemoveAt(nIndex);
+
+                        if (listViewGames.Items.Count > 0)
                         {
-                            --nIndex;
+                            if (listViewGames.Items.Count == nIndex)
+                            {
+                                --nIndex;
+                            }
+
+                            listViewGames.Items[nIndex].Selected = true;
+                            listViewGames.Items[nIndex].Focused = true;
+
+                            listViewGames.Items[nIndex].EnsureVisible();
                         }
+                        else
+                        {
+                            listViewGames.Enabled = false;
 
-                        listViewGames.Items[nIndex].Selected = true;
-                        listViewGames.Items[nIndex].Focused = true;
-
-                        listViewGames.Items[nIndex].EnsureVisible();
+                            buttonEdit.Enabled = false;
+                            buttonDelete.Enabled = false;
+                        }
                     }
                     else
                     {
-                        listViewGames.Enabled = false;
-
-                        buttonEdit.Enabled = false;
-                        buttonDelete.Enabled = false;
+                        Common.Forms.MessageBox.Show(this, sErrorMessage,
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
                     }
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-            }
+
+                    this.BusyControlVisible = false;
+                });
+            }, "List Games Form Delete Thread");
         }
 
         private void buttonClose_Click(object sender, EventArgs e)
@@ -212,6 +205,9 @@ namespace Arcade.Forms
             Arcade.Forms.GameEntryForm GameEntry = new Arcade.Forms.GameEntryForm();
             System.String sErrorMessage;
             DatabaseDefs.TGame Game;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsUIThread();
 
             new Common.Forms.FormLocation(GameEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -234,49 +230,99 @@ namespace Arcade.Forms
 
             if (System.Windows.Forms.DialogResult.OK == GameEntry.ShowDialog(this))
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (Database.EditGame(Game.nGameId,
-                                          GameEntry.GameName,
-                                          GameEntry.Manufacturer,
-                                          GameEntry.GameWiringHarness,
-                                          GameEntry.GameHaveWiringHarness,
-                                          GameEntry.GameNeedPowerOnReset,
-                                          GameEntry.GameCocktail,
-                                          GameEntry.GameDescription,
-                                          GameEntry.GamePinouts,
-                                          GameEntry.GameDipSwitches,
-                                          GameEntry.GameAudioColl,
-                                          GameEntry.GameVideoColl,
-                                          GameEntry.GameControlsColl,
-                                          out sErrorMessage))
-                    {
-                        Game.sGameName = GameEntry.GameName;
-                        Game.sManufacturer = GameEntry.Manufacturer;
-                        Game.sGameWiringHarness = GameEntry.GameWiringHarness;
-                        Game.bGameHaveWiringHarness = GameEntry.GameHaveWiringHarness;
-                        Game.bGameNeedPowerOnReset = GameEntry.GameNeedPowerOnReset;
-                        Game.sGameCocktail = GameEntry.GameCocktail;
-                        Game.sGameDescription = GameEntry.GameDescription;
-                        Game.sGamePinouts = GameEntry.GamePinouts;
-                        Game.sGameDipSwitches = GameEntry.GameDipSwitches;
-                        Game.GameAudioColl = GameEntry.GameAudioColl;
-                        Game.GameVideoColl = GameEntry.GameVideoColl;
-                        Game.GameControlsColl = GameEntry.GameControlsColl;
+                    bResult = Database.EditGame(Game.nGameId,
+                                                GameEntry.GameName,
+                                                GameEntry.Manufacturer,
+                                                GameEntry.GameWiringHarness,
+                                                GameEntry.GameHaveWiringHarness,
+                                                GameEntry.GameNeedPowerOnReset,
+                                                GameEntry.GameCocktail,
+                                                GameEntry.GameDescription,
+                                                GameEntry.GamePinouts,
+                                                GameEntry.GameDipSwitches,
+                                                GameEntry.GameAudioColl,
+                                                GameEntry.GameVideoColl,
+                                                GameEntry.GameControlsColl,
+                                                out sErrorMessage);
 
-                        listViewGames.Items[nIndex].Text = GameEntry.GameName;
-                        listViewGames.Items[nIndex].Tag = Game;
-
-                        listViewGames.AutosizeColumns();
-                    }
-                    else
+                    RunOnUIThreadWait(() =>
                     {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
+                        if (bResult)
+                        {
+                            Game.sGameName = GameEntry.GameName;
+                            Game.sManufacturer = GameEntry.Manufacturer;
+                            Game.sGameWiringHarness = GameEntry.GameWiringHarness;
+                            Game.bGameHaveWiringHarness = GameEntry.GameHaveWiringHarness;
+                            Game.bGameNeedPowerOnReset = GameEntry.GameNeedPowerOnReset;
+                            Game.sGameCocktail = GameEntry.GameCocktail;
+                            Game.sGameDescription = GameEntry.GameDescription;
+                            Game.sGamePinouts = GameEntry.GamePinouts;
+                            Game.sGameDipSwitches = GameEntry.GameDipSwitches;
+                            Game.GameAudioColl = GameEntry.GameAudioColl;
+                            Game.GameVideoColl = GameEntry.GameVideoColl;
+                            Game.GameControlsColl = GameEntry.GameControlsColl;
+
+                            listViewGames.Items[nIndex].Text = GameEntry.GameName;
+                            listViewGames.Items[nIndex].Tag = Game;
+                        }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
+
+                        this.BusyControlVisible = false;
+                    });
+                }, "List Games Form Edit Thread");
             }
+        }
+
+        private void InitializeControls()
+        {
+            System.Collections.Generic.List<DatabaseDefs.TGame> GamesList;
+            System.String sErrorMessage;
+            System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            bResult = Database.GetGames(out GamesList, out sErrorMessage);
+
+            RunOnUIThreadWait(() =>
+            {
+                buttonEdit.Enabled = false;
+                buttonDelete.Enabled = false;
+
+                if (bResult)
+                {
+                    listViewGames.BeginUpdate();
+
+                    foreach (DatabaseDefs.TGame Game in GamesList)
+                    {
+                        Item = listViewGames.Items.Add(Game.sGameName);
+
+                        Item.Tag = Game;
+                    }
+
+                    listViewGames.EndUpdate();
+                }
+                else
+                {
+                    Common.Forms.MessageBox.Show(this, sErrorMessage,
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
+                }
+
+                if (listViewGames.Items.Count == 0)
+                {
+                    listViewGames.Enabled = false;
+                }
+            });
         }
         #endregion
     }

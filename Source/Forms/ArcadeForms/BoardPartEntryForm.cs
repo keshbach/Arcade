@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class BoardPartEntryForm : Common.Forms.Form
+    public partial class BoardPartEntryForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EBoardPartEntryFormType
@@ -28,6 +28,8 @@ namespace Arcade.Forms
         private System.String m_sPartPackageName = "";
 
         private Common.Collections.StringSortedList<System.Int32> m_BoardPartLocationList = null;
+
+        private System.Boolean m_bTimerExpiredDuringFind = false;
         #endregion
 
         #region "Constructor"
@@ -156,61 +158,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Board Part Entry Event Handlers"
-        private void BoardPartEntryForm_Load(object sender, EventArgs e)
+        private void BoardPartEntryForm_Shown(object sender, EventArgs e)
         {
-            DatabaseDefs.TBoardPartLocationLens BoardPartLocationLens;
-            DatabaseDefs.TPartLens PartLens;
+            this.BusyControlVisible = true;
 
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (Database.GetBoardPartLocationMaxLens(out BoardPartLocationLens))
+                InitializeControls();
+
+                RunOnUIThreadWait(() =>
                 {
-                    textBoxPosition.MaxLength = BoardPartLocationLens.nBoardPartPositionLen;
-                    textBoxDescription.MaxLength = BoardPartLocationLens.nBoardPartDescriptionLen;
-                }
-
-                if (Database.GetPartMaxLens(out PartLens))
-                {
-                    textBoxTimerFind.MaxLength = PartLens.nPartNameLen;
-                }
-
-                Database.GetBoardPartLocationList(out m_BoardPartLocationList);
-
-                comboBoxLocation.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_BoardPartLocationList)
-                {
-                    comboBoxLocation.Items.Add(Pair.Key);
-                }
-
-                comboBoxLocation.EndUpdate();
-            }
-
-            switch (m_BoardPartEntryFormType)
-            {
-                case EBoardPartEntryFormType.AddBoardPart:
-                    Text = "Add...";
-
-                    m_sPartLocation = Database.DefBoardPartLocation;
-
-                    buttonOK.Enabled = false;
-                    break;
-                case EBoardPartEntryFormType.EditBoardPart:
-                    Text = "Edit...";
-
-                    textBoxPosition.Text = m_sPartPosition;
-                    textBoxDescription.Text = m_sPartDescription;
-
-                    textBoxTimerFind.Text = m_sPartName;
-
-                    FindPartsFromPartName();
-                    break;
-                default:
-                    System.Diagnostics.Debug.Assert(false);
-                    break;
-            }
-
-            comboBoxLocation.SelectedIndex = m_BoardPartLocationList.IndexOfKey(m_sPartLocation);
+                    this.BusyControlVisible = false;
+                });
+            }, "Board Part Entry Form Initialize Thread");
         }
         #endregion
 
@@ -233,6 +193,7 @@ namespace Arcade.Forms
             Arcade.Forms.PartEntryForm PartEntry = new Arcade.Forms.PartEntryForm();
             System.Int32 nPartId;
             System.String sErrorMessage;
+            System.Boolean bResult;
 
             new Common.Forms.FormLocation(PartEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -240,25 +201,35 @@ namespace Arcade.Forms
 
             if (PartEntry.ShowDialog(this) == DialogResult.OK)
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (true == Database.AddPartGroup(PartEntry.PartName,
-                                                      PartEntry.PartCategoryName,
-                                                      PartEntry.PartTypeName,
-                                                      PartEntry.PartPackageName,
-                                                      PartEntry.PartPinouts,
-                                                      PartEntry.PartDatasheetColl,
-                                                      out nPartId, out sErrorMessage))
+                    bResult = Database.AddPartGroup(PartEntry.PartName,
+                                                    PartEntry.PartCategoryName,
+                                                    PartEntry.PartTypeName,
+                                                    PartEntry.PartPackageName,
+                                                    PartEntry.PartPinouts,
+                                                    PartEntry.PartDatasheetColl,
+                                                    out nPartId,
+                                                    out sErrorMessage);
+
+                    RunOnUIThreadWait(() =>
                     {
-                        FindPartsFromPartName();
-                    }
-                    else
-                    {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
+                        this.BusyControlVisible = false;
+
+                        if (bResult)
+                        {
+                            FindPartsFromPartName();
+                        }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
+                    });
+                }, "Board Part Entry Form New Thread");
             }
 
             PartEntry.Dispose();
@@ -300,7 +271,14 @@ namespace Arcade.Forms
         #region "Text Box Timer Event Handlers"
         private void textBoxTimerFind_KeyPressTimerExpired(object sender, EventArgs e)
         {
-            FindPartsFromPartName();
+            if (!this.BusyControlVisible)
+            {
+                FindPartsFromPartName();
+            }
+            else
+            {
+                m_bTimerExpiredDuringFind = true;
+            }
         }
         #endregion
 
@@ -319,74 +297,177 @@ namespace Arcade.Forms
         #region "Internal Helpers"
         private void FindPartsFromPartName()
         {
-            System.Collections.Generic.List<DatabaseDefs.TPart> PartList;
-            System.String sErrorMessage;
-            System.Windows.Forms.ListViewItem Item;
+            Common.Debug.Thread.IsUIThread();
 
             buttonOK.Enabled = false;
             listViewParts.Enabled = false;
 
             if (textBoxTimerFind.Text.Length > 0)
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (false == Database.GetPartsMatchingKeyword(textBoxTimerFind.Text,
-                                        DatabaseDefs.EKeywordMatchingCriteria.Start,
-                                        out PartList,
-                                        out sErrorMessage))
+                    RefreshMatchingKeywords(textBoxTimerFind.Text);
+
+                    RunOnUIThreadWait(() =>
                     {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
+                        this.BusyControlVisible = false;
 
-                        return;
-                    }
-                }
+                        if (m_bTimerExpiredDuringFind)
+                        {
+                            m_bTimerExpiredDuringFind = false;
 
-                listViewParts.BeginUpdate();
+                            FindPartsFromPartName();
+                        }
+                    });
+                }, "Board Part Entry Form Find Thread");
+            }
+        }
 
-                listViewParts.Sorting = Common.Forms.ListView.ESortOrder.None;
+        private void RefreshMatchingKeywords(System.String sKeyword)
+        {
+            System.Collections.Generic.List<DatabaseDefs.TPart> PartList;
+            System.String sErrorMessage;
+            System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
-                listViewParts.Items.Clear();
+            Common.Debug.Thread.IsWorkerThread();
 
-                foreach (DatabaseDefs.TPart Part in PartList)
+            bResult = Database.GetPartsMatchingKeyword(sKeyword,
+                                                       DatabaseDefs.EKeywordMatchingCriteria.Start,
+                                                       out PartList,
+                                                       out sErrorMessage);
+
+            RunOnUIThreadWait(() => {
+                if (bResult)
                 {
-                    Item = listViewParts.Items.Add(Part.sPartName);
+                    listViewParts.BeginUpdate();
 
-                    Item.SubItems.Add(Part.sPartCategoryName);
-                    Item.SubItems.Add(Part.sPartTypeName);
-                    Item.SubItems.Add(Part.sPartPackageName);
+                    listViewParts.Sorting = Common.Forms.ListView.ESortOrder.None;
 
-                    if (0 == System.String.Compare(m_sPartName, Part.sPartName, true) &&
-                        0 == System.String.Compare(m_sPartCategoryName, Part.sPartCategoryName, true) &&
-                        0 == System.String.Compare(m_sPartTypeName, Part.sPartTypeName, true) &&
-                        0 == System.String.Compare(m_sPartPackageName, Part.sPartPackageName, true))
+                    listViewParts.Items.Clear();
+
+                    foreach (DatabaseDefs.TPart Part in PartList)
+                    {
+                        Item = listViewParts.Items.Add(Part.sPartName);
+
+                        Item.SubItems.Add(Part.sPartCategoryName);
+                        Item.SubItems.Add(Part.sPartTypeName);
+                        Item.SubItems.Add(Part.sPartPackageName);
+
+                        if (0 == System.String.Compare(m_sPartName, Part.sPartName, true) &&
+                            0 == System.String.Compare(m_sPartCategoryName, Part.sPartCategoryName, true) &&
+                            0 == System.String.Compare(m_sPartTypeName, Part.sPartTypeName, true) &&
+                            0 == System.String.Compare(m_sPartPackageName, Part.sPartPackageName, true))
+                        {
+                            listViewParts.Enabled = true;
+
+                            Item.EnsureVisible();
+
+                            Item.Selected = true;
+                        }
+                    }
+
+                    listViewParts.EndUpdate();
+
+                    if (listViewParts.Items.Count > 0)
                     {
                         listViewParts.Enabled = true;
 
-                        Item.EnsureVisible();
+                        if (listViewParts.Items.Count == 1)
+                        {
+                            listViewParts.Items[0].Selected = true;
 
-                        Item.Selected = true;
+                            buttonOK.Enabled = true;
+                        }
                     }
-                }
-
-                listViewParts.EndUpdate();
-
-                if (listViewParts.Items.Count > 0)
-                {
-                    listViewParts.Enabled = true;
-
-                    if (listViewParts.Items.Count == 1)
+                    else
                     {
-                        listViewParts.Items[0].Selected = true;
-
-                        buttonOK.Enabled = true;
+                        listViewParts.Enabled = false;
                     }
                 }
                 else
                 {
-                    listViewParts.Enabled = false;
+                    Common.Forms.MessageBox.Show(this, sErrorMessage,
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
                 }
+            });
+        }
+
+        private void InitializeControls()
+        {
+            System.String sKeyword = null;
+            DatabaseDefs.TBoardPartLocationLens BoardPartLocationLens;
+            DatabaseDefs.TPartLens PartLens;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            if (Database.GetBoardPartLocationMaxLens(out BoardPartLocationLens))
+            {
+                RunOnUIThreadWait(() =>
+                {
+                    textBoxPosition.MaxLength = BoardPartLocationLens.nBoardPartPositionLen;
+                    textBoxDescription.MaxLength = BoardPartLocationLens.nBoardPartDescriptionLen;
+                });
+            }
+
+            if (Database.GetPartMaxLens(out PartLens))
+            {
+                RunOnUIThreadWait(() =>
+                {
+                    textBoxTimerFind.MaxLength = PartLens.nPartNameLen;
+                });
+            }
+
+            if (Database.GetBoardPartLocationList(out m_BoardPartLocationList))
+            {
+                RunOnUIThreadWait(() =>
+                {
+                    comboBoxLocation.BeginUpdate();
+
+                    foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_BoardPartLocationList)
+                    {
+                        comboBoxLocation.Items.Add(Pair.Key);
+                    }
+
+                    comboBoxLocation.EndUpdate();
+                });
+            }
+
+            RunOnUIThreadWait(() =>
+            {
+                switch (m_BoardPartEntryFormType)
+                {
+                    case EBoardPartEntryFormType.AddBoardPart:
+                        Text = "Add...";
+
+                        m_sPartLocation = Database.DefBoardPartLocation;
+
+                        buttonOK.Enabled = false;
+                        break;
+                    case EBoardPartEntryFormType.EditBoardPart:
+                        Text = "Edit...";
+
+                        textBoxPosition.Text = m_sPartPosition;
+                        textBoxDescription.Text = m_sPartDescription;
+
+                        textBoxTimerFind.Text = m_sPartName;
+
+                        sKeyword = textBoxTimerFind.Text;
+                        break;
+                    default:
+                        System.Diagnostics.Debug.Assert(false);
+                        break;
+                }
+
+                comboBoxLocation.SelectedIndex = m_BoardPartLocationList.IndexOfKey(m_sPartLocation);
+            });
+
+            if (!System.String.IsNullOrEmpty(sKeyword))
+            {
+                RefreshMatchingKeywords(sKeyword);
             }
         }
         #endregion

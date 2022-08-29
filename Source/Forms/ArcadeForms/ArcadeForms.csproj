@@ -66,6 +66,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UiArcadeCtrlsNet">
+      <HintPath>$(SolutionDir)..\bin\$(Configuration)\$(PlatformName)\UiArcadeCtrlsNet.dll</HintPath>
+    </Reference>
     <Reference Include="UiCtrlsNet">
       <HintPath>$(SolutionDir)..\bin\$(Configuration)\$(PlatformName)\UiCtrlsNet.dll</HintPath>
     </Reference>

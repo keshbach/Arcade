@@ -62,6 +62,12 @@ namespace Arcade
             }
 
         protected:
+            System::Boolean OpenFile(System::String^ sFile, System::String^% sErrorMessage);
+
+            void UpdateControlVisibility(System::Windows::Forms::Control^ Control, System::Boolean bVisible);
+            void UpdateFocusedControl(System::Windows::Forms::Control^ Control);
+
+        protected:
             /// <summary>
             /// Clean up any resources being used.
             /// </summary>

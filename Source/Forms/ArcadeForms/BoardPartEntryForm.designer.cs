@@ -295,7 +295,7 @@ namespace Arcade.Forms
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Board Part Entry";
-            this.Load += new System.EventHandler(this.BoardPartEntryForm_Load);
+            this.Shown += new System.EventHandler(this.BoardPartEntryForm_Shown);
             this.groupBoxPart.ResumeLayout(false);
             this.groupBoxPart.PerformLayout();
             this.splitContainerBoardPart.Panel1.ResumeLayout(false);

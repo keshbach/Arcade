@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class LogEntryForm : Common.Forms.Form
+    public partial class LogEntryForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum ELogEntryFormType
@@ -92,58 +92,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Log Entry Event Handlers"
-        private void LogEntryForm_Load(object sender, EventArgs e)
+        private void LogEntryForm_Shown(object sender, EventArgs e)
         {
-            DatabaseDefs.TLogLens LogLens;
+            this.BusyControlVisible = true;
 
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                Database.GetLogTypeList(out m_LogTypeList);
+                InitializeControls();
 
-                comboBoxType.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_LogTypeList)
+                RunOnUIThreadWait(() =>
                 {
-                    comboBoxType.Items.Add(Pair.Key);
-                }
-
-                comboBoxType.EndUpdate();
-
-                comboBoxType.AutosizeDropDown();
-
-                switch (m_LogEntryFormType)
-                {
-                    case ELogEntryFormType.NewLog:
-                        Text = "New Log...";
-
-                        comboBoxType.SelectedIndex = m_LogTypeList.IndexOfKey(m_sLogType);
-                        break;
-                    case ELogEntryFormType.EditLog:
-                        Text = "Edit Log...";
-
-                        dateTimePickerLog.Value = m_LogDateTime;
-
-                        textBoxDescription.Text = m_sLogDescription;
-
-                        comboBoxType.SelectedIndex = m_LogTypeList.IndexOfKey(m_sLogType);
-
-                        ValidateData();
-                        break;
-                    default:
-                        System.Diagnostics.Debug.Assert(false);
-                        break;
-                }
-
-                if (comboBoxType.SelectedIndex == -1)
-                {
-                    buttonOK.Enabled = false;
-                }
-
-                if (Arcade.Database.GetLogMaxLens(out LogLens))
-                {
-                    textBoxDescription.MaxLength = LogLens.nLogDescriptionLen;
-                }
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "Log Entry Form Initialize Thread");
         }
         #endregion
 
@@ -189,6 +150,8 @@ namespace Arcade.Forms
         #region "Internal Helpers"
         private void ValidateData()
         {
+            Common.Debug.Thread.IsUIThread();
+
             if (comboBoxType.SelectedIndex != -1 && textBoxDescription.TextLength > 0)
             {
                 buttonOK.Enabled = true;
@@ -197,6 +160,65 @@ namespace Arcade.Forms
             {
                 buttonOK.Enabled = false;
             }
+        }
+
+        private void InitializeControls()
+        {
+            DatabaseDefs.TLogLens LogLens;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            Database.GetLogTypeList(out m_LogTypeList);
+
+            bResult = Database.GetLogMaxLens(out LogLens);
+
+            RunOnUIThreadWait(() =>
+            {
+                comboBoxType.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_LogTypeList)
+                {
+                    comboBoxType.Items.Add(Pair.Key);
+                }
+
+                comboBoxType.EndUpdate();
+
+                comboBoxType.AutosizeDropDown();
+
+                switch (m_LogEntryFormType)
+                {
+                    case ELogEntryFormType.NewLog:
+                        Text = "New Log...";
+
+                        comboBoxType.SelectedIndex = m_LogTypeList.IndexOfKey(m_sLogType);
+                        break;
+                    case ELogEntryFormType.EditLog:
+                        Text = "Edit Log...";
+
+                        dateTimePickerLog.Value = m_LogDateTime;
+
+                        textBoxDescription.Text = m_sLogDescription;
+
+                        comboBoxType.SelectedIndex = m_LogTypeList.IndexOfKey(m_sLogType);
+
+                        ValidateData();
+                        break;
+                    default:
+                        System.Diagnostics.Debug.Assert(false);
+                        break;
+                }
+
+                if (comboBoxType.SelectedIndex == -1)
+                {
+                    buttonOK.Enabled = false;
+                }
+
+                if (bResult)
+                {
+                    textBoxDescription.MaxLength = LogLens.nLogDescriptionLen;
+                }
+            });
         }
         #endregion
     }

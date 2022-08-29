@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class PartEntryForm : Common.Forms.Form
+    public partial class PartEntryForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EPartEntryFormType
@@ -167,121 +167,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Part Entry Event Handlers"
-        private void PartEntryForm_Load(object sender, EventArgs e)
+        private void PartEntryForm_Shown(object sender, EventArgs e)
         {
-            DatabaseDefs.TPartLens PartLens;
+            this.BusyControlVisible = true;
 
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                m_IgnoreChange = true;
+                InitializeControls();
 
-                Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Category,
-                                             out m_PartCategoryList);
-                Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Type,
-                                             out m_PartTypeList);
-                Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Package,
-                                             out m_PartPackageList);
-
-                comboBoxCategory.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_PartCategoryList)
+                RunOnUIThreadWait(() =>
                 {
-                    comboBoxCategory.Items.Add(Pair.Key);
-                }
-
-                comboBoxCategory.EndUpdate();
-
-                comboBoxCategory.AutosizeDropDown();
-
-                comboBoxType.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_PartTypeList)
-                {
-                    comboBoxType.Items.Add(Pair.Key);
-                }
-
-                comboBoxType.EndUpdate();
-
-                comboBoxType.AutosizeDropDown();
-
-                comboBoxPackage.BeginUpdate();
-
-                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_PartPackageList)
-                {
-                    comboBoxPackage.Items.Add(Pair.Key);
-                }
-
-                comboBoxPackage.EndUpdate();
-
-                comboBoxPackage.AutosizeDropDown();
-
-                buttonDeleteDatasheet.Enabled = false;
-                buttonViewDatasheet.Enabled = false;
-
-                switch (m_PartEntryFormType)
-                {
-                    case EPartEntryFormType.AddPartName:
-                        Text = "Add...";
-
-                        textBoxPartPinouts.ReadOnly = true;
-                        textBoxPartPinouts.Text = m_sPartPinouts;
-
-                        comboBoxCategory.SelectedIndex = m_PartCategoryList.IndexOfKey(m_sPartCategoryName);
-                        comboBoxType.SelectedIndex = m_PartTypeList.IndexOfKey(m_sPartTypeName);
-                        comboBoxPackage.SelectedIndex = m_PartPackageList.IndexOfKey(m_sPartPackageName);
-
-                        comboBoxCategory.Enabled = false;
-                        comboBoxType.Enabled = false;
-
-                        checkBoxDefault.Enabled = false;
-                        break;
-                    case EPartEntryFormType.NewPart:
-                        Text = "New Part...";
-
-                        checkBoxDefault.Checked = true;
-                        checkBoxDefault.Enabled = false;
-                        break;
-                    case EPartEntryFormType.EditPart:
-                        Text = "Edit...";
-
-                        textBoxName.Text = m_sPartName;
-                        textBoxPartPinouts.Text = m_sPartPinouts;
-
-                        comboBoxCategory.SelectedIndex = m_PartCategoryList.IndexOfKey(m_sPartCategoryName);
-                        comboBoxType.SelectedIndex = m_PartTypeList.IndexOfKey(m_sPartTypeName);
-                        comboBoxPackage.SelectedIndex = m_PartPackageList.IndexOfKey(m_sPartPackageName);
-
-                        checkBoxDefault.Checked = m_bDefaultPartName;
-
-                        listViewDatasheets.BeginUpdate();
-
-                        foreach (System.String sValue in m_PartDatasheetColl)
-                        {
-                            listViewDatasheets.Items.Add(sValue);
-                        }
-
-                        listViewDatasheets.EndUpdate();
-
-                        listViewDatasheets.Enabled = (m_PartDatasheetColl.Count > 0);
-                        break;
-                    default:
-                        System.Diagnostics.Debug.Assert(false);
-                        break;
-                }
-
-                if (textBoxName.Text.Length == 0)
-                {
-                    buttonOK.Enabled = false;
-                }
-
-                if (Database.GetPartMaxLens(out PartLens))
-                {
-                    textBoxName.MaxLength = PartLens.nPartNameLen;
-                    textBoxPartPinouts.MaxLength = PartLens.nPartPinoutsLen;
-                }
-
-                m_IgnoreChange = false;
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "Part Entry Form Initialize Thread");
         }
         #endregion
 
@@ -323,7 +221,7 @@ namespace Arcade.Forms
             if (OpenFileDlg.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
             {
                 for (System.Int32 nIndex = 0; nIndex < listViewDatasheets.Items.Count;
-                        ++nIndex)
+                     ++nIndex)
                 {
                     if (0 == System.String.Compare(listViewDatasheets.Items[nIndex].Text,
                                                    OpenFileDlg.FileName, true))
@@ -339,8 +237,6 @@ namespace Arcade.Forms
                     Item = listViewDatasheets.Items.Add(OpenFileDlg.FileName);
 
                     m_PartDatasheetColl.Add(OpenFileDlg.FileName);
-
-                    listViewDatasheets.AutosizeColumns();
 
                     Item.Selected = true;
                     Item.Focused = true;
@@ -481,29 +377,39 @@ namespace Arcade.Forms
         private void ViewDatasheet()
         {
             System.Int32 nIndex = listViewDatasheets.SelectedIndices[0];
-            System.Diagnostics.ProcessStartInfo StartInfo = new System.Diagnostics.ProcessStartInfo();
+            System.String sFile = listViewDatasheets.Items[nIndex].Text;
+            System.Boolean bResult;
+            System.String sErrorMessage;
 
-            try
-            {
-                StartInfo.FileName = listViewDatasheets.Items[nIndex].Text;
-                StartInfo.UseShellExecute = true;
-                StartInfo.Verb = "Open";
-                StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+            Common.Debug.Thread.IsUIThread();
 
-                System.Diagnostics.Process.Start(StartInfo);
-            }
-            catch (System.Exception Exception)
+            this.BusyControlVisible = true;
+
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                Common.Forms.MessageBox.Show(this,
-                    "The file could not be opened.\n\n(" + Exception.Message + ")",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Information);
-            }
+                sErrorMessage = null;
+                bResult = OpenFile(sFile, ref sErrorMessage);
+
+                RunOnUIThreadWait(() =>
+                {
+                    if (!bResult)
+                    {
+                        Common.Forms.MessageBox.Show(this,
+                            String.Format("The file could not be opened.\n\n({0})", sErrorMessage),
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
+                    }
+
+                    this.BusyControlVisible = false;
+                });
+            }, "Part Entry Form View Datasheet Thread");
         }
 
         private void UpdateOKButton()
         {
             bool bEnabled = false;
+
+            Common.Debug.Thread.IsUIThread();
 
             if (m_IgnoreChange == false &&
                 textBoxName.TextLength > 0 &&
@@ -522,6 +428,8 @@ namespace Arcade.Forms
             System.Collections.Generic.List<Common.Forms.FileTypeItem> FileTypeList = new System.Collections.Generic.List<Common.Forms.FileTypeItem>();
             Common.Forms.FileTypeItem FileTypeItem;
 
+            Common.Debug.Thread.IsUIThread();
+
             FileTypeItem = new Common.Forms.FileTypeItem("Adobe PDF Files", "*.pdf");
 
             FileTypeList.Add(FileTypeItem);
@@ -535,6 +443,125 @@ namespace Arcade.Forms
             FileTypeList.Add(FileTypeItem);
 
             return FileTypeList;
+        }
+
+        private void InitializeControls()
+        {
+            DatabaseDefs.TPartLens PartLens;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Category,
+                                         out m_PartCategoryList);
+            Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Type,
+                                         out m_PartTypeList);
+            Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Package,
+                                         out m_PartPackageList);
+
+            RunOnUIThreadWait(() =>
+            {
+                m_IgnoreChange = true;
+
+                comboBoxCategory.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_PartCategoryList)
+                {
+                    comboBoxCategory.Items.Add(Pair.Key);
+                }
+
+                comboBoxCategory.EndUpdate();
+
+                comboBoxCategory.AutosizeDropDown();
+
+                comboBoxType.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_PartTypeList)
+                {
+                    comboBoxType.Items.Add(Pair.Key);
+                }
+
+                comboBoxType.EndUpdate();
+
+                comboBoxType.AutosizeDropDown();
+
+                comboBoxPackage.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_PartPackageList)
+                {
+                    comboBoxPackage.Items.Add(Pair.Key);
+                }
+
+                comboBoxPackage.EndUpdate();
+
+                comboBoxPackage.AutosizeDropDown();
+
+                buttonDeleteDatasheet.Enabled = false;
+                buttonViewDatasheet.Enabled = false;
+
+                switch (m_PartEntryFormType)
+                {
+                    case EPartEntryFormType.AddPartName:
+                        Text = "Add...";
+
+                        textBoxPartPinouts.ReadOnly = true;
+                        textBoxPartPinouts.Text = m_sPartPinouts;
+
+                        comboBoxCategory.SelectedIndex = m_PartCategoryList.IndexOfKey(m_sPartCategoryName);
+                        comboBoxType.SelectedIndex = m_PartTypeList.IndexOfKey(m_sPartTypeName);
+                        comboBoxPackage.SelectedIndex = m_PartPackageList.IndexOfKey(m_sPartPackageName);
+
+                        comboBoxCategory.Enabled = false;
+                        comboBoxType.Enabled = false;
+
+                        checkBoxDefault.Enabled = false;
+                        break;
+                    case EPartEntryFormType.NewPart:
+                        Text = "New Part...";
+
+                        checkBoxDefault.Checked = true;
+                        checkBoxDefault.Enabled = false;
+                        break;
+                    case EPartEntryFormType.EditPart:
+                        Text = "Edit...";
+
+                        textBoxName.Text = m_sPartName;
+                        textBoxPartPinouts.Text = m_sPartPinouts;
+
+                        comboBoxCategory.SelectedIndex = m_PartCategoryList.IndexOfKey(m_sPartCategoryName);
+                        comboBoxType.SelectedIndex = m_PartTypeList.IndexOfKey(m_sPartTypeName);
+                        comboBoxPackage.SelectedIndex = m_PartPackageList.IndexOfKey(m_sPartPackageName);
+
+                        checkBoxDefault.Checked = m_bDefaultPartName;
+
+                        listViewDatasheets.BeginUpdate();
+
+                        foreach (System.String sValue in m_PartDatasheetColl)
+                        {
+                            listViewDatasheets.Items.Add(sValue);
+                        }
+
+                        listViewDatasheets.EndUpdate();
+
+                        listViewDatasheets.Enabled = (m_PartDatasheetColl.Count > 0);
+                        break;
+                    default:
+                        System.Diagnostics.Debug.Assert(false);
+                        break;
+                }
+
+                if (textBoxName.Text.Length == 0)
+                {
+                    buttonOK.Enabled = false;
+                }
+
+                if (Database.GetPartMaxLens(out PartLens))
+                {
+                    textBoxName.MaxLength = PartLens.nPartNameLen;
+                    textBoxPartPinouts.MaxLength = PartLens.nPartPinoutsLen;
+                }
+
+                m_IgnoreChange = false;
+            });
         }
         #endregion
     }

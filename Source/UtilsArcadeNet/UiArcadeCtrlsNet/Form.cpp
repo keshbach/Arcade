@@ -272,6 +272,52 @@ Arcade::Forms::Form::~Form()
 
 #pragma endregion
 
+System::Boolean Arcade::Forms::Form::OpenFile(
+  System::String^ sFile,
+  System::String^% sErrorMessage)
+{
+	System::Boolean bResult = false;
+	System::Diagnostics::ProcessStartInfo^ StartInfo;
+
+	sErrorMessage = nullptr;
+
+	try
+	{
+		StartInfo = gcnew System::Diagnostics::ProcessStartInfo();
+
+		StartInfo->FileName = sFile;
+		StartInfo->UseShellExecute = true;
+		StartInfo->Verb = L"Open";
+		StartInfo->WindowStyle = System::Diagnostics::ProcessWindowStyle::Normal;
+
+		System::Diagnostics::Process::Start(StartInfo);
+
+		bResult = true;
+	}
+	catch (System::SystemException^ exception)
+	{
+		sErrorMessage = exception->Message;
+	}
+
+	return bResult;
+}
+
+void Arcade::Forms::Form::UpdateControlVisibility(
+  System::Windows::Forms::Control^ Control,
+  System::Boolean bVisible)
+{
+	System::Diagnostics::Debug::Assert(m_bBusyVisible);
+	System::Diagnostics::Debug::Assert(m_ControlVisibleDict->ContainsKey(Control));
+
+	m_ControlVisibleDict[Control] = bVisible;
+}
+
+void Arcade::Forms::Form::UpdateFocusedControl(
+  System::Windows::Forms::Control^ Control)
+{
+	m_hFocusedControl = (HWND)Control->Handle.ToPointer();
+}
+
 void Arcade::Forms::Form::OnPaintBackground(
   System::Windows::Forms::PaintEventArgs^ e)
 {

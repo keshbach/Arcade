@@ -168,7 +168,7 @@ namespace Arcade.Forms
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GameBoardEntryForm";
-            this.Load += new System.EventHandler(this.GameBoardEntryForm_Load);
+            this.Shown += new System.EventHandler(this.GameBoardEntryForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -105,7 +105,10 @@ namespace Arcade.Forms
             InitImageLists();
             InitImageKeys();
 
-            InitDatabase();
+            Common.Threading.Thread.RunWorkerThread(() =>
+            {
+                InitDatabase();
+            }, "Main Form Initialize Database Threadread");
         }
 
         private void MainForm_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
@@ -677,11 +680,13 @@ namespace Arcade.Forms
         #endregion
 
         #region "Internal Functions"
-        private void InitDatabaseThreadProc(object obj)
+        private void InitDatabase()
         {
             System.String sErrorMessage;
             Database.EDatabaseAdapter DatabaseAdapter;
             System.Boolean bDatabaseAvailable;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             UpdateState(State.Initializing);
 
@@ -720,16 +725,6 @@ namespace Arcade.Forms
 
                 UpdateState(State.InitializatedFailed);
             }
-        }
-
-        private void InitDatabase()
-        {
-            System.Threading.ParameterizedThreadStart ThreadStart = new System.Threading.ParameterizedThreadStart(InitDatabaseThreadProc);
-            System.Threading.Thread Thread = new System.Threading.Thread(ThreadStart);
-
-            Thread.Name = "Initialize Database Thread";
-
-            Thread.Start();
         }
 
         private void InitImageLists()

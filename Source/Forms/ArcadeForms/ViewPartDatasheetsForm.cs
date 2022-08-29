@@ -6,7 +6,7 @@ using System;
 
 namespace Arcade.Forms
 {
-    public partial class ViewPartDatasheetsForm : Common.Forms.Form
+    public partial class ViewPartDatasheetsForm : Arcade.Forms.Form
     {
         #region "Member Variables"
         private System.Collections.Specialized.StringCollection m_PartDatasheetColl;
@@ -85,24 +85,29 @@ namespace Arcade.Forms
         private void buttonView_Click(object sender, EventArgs e)
         {
             System.Int32 nIndex = listViewDatasheets.SelectedIndices[0];
-            System.Diagnostics.ProcessStartInfo StartInfo = new System.Diagnostics.ProcessStartInfo();
+            System.String sFile = listViewDatasheets.Items[nIndex].Text;
+            System.Boolean bResult;
+            System.String sErrorMessage;
 
-            try
-            {
-                StartInfo.FileName = listViewDatasheets.Items[nIndex].Text;
-                StartInfo.UseShellExecute = true;
-                StartInfo.Verb = "Open";
-                StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+            this.BusyControlVisible = true;
 
-                System.Diagnostics.Process.Start(StartInfo);
-            }
-            catch (System.Exception Exception)
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                Common.Forms.MessageBox.Show(this,
-                    "The file could not be opened.\n\n(" + Exception.Message + ")",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Information);
-            }
+                sErrorMessage = null;
+                bResult = OpenFile(sFile, ref sErrorMessage);
+
+                RunOnUIThreadWait(() =>
+                {
+                    if (!bResult)
+                    {
+                        Common.Forms.MessageBox.Show(this, sErrorMessage,
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
+                    }
+
+                    this.BusyControlVisible = false;
+                });
+            }, "View Part Datasheets Form View Thread");
         }
 
         private void buttonClose_Click(object sender, EventArgs e)

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class ListDisplaysForm : Common.Forms.Form
+    public partial class ListDisplaysForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EListDisplaysFormType
@@ -20,7 +20,6 @@ namespace Arcade.Forms
         #region "Member Variables"
         private EListDisplaysFormType m_ListDisplaysFormType = EListDisplaysFormType.EditDisplays;
         private System.Int32 m_nDisplayId = -1;
-        private System.String m_sDisplayName;
         private System.String m_sDisplayType;
         private System.String m_sDisplayResolution;
         private System.String m_sDisplayColors;
@@ -95,61 +94,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "List Displays Event Handlers"
-        private void ListDisplaysForm_Load(object sender, EventArgs e)
+        private void ListDisplaysForm_Shown(object sender, EventArgs e)
         {
-            System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplaysList;
-            System.String sErrorMessage;
-            System.Windows.Forms.ListViewItem Item;
+            this.BusyControlVisible = true;
 
-            buttonOK.Enabled = false;
-
-            using (new Common.Forms.WaitCursor(this))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (true == Database.GetDisplays(out DisplaysList,
-                                                 out sErrorMessage))
+                InitializeControls();
+
+                RunOnUIThreadWait(() =>
                 {
-                    listViewDisplays.BeginUpdate();
-
-                    foreach (DatabaseDefs.TDisplay Display in DisplaysList)
-                    {
-                        Item = listViewDisplays.Items.Add(Display.sDisplayName);
-
-                        Item.Tag = Display;
-                    }
-
-                    listViewDisplays.EndUpdate();
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-            }
-
-            if (listViewDisplays.Items.Count == 0)
-            {
-                listViewDisplays.Enabled = false;
-            }
-
-            switch (this.m_ListDisplaysFormType)
-            {
-                case EListDisplaysFormType.ListDisplays:
-                    buttonAdd.Visible = false;
-                    buttonEdit.Visible = false;
-                    buttonDelete.Visible = false;
-                    break;
-                case EListDisplaysFormType.EditDisplays:
-                    buttonEdit.Enabled = false;
-                    buttonDelete.Enabled = false;
-
-                    buttonOK.Visible = false;
-                    buttonCancel.Text = "Close";
-                    break;
-                default:
-                    System.Diagnostics.Debug.Assert(false);
-                    break;
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "List Displays Form Initialize Thread");
         }
         #endregion
 
@@ -183,6 +140,7 @@ namespace Arcade.Forms
             System.Int32 nNewDisplayId;
             DatabaseDefs.TDisplay Display;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
             new Common.Forms.FormLocation(DisplayEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -190,45 +148,58 @@ namespace Arcade.Forms
 
             if (DisplayEntry.ShowDialog(this) == DialogResult.OK)
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (Database.AddDisplay(DisplayEntry.DisplayName,
-                                            DisplayEntry.DisplayType,
-                                            DisplayEntry.DisplayResolution,
-                                            DisplayEntry.DisplayColors,
-                                            DisplayEntry.DisplayOrientation,
-                                            out nNewDisplayId,
-                                            out sErrorMessage))
+                    bResult = Database.AddDisplay(DisplayEntry.DisplayName,
+                                                  DisplayEntry.DisplayType,
+                                                  DisplayEntry.DisplayResolution,
+                                                  DisplayEntry.DisplayColors,
+                                                  DisplayEntry.DisplayOrientation,
+                                                  out nNewDisplayId,
+                                                  out sErrorMessage);
+
+                    RunOnUIThreadWait(() =>
                     {
-                        Display = new DatabaseDefs.TDisplay();
+                        if (bResult)
+                        {
+                            Display = new DatabaseDefs.TDisplay();
 
-                        Display.nDisplayId = nNewDisplayId;
-                        Display.sDisplayName = DisplayEntry.DisplayName;
-                        Display.sDisplayType = DisplayEntry.DisplayType;
-                        Display.sDisplayResolution = DisplayEntry.DisplayResolution;
-                        Display.sDisplayColors = DisplayEntry.DisplayColors;
-                        Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
+                            Display.nDisplayId = nNewDisplayId;
+                            Display.sDisplayName = DisplayEntry.DisplayName;
+                            Display.sDisplayType = DisplayEntry.DisplayType;
+                            Display.sDisplayResolution = DisplayEntry.DisplayResolution;
+                            Display.sDisplayColors = DisplayEntry.DisplayColors;
+                            Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
 
-                        listViewDisplays.Enabled = true;
+                            listViewDisplays.Enabled = true;
 
-                        Item = listViewDisplays.Items.Add(Display.sDisplayName);
+                            Item = listViewDisplays.Items.Add(Display.sDisplayName);
 
-                        Item.Tag = Display;
+                            Item.Tag = Display;
 
-                        Item.Selected = true;
-                        Item.Focused = true;
+                            Item.Selected = true;
+                            Item.Focused = true;
 
-                        Item.EnsureVisible();
+                            Item.EnsureVisible();
+                        }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
 
-                        listViewDisplays.AutosizeColumns();
-                    }
-                    else
-                    {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
+                        this.BusyControlVisible = false;
+
+                        DisplayEntry.Dispose();
+                    });
+                }, "List Data Form Details Thread");
+            }
+            else
+            {
+                DisplayEntry.Dispose();
             }
         }
 
@@ -243,44 +214,54 @@ namespace Arcade.Forms
             System.String sErrorMessage;
             DatabaseDefs.TDisplay Display;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
             Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
 
-            using (new Common.Forms.WaitCursor(this))
+            this.BusyControlVisible = true;
+
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (Database.DeleteDisplay(Display.nDisplayId, out sErrorMessage))
+                bResult = Database.DeleteDisplay(Display.nDisplayId, out sErrorMessage);
+
+                RunOnUIThreadWait(() =>
                 {
-                    listViewDisplays.Items.RemoveAt(nIndex);
-
-                    if (listViewDisplays.Items.Count > 0)
+                    if (bResult)
                     {
-                        if (nIndex == listViewDisplays.Items.Count)
+                        listViewDisplays.Items.RemoveAt(nIndex);
+
+                        if (listViewDisplays.Items.Count > 0)
                         {
-                            --nIndex;
+                            if (nIndex == listViewDisplays.Items.Count)
+                            {
+                                --nIndex;
+                            }
+
+                            Item = listViewDisplays.Items[nIndex];
+
+                            Item.Selected = true;
+                            Item.Focused = true;
+
+                            Item.EnsureVisible();
                         }
+                        else
+                        {
+                            listViewDisplays.Enabled = false;
 
-                        Item = listViewDisplays.Items[nIndex];
-
-                        Item.Selected = true;
-                        Item.Focused = true;
-
-                        Item.EnsureVisible();
+                            buttonEdit.Enabled = false;
+                            buttonDelete.Enabled = false;
+                        }
                     }
                     else
                     {
-                        listViewDisplays.Enabled = false;
-
-                        buttonEdit.Enabled = false;
-                        buttonDelete.Enabled = false;
+                        Common.Forms.MessageBox.Show(this, sErrorMessage,
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
                     }
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-            }
+
+                    this.BusyControlVisible = false;
+                });
+            }, "List Displays Form Delete Thread");
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -304,6 +285,7 @@ namespace Arcade.Forms
             System.String sErrorMessage;
             DatabaseDefs.TDisplay Display;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
             new Common.Forms.FormLocation(DisplayEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -319,34 +301,49 @@ namespace Arcade.Forms
 
             if (DisplayEntry.ShowDialog(this) == DialogResult.OK)
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (Database.EditDisplay(Display.nDisplayId,
-                                             DisplayEntry.DisplayName,
-                                             DisplayEntry.DisplayType,
-                                             DisplayEntry.DisplayResolution,
-                                             DisplayEntry.DisplayColors,
-                                             DisplayEntry.DisplayOrientation,
-                                             out sErrorMessage))
-                    {
-                        Display.sDisplayName = DisplayEntry.DisplayName;
-                        Display.sDisplayType = DisplayEntry.DisplayType;
-                        Display.sDisplayResolution = DisplayEntry.DisplayResolution;
-                        Display.sDisplayColors = DisplayEntry.DisplayColors;
-                        Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
+                    bResult = Database.EditDisplay(Display.nDisplayId,
+                                                   DisplayEntry.DisplayName,
+                                                   DisplayEntry.DisplayType,
+                                                   DisplayEntry.DisplayResolution,
+                                                   DisplayEntry.DisplayColors,
+                                                   DisplayEntry.DisplayOrientation,
+                                                   out sErrorMessage);
 
-                        Item = listViewDisplays.Items[nIndex];
-
-                        Item.Text = Display.sDisplayName;
-                        Item.Tag = Display;
-                    }
-                    else
+                    RunOnUIThreadWait(() =>
                     {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
+                        if (bResult)
+                        {
+                            Display.sDisplayName = DisplayEntry.DisplayName;
+                            Display.sDisplayType = DisplayEntry.DisplayType;
+                            Display.sDisplayResolution = DisplayEntry.DisplayResolution;
+                            Display.sDisplayColors = DisplayEntry.DisplayColors;
+                            Display.sDisplayOrientation = DisplayEntry.DisplayOrientation;
+
+                            Item = listViewDisplays.Items[nIndex];
+
+                            Item.Text = Display.sDisplayName;
+                            Item.Tag = Display;
+                        }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
+
+                        this.BusyControlVisible = false;
+
+                        DisplayEntry.Dispose();
+                    });
+                }, "List Displays Form Edit Thread");
+            }
+            else
+            {
+                DisplayEntry.Dispose();
             }
         }
 
@@ -358,7 +355,6 @@ namespace Arcade.Forms
             Display = (DatabaseDefs.TDisplay)listViewDisplays.Items[nIndex].Tag;
 
             m_nDisplayId = Display.nDisplayId;
-            m_sDisplayName = Display.sDisplayName;
             m_sDisplayType = Display.sDisplayType;
             m_sDisplayResolution = Display.sDisplayResolution;
             m_sDisplayColors = Display.sDisplayColors;
@@ -367,6 +363,71 @@ namespace Arcade.Forms
             DialogResult = DialogResult.OK;
 
             Close();
+        }
+
+        private void InitializeControls()
+        {
+            System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplaysList;
+            System.Windows.Forms.ListViewItem Item;
+            System.String sErrorMessage;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            bResult = Database.GetDisplays(out DisplaysList,
+                                           out sErrorMessage);
+
+            RunOnUIThreadWait(() =>
+            {
+                buttonOK.Enabled = false;
+
+                if (bResult)
+                {
+                    listViewDisplays.BeginUpdate();
+
+                    foreach (DatabaseDefs.TDisplay Display in DisplaysList)
+                    {
+                        Item = listViewDisplays.Items.Add(Display.sDisplayName);
+
+                        Item.Tag = Display;
+                    }
+
+                    listViewDisplays.EndUpdate();
+                }
+
+                if (listViewDisplays.Items.Count == 0)
+                {
+                    listViewDisplays.Enabled = false;
+                }
+
+                switch (this.m_ListDisplaysFormType)
+                {
+                    case EListDisplaysFormType.ListDisplays:
+                        UpdateControlVisibility(buttonAdd, false);
+                        UpdateControlVisibility(buttonEdit, false);
+                        UpdateControlVisibility(buttonDelete, false);
+                        break;
+                    case EListDisplaysFormType.EditDisplays:
+                        buttonEdit.Enabled = false;
+                        buttonDelete.Enabled = false;
+
+                        UpdateControlVisibility(buttonOK, false);
+
+                        buttonCancel.Text = "Close";
+                        break;
+                    default:
+                        System.Diagnostics.Debug.Assert(false);
+                        break;
+                }
+
+                if (!bResult)
+                {
+                    Common.Forms.MessageBox.Show(this, sErrorMessage,
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
+                }
+
+            });
         }
         #endregion
     }

@@ -226,7 +226,7 @@ namespace Arcade.Forms
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Games...";
-            this.Load += new System.EventHandler(this.ViewGamePartLocationForm_Load);
+            this.Shown += new System.EventHandler(this.ViewGamePartLocationForm_Shown);
             this.splitContainerLeft.Panel1.ResumeLayout(false);
             this.splitContainerLeft.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerLeft)).EndInit();

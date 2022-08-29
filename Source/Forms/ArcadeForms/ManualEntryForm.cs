@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class ManualEntryForm : Common.Forms.Form
+    public partial class ManualEntryForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EManualEntryFormType
@@ -186,116 +186,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Manual Entry Event Handlers"
-        private void ManualEntryForm_Load(object sender, EventArgs e)
+        private void ManualEntryForm_Shown(object sender, EventArgs e)
         {
-            DatabaseDefs.TManualLens ManualLens;
+            this.BusyControlVisible = true;
 
-            if (Database.GetManualMaxLens(out ManualLens))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                textBoxName.MaxLength = ManualLens.nManualNameLen;
-                textBoxPartNumber.MaxLength = ManualLens.nManualPartNumberLen;
-                textBoxDescription.MaxLength = ManualLens.nManualDescriptionLen;
-            }
+                InitializeControls();
 
-            Database.GetManufacturerList(out m_ManufacturerList);
-            Database.GetManualCategoryList(DatabaseDefs.EManualDataType.StorageBox,
-                                           out m_ManualStorageBoxList);
-            Database.GetManualCategoryList(DatabaseDefs.EManualDataType.PrintEdition,
-                                           out m_ManualPrintEditionList);
-            Database.GetManualCategoryList(DatabaseDefs.EManualDataType.Condition,
-                                           out m_ManualConditionList);
-
-            comboBoxManufacturer.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManufacturerList)
-            {
-                comboBoxManufacturer.Items.Add(Pair.Key);
-            }
-
-            comboBoxManufacturer.EndUpdate();
-
-            comboBoxStorageBox.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManualStorageBoxList)
-            {
-                comboBoxStorageBox.Items.Add(Pair.Key);
-            }
-
-            comboBoxStorageBox.EndUpdate();
-
-            comboBoxPrintEdition.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManualPrintEditionList)
-            {
-                comboBoxPrintEdition.Items.Add(Pair.Key);
-            }
-
-            comboBoxPrintEdition.EndUpdate();
-
-            comboBoxCondition.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManualConditionList)
-            {
-                comboBoxCondition.Items.Add(Pair.Key);
-            }
-
-            comboBoxCondition.EndUpdate();
-
-            textBoxName.Text = m_sManualName;
-            textBoxPartNumber.Text = m_sPartNumber;
-            textBoxDescription.Text = m_sDescription;
-
-            if (m_nYearPrinted > 0)
-            {
-                maskedTextBoxYearPrinted.Text = System.Convert.ToString(m_nYearPrinted);
-            }
-            else
-            {
-                maskedTextBoxYearPrinted.Text = "";
-            }
-
-            checkBoxComplete.Checked = m_bComplete;
-            checkBoxOriginal.Checked = m_bOriginal;
-
-            if (m_ManualEntryFormType == EManualEntryFormType.NewManual)
-            {
-                Text = "Add...";
-
-                buttonOK.Enabled = false;
-            }
-            else
-            {
-                comboBoxManufacturer.SelectedIndex = m_ManufacturerList.IndexOfKey(m_sManufacturer);
-                comboBoxStorageBox.SelectedIndex = m_ManualStorageBoxList.IndexOfKey(m_sStorageBox);
-                comboBoxPrintEdition.SelectedIndex = m_ManualPrintEditionList.IndexOfKey(m_sPrintEdition);
-                comboBoxCondition.SelectedIndex = m_ManualConditionList.IndexOfKey(m_sCondition);
-
-                if (m_ManualEntryFormType == EManualEntryFormType.EditManual)
+                RunOnUIThreadWait(() =>
                 {
-                    Text = "Edit...";
-
-                    buttonOK.Enabled = true;
-                }
-                else
-                {
-                    Text = "View...";
-
-                    buttonOK.Visible = false;
-                    buttonCancel.Text = "Close";
-
-                    textBoxName.ReadOnly = true;
-                    textBoxPartNumber.ReadOnly = true;
-                    textBoxDescription.ReadOnly = true;
-                    maskedTextBoxYearPrinted.Enabled = false;
-                    checkBoxComplete.Enabled = false;
-                    checkBoxOriginal.Enabled = false;
-
-                    comboBoxStorageBox.Enabled = false;
-                    comboBoxPrintEdition.Enabled = false;
-                    comboBoxCondition.Enabled = false;
-                    comboBoxManufacturer.Enabled = false;
-                }
-            }
+                    this.BusyControlVisible = false;
+                });
+            }, "Manual Entry Form Initialize Thread");
         }
         #endregion
 
@@ -411,6 +314,8 @@ namespace Arcade.Forms
         #region "Internal Helpers"
         private void ValidateFields()
         {
+            Common.Debug.Thread.IsUIThread();
+
             if (textBoxName.Text.Length > 0 &&
                 comboBoxStorageBox.SelectedIndex != -1 &&
                 comboBoxPrintEdition.SelectedIndex != -1 &&
@@ -423,6 +328,127 @@ namespace Arcade.Forms
             {
                 buttonOK.Enabled = false;
             }
+        }
+
+        private void InitializeControls()
+        {
+            DatabaseDefs.TManualLens ManualLens;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            bResult = Database.GetManualMaxLens(out ManualLens);
+
+            Database.GetManufacturerList(out m_ManufacturerList);
+            Database.GetManualCategoryList(DatabaseDefs.EManualDataType.StorageBox,
+                                           out m_ManualStorageBoxList);
+            Database.GetManualCategoryList(DatabaseDefs.EManualDataType.PrintEdition,
+                                           out m_ManualPrintEditionList);
+            Database.GetManualCategoryList(DatabaseDefs.EManualDataType.Condition,
+                                           out m_ManualConditionList);
+
+            RunOnUIThreadWait(() =>
+            {
+                if (bResult)
+                {
+                    textBoxName.MaxLength = ManualLens.nManualNameLen;
+                    textBoxPartNumber.MaxLength = ManualLens.nManualPartNumberLen;
+                    textBoxDescription.MaxLength = ManualLens.nManualDescriptionLen;
+                }
+
+                comboBoxManufacturer.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManufacturerList)
+                {
+                    comboBoxManufacturer.Items.Add(Pair.Key);
+                }
+
+                comboBoxManufacturer.EndUpdate();
+
+                comboBoxStorageBox.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManualStorageBoxList)
+                {
+                    comboBoxStorageBox.Items.Add(Pair.Key);
+                }
+
+                comboBoxStorageBox.EndUpdate();
+
+                comboBoxPrintEdition.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManualPrintEditionList)
+                {
+                    comboBoxPrintEdition.Items.Add(Pair.Key);
+                }
+
+                comboBoxPrintEdition.EndUpdate();
+
+                comboBoxCondition.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in m_ManualConditionList)
+                {
+                    comboBoxCondition.Items.Add(Pair.Key);
+                }
+
+                comboBoxCondition.EndUpdate();
+
+                textBoxName.Text = m_sManualName;
+                textBoxPartNumber.Text = m_sPartNumber;
+                textBoxDescription.Text = m_sDescription;
+
+                if (m_nYearPrinted > 0)
+                {
+                    maskedTextBoxYearPrinted.Text = System.Convert.ToString(m_nYearPrinted);
+                }
+                else
+                {
+                    maskedTextBoxYearPrinted.Text = "";
+                }
+
+                checkBoxComplete.Checked = m_bComplete;
+                checkBoxOriginal.Checked = m_bOriginal;
+
+                if (m_ManualEntryFormType == EManualEntryFormType.NewManual)
+                {
+                    Text = "Add...";
+
+                    buttonOK.Enabled = false;
+                }
+                else
+                {
+                    comboBoxManufacturer.SelectedIndex = m_ManufacturerList.IndexOfKey(m_sManufacturer);
+                    comboBoxStorageBox.SelectedIndex = m_ManualStorageBoxList.IndexOfKey(m_sStorageBox);
+                    comboBoxPrintEdition.SelectedIndex = m_ManualPrintEditionList.IndexOfKey(m_sPrintEdition);
+                    comboBoxCondition.SelectedIndex = m_ManualConditionList.IndexOfKey(m_sCondition);
+
+                    if (m_ManualEntryFormType == EManualEntryFormType.EditManual)
+                    {
+                        Text = "Edit...";
+
+                        buttonOK.Enabled = true;
+                    }
+                    else
+                    {
+                        Text = "View...";
+
+                        UpdateControlVisibility(buttonOK, false);
+
+                        buttonCancel.Text = "Close";
+
+                        textBoxName.ReadOnly = true;
+                        textBoxPartNumber.ReadOnly = true;
+                        textBoxDescription.ReadOnly = true;
+                        maskedTextBoxYearPrinted.Enabled = false;
+                        checkBoxComplete.Enabled = false;
+                        checkBoxOriginal.Enabled = false;
+
+                        comboBoxStorageBox.Enabled = false;
+                        comboBoxPrintEdition.Enabled = false;
+                        comboBoxCondition.Enabled = false;
+                        comboBoxManufacturer.Enabled = false;
+                    }
+                }
+            });
         }
         #endregion
     }

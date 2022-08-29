@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class GameBoardEntryForm : Common.Forms.Form
+    public partial class GameBoardEntryForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EGameBoardEntryFormType
@@ -102,45 +102,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "Game Board Entry Event Handlers"
-        private void GameBoardEntryForm_Load(object sender, EventArgs e)
+        private void GameBoardEntryForm_Shown(object sender, EventArgs e)
         {
-            Common.Collections.StringSortedList<System.Int32> BoardTypeList;
-            DatabaseDefs.TBoardLens BoardLens;
+            this.BusyControlVisible = true;
 
-            if (Database.GetBoardMaxLens(out BoardLens))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                textBoxName.MaxLength = BoardLens.nBoardNameLen;
-                textBoxSize.MaxLength = BoardLens.nBoardSizeLen;
-                textBoxDescription.MaxLength = BoardLens.nBoardDescriptionLen;
-            }
+                InitializeControls();
 
-            Database.GetBoardTypeList(out BoardTypeList);
-
-            comboBoxBoardType.BeginUpdate();
-
-            foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in BoardTypeList)
-            {
-                comboBoxBoardType.Items.Add(Pair.Key);
-            }
-
-            comboBoxBoardType.EndUpdate();
-
-            if (m_GameBoardEntryFormType == EGameBoardEntryFormType.NewBoard)
-            {
-                this.Text = "Add...";
-
-                buttonOK.Enabled = false;
-            }
-            else
-            {
-                this.Text = "Edit...";
-
-                comboBoxBoardType.SelectedIndex = BoardTypeList.IndexOfKey(m_sBoardTypeName);
-
-                textBoxName.Text = m_sBoardName;
-                textBoxSize.Text = m_sBoardSize;
-                textBoxDescription.Text = m_sBoardDescription;
-            }
+                RunOnUIThreadWait(() =>
+                {
+                    this.BusyControlVisible = false;
+                });
+            }, "Game Board Entry Form Initialize Thread");
         }
         #endregion
 
@@ -191,6 +165,8 @@ namespace Arcade.Forms
         #region "Internal Helpers"
         private void VerifyFields()
         {
+            Common.Debug.Thread.IsUIThread();
+
             if (comboBoxBoardType.SelectedIndex != -1)
             {
                 if (DatabaseDefs.CCartridgeName == (System.String)comboBoxBoardType.SelectedItem)
@@ -213,6 +189,55 @@ namespace Arcade.Forms
             {
                 buttonOK.Enabled = false;
             }
+        }
+
+        private void InitializeControls()
+        {
+            Common.Collections.StringSortedList<System.Int32> BoardTypeList;
+            DatabaseDefs.TBoardLens BoardLens;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            bResult = Database.GetBoardMaxLens(out BoardLens);
+
+            Database.GetBoardTypeList(out BoardTypeList);
+
+            RunOnUIThreadWait(() =>
+            {
+                if (bResult)
+                {
+                    textBoxName.MaxLength = BoardLens.nBoardNameLen;
+                    textBoxSize.MaxLength = BoardLens.nBoardSizeLen;
+                    textBoxDescription.MaxLength = BoardLens.nBoardDescriptionLen;
+                }
+
+                comboBoxBoardType.BeginUpdate();
+
+                foreach (System.Collections.Generic.KeyValuePair<System.String, System.Int32> Pair in BoardTypeList)
+                {
+                    comboBoxBoardType.Items.Add(Pair.Key);
+                }
+
+                comboBoxBoardType.EndUpdate();
+
+                if (m_GameBoardEntryFormType == EGameBoardEntryFormType.NewBoard)
+                {
+                    this.Text = "Add...";
+
+                    buttonOK.Enabled = false;
+                }
+                else
+                {
+                    this.Text = "Edit...";
+
+                    comboBoxBoardType.SelectedIndex = BoardTypeList.IndexOfKey(m_sBoardTypeName);
+
+                    textBoxName.Text = m_sBoardName;
+                    textBoxSize.Text = m_sBoardSize;
+                    textBoxDescription.Text = m_sBoardDescription;
+                }
+            });
         }
         #endregion
     }

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Arcade.Forms
 {
-    public partial class ListManualsForm : Common.Forms.Form
+    public partial class ListManualsForm : Arcade.Forms.Form
     {
         #region "Enumerations"
         public enum EListManualsFormType
@@ -148,37 +148,19 @@ namespace Arcade.Forms
         #endregion
 
         #region "List Manuals Event Handlers"
-        private void ListManualsForm_Load(object sender, EventArgs e)
+        private void ListManualsForm_Shown(object sender, EventArgs e)
         {
-            DatabaseDefs.TManualLens ManualLens;
+            this.BusyControlVisible = true;
 
-            ReadManuals(null);
-
-            if (Database.GetManualMaxLens(out ManualLens))
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                textBoxKeyword.MaxLength = ManualLens.nManualNameLen;
-            }
+                InitializeControls();
 
-            if (m_ListManualsFormType == EListManualsFormType.EditManuals)
-            {
-                buttonEdit.Enabled = false;
-                buttonDelete.Enabled = false;
-
-                buttonOK.Visible = false;
-
-                buttonCancel.Text = "Close";
-            }
-            else
-            {
-                buttonAdd.Visible = false;
-                buttonEdit.Visible = false;
-                buttonDelete.Visible = false;
-
-                buttonOK.Enabled = false;
-            }
-
-            buttonSearch.Enabled = false;
-            buttonClear.Enabled = false;
+                RunOnUIThreadWait(() =>
+                {
+                    this.BusyControlVisible = false;
+                });
+            }, "List Manuals Form Initialize Thread");
         }
         #endregion
 
@@ -221,16 +203,38 @@ namespace Arcade.Forms
         #region "Button Event Handlers"
         private void buttonSearch_Click(object sender, EventArgs e)
         {
+            System.String sKeyword = textBoxKeyword.Text;
+
             buttonClear.Enabled = true;
 
-            ReadManuals(textBoxKeyword.Text);
+            this.BusyControlVisible = true;
+
+            Common.Threading.Thread.RunWorkerThread(() =>
+            {
+                ReadManuals(sKeyword);
+
+                RunOnUIThreadWait(() =>
+                {
+                    this.BusyControlVisible = false;
+                });
+            }, "List Manuals Form Search Thread");
         }
 
         private void buttonClear_Click(object sender, EventArgs e)
         {
             buttonClear.Enabled = false;
 
-            ReadManuals(null);
+            this.BusyControlVisible = true;
+
+            Common.Threading.Thread.RunWorkerThread(() =>
+            {
+                ReadManuals(null);
+
+                RunOnUIThreadWait(() =>
+                {
+                    this.BusyControlVisible = false;
+                });
+            }, "List Manuals Form Clear Thread");
         }
 
         private void buttonAdd_Click(object sender, EventArgs e)
@@ -240,6 +244,7 @@ namespace Arcade.Forms
             System.Int32 nNewManualId;
             DatabaseDefs.TManual Manual;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
             new Common.Forms.FormLocation(ManualEntry, ((Arcade.Forms.MainForm)Common.Forms.Application.MainForm).FormLocationsRegistryKey);
 
@@ -247,53 +252,64 @@ namespace Arcade.Forms
 
             if (ManualEntry.ShowDialog(this) == DialogResult.OK)
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (Database.AddManual(ManualEntry.ManualName, ManualEntry.StorageBox,
-                                           ManualEntry.PartNumber, ManualEntry.YearPrinted,
-                                           ManualEntry.PrintEdition, ManualEntry.Condition,
-                                           ManualEntry.Manufacturer, ManualEntry.Complete,
-                                           ManualEntry.Original, ManualEntry.Description,
-                                           out nNewManualId, out sErrorMessage))
+                    bResult = Database.AddManual(ManualEntry.ManualName, ManualEntry.StorageBox,
+                                                 ManualEntry.PartNumber, ManualEntry.YearPrinted,
+                                                 ManualEntry.PrintEdition, ManualEntry.Condition,
+                                                 ManualEntry.Manufacturer, ManualEntry.Complete,
+                                                 ManualEntry.Original, ManualEntry.Description,
+                                                 out nNewManualId, out sErrorMessage);
+
+                    RunOnUIThreadWait(() =>
                     {
-                        Manual = new DatabaseDefs.TManual();
+                        if (bResult)
+                        {
+                            Manual = new DatabaseDefs.TManual();
 
-                        Manual.nManualId = nNewManualId;
-                        Manual.sManualName = ManualEntry.ManualName;
-                        Manual.sManualPartNumber = ManualEntry.PartNumber;
-                        Manual.nManualYearPrinted = ManualEntry.YearPrinted;
-                        Manual.bManualComplete = ManualEntry.Complete;
-                        Manual.bManualOriginal = ManualEntry.Original;
-                        Manual.sManualDescription = ManualEntry.Description;
-                        Manual.sManualPrintEdition = ManualEntry.PrintEdition;
-                        Manual.sManualCondition = ManualEntry.Condition;
-                        Manual.sManufacturer = ManualEntry.Manufacturer;
-                        Manual.sManualStorageBox = ManualEntry.StorageBox;
+                            Manual.nManualId = nNewManualId;
+                            Manual.sManualName = ManualEntry.ManualName;
+                            Manual.sManualPartNumber = ManualEntry.PartNumber;
+                            Manual.nManualYearPrinted = ManualEntry.YearPrinted;
+                            Manual.bManualComplete = ManualEntry.Complete;
+                            Manual.bManualOriginal = ManualEntry.Original;
+                            Manual.sManualDescription = ManualEntry.Description;
+                            Manual.sManualPrintEdition = ManualEntry.PrintEdition;
+                            Manual.sManualCondition = ManualEntry.Condition;
+                            Manual.sManufacturer = ManualEntry.Manufacturer;
+                            Manual.sManualStorageBox = ManualEntry.StorageBox;
 
-                        listViewManuals.Enabled = true;
+                            listViewManuals.Enabled = true;
 
-                        Item = listViewManuals.Items.Add(Manual.sManualName);
+                            Item = listViewManuals.Items.Add(Manual.sManualName);
 
-                        Item.Tag = Manual;
+                            Item.Tag = Manual;
 
-                        Item.SubItems.Add(Manual.sManualPrintEdition);
-                        Item.SubItems.Add(Manual.sManufacturer);
-                        Item.SubItems.Add(Manual.sManualStorageBox);
+                            Item.SubItems.Add(Manual.sManualPrintEdition);
+                            Item.SubItems.Add(Manual.sManufacturer);
+                            Item.SubItems.Add(Manual.sManualStorageBox);
 
-                        Item.Selected = true;
-                        Item.Focused = true;
+                            Item.Selected = true;
+                            Item.Focused = true;
 
-                        Item.EnsureVisible();
+                            Item.EnsureVisible();
+                        }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
 
-                        listViewManuals.AutosizeColumns();
-                    }
-                    else
-                    {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
+                        this.BusyControlVisible = false;
+                    });
+                }, "List Manuals Form Add Thread");
+            }
+            else
+            {
+                ManualEntry.Dispose();
             }
         }
 
@@ -308,44 +324,54 @@ namespace Arcade.Forms
             System.String sErrorMessage;
             DatabaseDefs.TManual Manual;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
             Manual = (DatabaseDefs.TManual)listViewManuals.Items[nIndex].Tag;
 
-            using (new Common.Forms.WaitCursor(this))
+            this.BusyControlVisible = true;
+
+            Common.Threading.Thread.RunWorkerThread(() =>
             {
-                if (Database.DeleteManual(Manual.nManualId, out sErrorMessage))
+                bResult = Database.DeleteManual(Manual.nManualId, out sErrorMessage);
+
+                RunOnUIThreadWait(() =>
                 {
-                    listViewManuals.Items.RemoveAt(nIndex);
-
-                    if (listViewManuals.Items.Count > 0)
+                    if (bResult)
                     {
-                        if (nIndex == listViewManuals.Items.Count)
+                        listViewManuals.Items.RemoveAt(nIndex);
+
+                        if (listViewManuals.Items.Count > 0)
                         {
-                            --nIndex;
+                            if (nIndex == listViewManuals.Items.Count)
+                            {
+                                --nIndex;
+                            }
+
+                            Item = listViewManuals.Items[nIndex];
+
+                            Item.Selected = true;
+                            Item.Focused = true;
+
+                            Item.EnsureVisible();
                         }
+                        else
+                        {
+                            listViewManuals.Enabled = false;
 
-                        Item = listViewManuals.Items[nIndex];
-
-                        Item.Selected = true;
-                        Item.Focused = true;
-
-                        Item.EnsureVisible();
+                            buttonEdit.Enabled = false;
+                            buttonDelete.Enabled = false;
+                        }
                     }
                     else
                     {
-                        listViewManuals.Enabled = false;
-
-                        buttonEdit.Enabled = false;
-                        buttonDelete.Enabled = false;
+                        Common.Forms.MessageBox.Show(this, sErrorMessage,
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
                     }
-                }
-                else
-                {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                }
-            }
+
+                    this.BusyControlVisible = false;
+                });
+            }, "List Manuals Form Delete Thread");
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -369,6 +395,9 @@ namespace Arcade.Forms
             System.String sErrorMessage;
             DatabaseDefs.TManual Manual;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsUIThread();
 
             Manual = (DatabaseDefs.TManual)listViewManuals.Items[nIndex].Tag;
 
@@ -389,118 +418,134 @@ namespace Arcade.Forms
 
             if (ManualEntry.ShowDialog(this) == DialogResult.OK)
             {
-                using (new Common.Forms.WaitCursor(this))
+                this.BusyControlVisible = true;
+
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    if (Database.EditManual(Manual.nManualId,
-                                            ManualEntry.ManualName,
-                                            ManualEntry.StorageBox,
-                                            ManualEntry.PartNumber,
-                                            ManualEntry.YearPrinted,
-                                            ManualEntry.PrintEdition,
-                                            ManualEntry.Condition,
-                                            ManualEntry.Manufacturer,
-                                            ManualEntry.Complete,
-                                            ManualEntry.Original,
-                                            ManualEntry.Description,
-                                            out sErrorMessage))
+                    bResult = Database.EditManual(Manual.nManualId,
+                                                  ManualEntry.ManualName,
+                                                  ManualEntry.StorageBox,
+                                                  ManualEntry.PartNumber,
+                                                  ManualEntry.YearPrinted,
+                                                  ManualEntry.PrintEdition,
+                                                  ManualEntry.Condition,
+                                                  ManualEntry.Manufacturer,
+                                                  ManualEntry.Complete,
+                                                  ManualEntry.Original,
+                                                  ManualEntry.Description,
+                                                  out sErrorMessage);
+
+                    RunOnUIThreadWait(() =>
                     {
-                        Manual.sManualName = ManualEntry.ManualName;
-                        Manual.sManualPartNumber = ManualEntry.PartNumber;
-                        Manual.nManualYearPrinted = ManualEntry.YearPrinted;
-                        Manual.bManualComplete = ManualEntry.Complete;
-                        Manual.bManualOriginal = ManualEntry.Original;
-                        Manual.sManualDescription = ManualEntry.Description;
-                        Manual.sManualPrintEdition = ManualEntry.PrintEdition;
-                        Manual.sManualCondition = ManualEntry.Condition;
-                        Manual.sManufacturer = ManualEntry.Manufacturer;
-                        Manual.sManualStorageBox = ManualEntry.StorageBox;
+                        if (bResult)
+                        {
+                            Manual.sManualName = ManualEntry.ManualName;
+                            Manual.sManualPartNumber = ManualEntry.PartNumber;
+                            Manual.nManualYearPrinted = ManualEntry.YearPrinted;
+                            Manual.bManualComplete = ManualEntry.Complete;
+                            Manual.bManualOriginal = ManualEntry.Original;
+                            Manual.sManualDescription = ManualEntry.Description;
+                            Manual.sManualPrintEdition = ManualEntry.PrintEdition;
+                            Manual.sManualCondition = ManualEntry.Condition;
+                            Manual.sManufacturer = ManualEntry.Manufacturer;
+                            Manual.sManualStorageBox = ManualEntry.StorageBox;
 
-                        Item = listViewManuals.Items[nIndex];
+                            Item = listViewManuals.Items[nIndex];
 
-                        Item.Text = Manual.sManualName;
-                        Item.Tag = Manual;
+                            Item.Text = Manual.sManualName;
+                            Item.Tag = Manual;
 
-                        Item.SubItems[1].Text = Manual.sManualPrintEdition;
-                        Item.SubItems[2].Text = Manual.sManufacturer;
-                        Item.SubItems[3].Text = Manual.sManualStorageBox;
-                    }
-                    else
-                    {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
+                            Item.SubItems[1].Text = Manual.sManualPrintEdition;
+                            Item.SubItems[2].Text = Manual.sManufacturer;
+                            Item.SubItems[3].Text = Manual.sManualStorageBox;
+                        }
+                        else
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                System.Windows.Forms.MessageBoxButtons.OK,
+                                System.Windows.Forms.MessageBoxIcon.Information);
+                        }
+
+                        this.BusyControlVisible = false;
+                    });
+                }, "List Manuals Form Edit Thread");
+            }
+            else
+            {
+                ManualEntry.Dispose();
             }
         }
 
-        private System.Boolean ReadManuals(System.String sKeyword)
+        private void ReadManuals(System.String sKeyword)
         {
             System.Collections.Generic.List<DatabaseDefs.TManual> ManualsList;
             System.String sErrorMessage;
             System.Windows.Forms.ListViewItem Item;
+            System.Boolean bResult;
 
-            listViewManuals.Items.Clear();
+            Common.Debug.Thread.IsWorkerThread();
 
-            buttonOK.Enabled = false;
+            bResult = Database.GetManuals(sKeyword, out ManualsList, out sErrorMessage);
 
-            using (new Common.Forms.WaitCursor(this))
+            this.RunOnUIThreadWait(() =>
             {
-                if (false == Database.GetManuals(sKeyword,
-                                                 out ManualsList,
-                                                 out sErrorMessage))
+                listViewManuals.Items.Clear();
+
+                buttonOK.Enabled = false;
+
+                if (bResult)
                 {
-                    Common.Forms.MessageBox.Show(this, sErrorMessage,
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
+                    listViewManuals.BeginUpdate();
 
-                    listViewManuals.Enabled = false;
+                    foreach (DatabaseDefs.TManual Manual in ManualsList)
+                    {
+                        Item = listViewManuals.Items.Add(Manual.sManualName);
 
-                    return false;
-                }
+                        Item.Tag = Manual;
 
-                listViewManuals.BeginUpdate();
+                        Item.SubItems.Add(Manual.sManualPrintEdition);
+                        Item.SubItems.Add(Manual.sManufacturer);
+                        Item.SubItems.Add(Manual.sManualStorageBox);
+                    }
 
-                foreach (DatabaseDefs.TManual Manual in ManualsList)
-                {
-                    Item = listViewManuals.Items.Add(Manual.sManualName);
+                    listViewManuals.EndUpdate();
 
-                    Item.Tag = Manual;
+                    if (ManualsList.Count > 0)
+                    {
+                        listViewManuals.Enabled = true;
+                    }
+                    else
+                    {
+                        Common.Forms.MessageBox.Show(this,
+                            "No manuals were found that match the given search criteria.",
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information,
+                            System.Windows.Forms.MessageBoxDefaultButton.Button1);
 
-                    Item.SubItems.Add(Manual.sManualPrintEdition);
-                    Item.SubItems.Add(Manual.sManufacturer);
-                    Item.SubItems.Add(Manual.sManualStorageBox);
-                }
+                        UpdateFocusedControl(textBoxKeyword);
 
-                listViewManuals.EndUpdate();
+                        listViewManuals.Enabled = false;
 
-                if (ManualsList.Count > 0)
-                {
-                    listViewManuals.Enabled = true;
+                        buttonOK.Enabled = false;
+                    }
                 }
                 else
                 {
-                    Common.Forms.MessageBox.Show(this,
-                        "No manuals were found that match the given search criteria.",
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information,
-                        System.Windows.Forms.MessageBoxDefaultButton.Button1);
-
-                    textBoxKeyword.Focus();
+                    Common.Forms.MessageBox.Show(this, sErrorMessage,
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
 
                     listViewManuals.Enabled = false;
-
-                    buttonOK.Enabled = false;
                 }
-            }
-
-            return true;
+            });
         }
 
         private void OnOK()
         {
             System.Int32 nIndex = listViewManuals.SelectedIndices[0];
             DatabaseDefs.TManual Manual;
+
+            Common.Debug.Thread.IsUIThread();
 
             Manual = (DatabaseDefs.TManual)listViewManuals.Items[nIndex].Tag;
 
@@ -519,6 +564,47 @@ namespace Arcade.Forms
             DialogResult = DialogResult.OK;
 
             Close();
+        }
+
+        private void InitializeControls()
+        {
+            DatabaseDefs.TManualLens ManualLens;
+            System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            ReadManuals(null);
+
+            bResult = Database.GetManualMaxLens(out ManualLens);
+
+            RunOnUIThreadWait(() =>
+            {
+                if (bResult)
+                {
+                    textBoxKeyword.MaxLength = ManualLens.nManualNameLen;
+                }
+
+                if (m_ListManualsFormType == EListManualsFormType.EditManuals)
+                {
+                    buttonEdit.Enabled = false;
+                    buttonDelete.Enabled = false;
+
+                    UpdateControlVisibility(buttonOK, false);
+
+                    buttonCancel.Text = "Close";
+                }
+                else
+                {
+                    UpdateControlVisibility(buttonAdd, false);
+                    UpdateControlVisibility(buttonEdit, false);
+                    UpdateControlVisibility(buttonDelete, false);
+
+                    buttonOK.Enabled = false;
+                }
+
+                buttonSearch.Enabled = false;
+                buttonClear.Enabled = false;
+            });
         }
         #endregion
     }
