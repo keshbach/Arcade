@@ -153,7 +153,7 @@ namespace Arcade.Forms
         {
             get
             {
-                return new System.Windows.Forms.Control[] { listViewDatasheets, splitContainerParts };
+                return new System.Windows.Forms.Control[] { splitContainerParts };
             }
         }
 
@@ -243,6 +243,8 @@ namespace Arcade.Forms
 
                     Item.EnsureVisible();
 
+                    listViewDatasheets.AutosizeColumns();
+
                     UpdateOKButton();
                 }
                 else
@@ -277,6 +279,8 @@ namespace Arcade.Forms
                 Item.Focused = true;
 
                 Item.EnsureVisible();
+
+                listViewDatasheets.AutosizeColumns();
             }
             else
             {
@@ -539,6 +543,8 @@ namespace Arcade.Forms
                         {
                             listViewDatasheets.Items.Add(sValue);
                         }
+
+                        listViewDatasheets.AutosizeColumns();
 
                         listViewDatasheets.EndUpdate();
 
