@@ -8,14 +8,6 @@ namespace Arcade.Forms
 {
     public partial class MainForm : Common.Forms.MainForm
     {
-        #region "Delegates"
-        private delegate void DelegateUpdateState(State State);
-        private DelegateUpdateState m_DelegateUpdateState;
-
-        private delegate void DelegateLogMessage(System.String sMessage);
-        private DelegateLogMessage m_DelegateLogMessage;
-        #endregion
-
         #region "Constants"
         private const string CEndOfLine = "\r\n";
         #endregion
@@ -72,9 +64,6 @@ namespace Arcade.Forms
             m_sDatabaseRegistryKey = sDatabaseRegistryKey;
             m_DatabaseMode = DatabaseMode;
 
-            m_DelegateUpdateState = new DelegateUpdateState(OnUpdateState);
-            m_DelegateLogMessage = new DelegateLogMessage(OnLogMessage);
-
             InitializeComponent();
         }
         #endregion
@@ -108,7 +97,7 @@ namespace Arcade.Forms
             Common.Threading.Thread.RunWorkerThread(() =>
             {
                 InitDatabase();
-            }, "Main Form Initialize Database Threadread");
+            }, "Main Form Initialize Database Thread");
         }
 
         private void MainForm_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
@@ -124,18 +113,18 @@ namespace Arcade.Forms
 
             if (m_State == State.Running)
             {
-                OnUpdateState(State.Uninitializing);
+                UpdateState(State.Uninitializing);
 
                 if (Database.Uninit(out sErrorMessage))
                 {
-                    OnUpdateState(State.UninitializatedSuccess);
+                    UpdateState(State.UninitializatedSuccess);
                 }
                 else
                 {
-                    OnUpdateState(State.UninitializatedFailed);
+                    UpdateState(State.UninitializatedFailed);
 
-                    OnLogMessage("An error occurred during the uninitialization of the database.");
-                    OnLogMessage(sErrorMessage);
+                    LogMessage("An error occurred during the uninitialization of the database.");
+                    LogMessage(sErrorMessage);
 
                     e.Cancel = true;
                 }
@@ -577,8 +566,9 @@ namespace Arcade.Forms
         }
         #endregion
 
-        #region "Delegate Functions"
-        private void OnUpdateState(State State)
+        #region "Internal Functions"
+        private void UpdateState(
+            State State)
         {
             System.Windows.Forms.ToolStripItem[] NoneExcludedMenuItems = { };
             System.Windows.Forms.ToolStripItem[] InitSuccessfulDatabaseNotAvailableExcludedMenuItems = {
@@ -588,6 +578,8 @@ namespace Arcade.Forms
             System.Windows.Forms.ToolStripItem[] InitFailedExcludedMenuItems = {
                 menuItemFileExit,
                 menuItemHelpAbout};
+
+            Common.Debug.Thread.IsUIThread();
 
             m_State = State;
 
@@ -643,10 +635,12 @@ namespace Arcade.Forms
             }
         }
 
-        private void OnLogMessage(
+        private void LogMessage(
             System.String sMessage)
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsUIThread();
 
             for (System.Int32 nIndex = 0; nIndex < sMessage.Length; ++nIndex)
             {
@@ -664,22 +658,7 @@ namespace Arcade.Forms
 
             textBoxMessages.AppendText(sb.ToString());
         }
-        #endregion
 
-        #region "Invoke Event Handlers"
-        private void UpdateState(State State)
-        {
-            Invoke(m_DelegateUpdateState, new object[] { State });
-        }
-
-        private void LogMessage(
-            System.String sMessage)
-        {
-            Invoke(m_DelegateLogMessage, new object[] { sMessage });
-        }
-        #endregion
-
-        #region "Internal Functions"
         private void InitDatabase()
         {
             System.String sErrorMessage;
@@ -688,9 +667,12 @@ namespace Arcade.Forms
 
             Common.Debug.Thread.IsWorkerThread();
 
-            UpdateState(State.Initializing);
+            RunOnUIThreadWait(() =>
+            {
+                UpdateState(State.Initializing);
 
-            LogMessage("Initializing the database.");
+                LogMessage("Initializing the database.");
+            });
 
             switch (m_DatabaseMode)
             {
@@ -707,23 +689,32 @@ namespace Arcade.Forms
             {
                 if (bDatabaseAvailable)
                 {
-                    LogMessage("Finished initializing the database.");
+                    RunOnUIThreadWait(() =>
+                    {
+                        LogMessage("Finished initializing the database.");
 
-                    UpdateState(State.InitializatedSuccessDatabaseAvailable);
+                        UpdateState(State.InitializatedSuccessDatabaseAvailable);
+                    });
                 }
                 else
                 {
-                    LogMessage("Finished initializing but the database is not available.");
+                    RunOnUIThreadWait(() =>
+                    {
+                        LogMessage("Finished initializing but the database is not available.");
 
-                    UpdateState(State.InitializatedSuccessDatabaseNotAvailable);
+                        UpdateState(State.InitializatedSuccessDatabaseNotAvailable);
+                    });
                 }
             }
             else
             {
-                LogMessage("Failed to initialize the database.");
-                LogMessage(sErrorMessage);
+                RunOnUIThreadWait(() =>
+                {
+                    LogMessage("Failed to initialize the database.");
+                    LogMessage(sErrorMessage);
 
-                UpdateState(State.InitializatedFailed);
+                    UpdateState(State.InitializatedFailed);
+                });
             }
         }
 
@@ -742,6 +733,8 @@ namespace Arcade.Forms
 
         private void InitImageKeys()
         {
+            Common.Debug.Thread.IsUIThread();
+
             contextMenuItemCopy.ImageKey = Common.Forms.ToolbarImageKey.Copy;
             contextMenuItemDelete.ImageKey = Common.Forms.ToolbarImageKey.Delete;
             contextMenuItemSelectAll.ImageKey = Common.Forms.ToolbarImageKey.Select;
@@ -756,6 +749,8 @@ namespace Arcade.Forms
             System.Windows.Forms.ToolStripMenuItem menuItemClear,
             System.Windows.Forms.ToolStripMenuItem menuItemSelectAll)
         {
+            Common.Debug.Thread.IsUIThread();
+
             if (textBoxMessages.Text.Length > 0)
             {
                 menuItemClear.Enabled = true;
@@ -779,16 +774,22 @@ namespace Arcade.Forms
 
         private void ExecuteCopy()
         {
+            Common.Debug.Thread.IsUIThread();
+
             System.Windows.Forms.Clipboard.SetText(textBoxMessages.SelectedText);
         }
 
         private void ExecuteDelete()
         {
+            Common.Debug.Thread.IsUIThread();
+
             textBoxMessages.Text = "";
         }
 
         private void ExecuteSelectAll()
         {
+            Common.Debug.Thread.IsUIThread();
+
             textBoxMessages.SelectionStart = 0;
             textBoxMessages.SelectionLength = textBoxMessages.TextLength;
         }
