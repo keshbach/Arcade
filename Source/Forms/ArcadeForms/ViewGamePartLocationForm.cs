@@ -156,7 +156,7 @@ namespace Arcade.Forms
         private void RefreshBoards(
             System.Int32 nGameId)
         {
-            System.Boolean bIncludeAllParts = (checkBoxIncludeAllParts.CheckState == CheckState.Unchecked);
+            System.Boolean bIncludeAllParts = (checkBoxIncludeAllParts.CheckState == CheckState.Checked);
             System.Collections.Generic.List<DatabaseDefs.TBoard> BoardsList;
             System.Boolean bResult;
             System.String sErrorMessage;
@@ -224,7 +224,7 @@ namespace Arcade.Forms
         private void RefreshPosAndLoc(
             System.Int32 nBoardId)
         {
-            System.Boolean bIncludeAllParts = (checkBoxIncludeAllParts.CheckState == CheckState.Unchecked);
+            System.Boolean bIncludeAllParts = (checkBoxIncludeAllParts.CheckState == CheckState.Checked);
             System.Collections.Generic.List<DatabaseDefs.TBoardPartLocation> PosAndLocList;
             System.Boolean bResult;
             System.String sErrorMessage;
