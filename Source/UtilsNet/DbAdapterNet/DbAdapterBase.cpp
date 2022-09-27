@@ -5,6 +5,7 @@
 #include "stdafx.h"
 
 #include "DbTableColumn.h"
+#include "IDbLogging.h"
 #include "IDbAdapter.h"
 #include "IDbProvider.h"
 
@@ -52,9 +53,14 @@ Common::Data::DbAdapterBase::~DbAdapterBase()
 
 System::Boolean Common::Data::DbAdapterBase::Initialize(
   Microsoft::Win32::RegistryKey^ RegKey,
+  Common::Data::IDbLogging^ Logging,
   System::String^% sErrorMessage)
 {
     Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
+
+    m_Logging = Logging;
+
+    m_Logging->DatabaseMessage("Initializing the database adapter");
 
     return pProvider->InitDatabase(RegKey, sErrorMessage);
 }
@@ -65,12 +71,16 @@ System::Boolean Common::Data::DbAdapterBase::Uninitialize(
     Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
     System::Boolean bResult;
 
+    m_Logging->DatabaseMessage("Uninitializing the database adapter");
+
     bResult = Close(sErrorMessage);
 
     if (false == pProvider->UninitDatabase(sErrorMessage))
     {
 	    bResult = false;
     }
+
+    m_Logging = nullptr;
 
     return bResult;
 }
@@ -102,11 +112,11 @@ System::Boolean Common::Data::DbAdapterBase::GetIdentityValue(
                     nIdentity = DataReader->GetInt32(0);
                     bResult = true;
                 }
-                if (DataReader->GetDataTypeName(0) == L"numeric")
+                else if (DataReader->GetDataTypeName(0) == L"numeric")
                 {
                     System::Decimal dValue = DataReader->GetDecimal(0);
 
-                    nIdentity = (System::Int32)DataReader->GetDecimal(0);
+                    nIdentity = System::Convert::ToInt32(dValue);
                     bResult = true;
                 }
                 else
@@ -134,8 +144,9 @@ System::Boolean Common::Data::DbAdapterBase::GetIdentityValue(
                 DataReader->Close();
             }
         }
-        catch (System::Data::Common::DbException^)
+        catch (System::Data::Common::DbException^ Exception)
         {
+            m_Logging->DatabaseMessage(System::String::Format(L"Exception in GetIdentityValue while closing the Data Reader ({0})", Exception->Message));
         }
 
         sErrorMessage = Exception->Message;
@@ -174,7 +185,12 @@ System::Boolean Common::Data::DbAdapterBase::AllocConnection(
 
     if (bResult)
     {
-        TmpConnection = (System::Data::Common::DbConnection^)m_ConnectionPool->FreeList[0];
+        TmpConnection = m_ConnectionPool->FreeList[0];
+
+        if (TmpConnection->State != System::Data::ConnectionState::Open)
+        {
+            m_Logging->DatabaseMessage(System::String::Format(L"AllocConnection connection state is {0}", TmpConnection->State.ToString()));
+        }
 
         if (TmpConnection->State == System::Data::ConnectionState::Closed)
         {
@@ -394,8 +410,10 @@ System::Boolean Common::Data::DbAdapterBase::WriteSetting(
     {
         DatabaseRegKey->SetValue(sSettingName, sSettingValue, Microsoft::Win32::RegistryValueKind::String);
     }
-    catch (System::Exception^)
+    catch (System::Exception^ Exception)
     {
+        m_Logging->DatabaseMessage(System::String::Format(L"WriteSetting exception: {0}", Exception->Message));
+
         bResult = false;
     }
 
@@ -422,8 +440,10 @@ System::Boolean Common::Data::DbAdapterBase::WriteSetting(
     {
         DatabaseRegKey->SetValue(sSettingName, nSettingValue, Microsoft::Win32::RegistryValueKind::DWord);
     }
-    catch (System::Exception^)
+    catch (System::Exception^ Exception)
     {
+        m_Logging->DatabaseMessage(System::String::Format(L"WriteSetting exception: {0}", Exception->Message));
+
         bResult = false;
     }
 
@@ -459,8 +479,9 @@ System::String^ Common::Data::DbAdapterBase::EncryptString(
 
         sEncryptedData = System::Convert::ToBase64String(MemoryStream->ToArray());
     }
-    catch (System::Exception^)
+    catch (System::Exception^ Exception)
     {
+        m_Logging->DatabaseMessage(System::String::Format(L"EncryptString exception: {0}", Exception->Message));
     }
 
     if (Aes != nullptr)
@@ -511,8 +532,9 @@ System::String^ Common::Data::DbAdapterBase::DecryptString(
 
         sDecryptedData = System::Text::Encoding::UTF8->GetString(MemoryStream->ToArray());
     }
-    catch (System::Exception^)
+    catch (System::Exception^ Exception)
     {
+        m_Logging->DatabaseMessage(System::String::Format(L"DecryptString exception: {0}", Exception->Message));
     }
 
     if (Aes != nullptr)
@@ -640,8 +662,9 @@ void Common::Data::DbAdapterBase::EmptyConnectionPool(
 		{
 			Connection->Close();
         }
-        catch (System::Exception^)
+        catch (System::Exception^ Exception)
         {
+            m_Logging->DatabaseMessage(System::String::Format(L"EmptyConnectionPool exception: {0}", Exception->Message));
         }
 
         delete Connection;

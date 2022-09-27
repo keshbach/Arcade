@@ -38,6 +38,15 @@ namespace Arcade
         private static System.String CLogTypeTableName = "LogType";
         private static System.String CLogTableName = "Log";
 
+        // Column names
+        private const System.String CNameColumnName = "Name";
+        private const System.String CDescriptionColumnName = "Description";
+        private const System.String CPinoutsColumnName = "Pinouts";
+        private const System.String CDipSwitchesColumnName = "DipSwitches";
+        private const System.String CSizeColumnName = "Size";
+        private const System.String CPartNumberColumnName = "PartNumber";
+        private const System.String CPositionColumnName = "Position";
+
         // Game Property Names
         private static System.String CGameAudioName = "Audio";
         private static System.String CGameWiringName = "Wiring";
@@ -65,6 +74,8 @@ namespace Arcade
         #endregion
 
         #region "Member Variables"
+
+        private static DatabaseLogging s_DatabaseLogging = null;
 
         private static Common.Data.IDbAdapter s_DbAdapter = null;
 
@@ -147,10 +158,21 @@ namespace Arcade
 
         #endregion
 
+        #region "Public Functions"
+
         /// <summary>
         /// Initializes the database.
+        /// <param name="DatabaseAdapter">
+        /// The database adapter to be used.
+        /// </param>
         /// <param name="sRegistryKey">
         /// The registry path under Current User that should be used for storing settings.
+        /// </param>
+        /// <param name="ArcadeDatabaseLogging">
+        /// Implementation of the IArcadeDatabaseLogging interface.
+        /// </param>
+        /// <param name="bDatabaseAvailable">
+        /// On return will contain whether the database is available or not.
         /// </param>
         /// <param name="sErrorMessage">
         /// On return will contain a message if an error occurred.
@@ -160,28 +182,39 @@ namespace Arcade
         public static System.Boolean Init(
             EDatabaseAdapter DatabaseAdapter,
             System.String sRegistryKey,
+            IArcadeDatabaseLogging ArcadeDatabaseLogging,
             out System.Boolean bDatabaseAvailable,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Boolean bInitSuccessful = true;
             System.Boolean bSnapshotSupported = false;
             Microsoft.Win32.RegistryKey RegKey;
             System.String sTmpErrorMessage;
+            System.DateTime EndDateTime;
 
             bDatabaseAvailable = false;
             sErrorMessage = "";
 
             s_sDatabaseRegistryKey = sRegistryKey;
 
+            s_DatabaseLogging = new DatabaseLogging(ArcadeDatabaseLogging);
+
             switch (DatabaseAdapter)
             {
                 case EDatabaseAdapter.Access:
+                    s_DatabaseLogging.DatabaseMessage("Creating Access database adapter");
+
                     s_DbAdapter = new Common.Data.DbAdapterAccess();
                     break;
                 case EDatabaseAdapter.SQLServer:
+                    s_DatabaseLogging.DatabaseMessage("Creating SQL Server database adapter");
+
                     s_DbAdapter = new Common.Data.DbAdapterSQLServer();
                     break;
                 default:
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("Unrecognized {0} database adapter", DatabaseAdapter.ToString()));
+
                     sErrorMessage = "Unrecognized database adapter.";
 
                     return false;
@@ -196,7 +229,7 @@ namespace Arcade
                 return true;
             }
 
-            if (false == s_DbAdapter.Initialize(RegKey, ref sErrorMessage))
+            if (false == s_DbAdapter.Initialize(RegKey, s_DatabaseLogging, ref sErrorMessage))
             {
                 RegKey.Close();
 
@@ -234,12 +267,22 @@ namespace Arcade
 
                 s_DbAdapter.Uninitialize(ref sTmpErrorMessage);
 
+                EndDateTime = System.DateTime.Now;
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.Init took {0}",
+                                                  FormatEllapsedTime(StartDateTime, EndDateTime)));
+
                 return true;
             }
 
             bDatabaseAvailable = true;
 
             s_bInitialized = true;
+
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.Init took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
 
             return true;
         }
@@ -266,6 +309,8 @@ namespace Arcade
             }
 
             s_DbAdapter = null;
+
+            s_DatabaseLogging = null;
 
             return bResult;
         }
@@ -369,7 +414,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             PartLens.nPartNameLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -386,7 +431,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             PartLens.nPartCategoryNameLen = TableColumn.ColumnLength;
                             PartLens.nPartTypeNameLen = TableColumn.ColumnLength;
                             PartLens.nPartPackageNameLen = TableColumn.ColumnLength;
@@ -406,7 +451,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Description":
+                        case CDescriptionColumnName:
                             PartLens.nPartPinoutsLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -442,16 +487,16 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             GameLens.nGameNameLen = TableColumn.ColumnLength;
                             break;
-                        case "Description":
+                        case CDescriptionColumnName:
                             GameLens.nGameDescriptionLen = TableColumn.ColumnLength;
                             break;
-                        case "Pinouts":
+                        case CPinoutsColumnName:
                             GameLens.nGamePinoutsLen = TableColumn.ColumnLength;
                             break;
-                        case "DipSwitches":
+                        case CDipSwitchesColumnName:
                             GameLens.nGameDipSwitchesLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -468,7 +513,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             GameLens.nManufacturerLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -485,7 +530,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             GameLens.nGameWiringHarnessLen = TableColumn.ColumnLength;
                             GameLens.nGameAudioLen = TableColumn.ColumnLength;
                             GameLens.nGameVideoLen = TableColumn.ColumnLength;
@@ -525,13 +570,13 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             BoardLens.nBoardNameLen = TableColumn.ColumnLength;
                             break;
-                        case "Description":
+                        case CDescriptionColumnName:
                             BoardLens.nBoardDescriptionLen = TableColumn.ColumnLength;
                             break;
-                        case "Size":
+                        case CSizeColumnName:
                             BoardLens.nBoardSizeLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -545,7 +590,7 @@ namespace Arcade
                     {
                         switch (TableColumn.ColumnName)
                         {
-                            case "Name":
+                            case CNameColumnName:
                                 BoardLens.nBoardTypeNameLen = TableColumn.ColumnLength;
                                 break;
                         }
@@ -582,12 +627,12 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Position":
+                        case CPositionColumnName:
                             BoardPartLocationLens.nBoardPartPositionLen = TableColumn.ColumnLength;
 
                             ++nTableTotal;
                             break;
-                        case "Description":
+                        case CDescriptionColumnName:
                             BoardPartLocationLens.nBoardPartDescriptionLen = TableColumn.ColumnLength;
 
                             ++nTableTotal;
@@ -604,7 +649,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             BoardPartLocationLens.nBoardPartLocationLen = TableColumn.ColumnLength;
 
                             ++nTableTotal;
@@ -640,13 +685,13 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             ManualLens.nManualNameLen = TableColumn.ColumnLength;
                             break;
-                        case "PartNumber":
+                        case CPartNumberColumnName:
                             ManualLens.nManualPartNumberLen = TableColumn.ColumnLength;
                             break;
-                        case "Description":
+                        case CDescriptionColumnName:
                             ManualLens.nManualDescriptionLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -663,7 +708,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             ManualLens.nManualPrintEditionLen = TableColumn.ColumnLength;
                             ManualLens.nManualConditionLen = TableColumn.ColumnLength;
                             ManualLens.nManualStorageBoxLen = TableColumn.ColumnLength;
@@ -682,7 +727,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             ManualLens.nManufacturerLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -718,7 +763,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             DisplayLens.nDisplayNameLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -735,7 +780,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             DisplayLens.nDisplayTypeLen = TableColumn.ColumnLength;
                             DisplayLens.nDisplayResolutionLen = TableColumn.ColumnLength;
                             DisplayLens.nDisplayColorsLen = TableColumn.ColumnLength;
@@ -774,7 +819,7 @@ namespace Arcade
                 {
                     switch (TableColumn.ColumnName)
                     {
-                        case "Name":
+                        case CNameColumnName:
                             LogLens.nLogTypeLen = TableColumn.ColumnLength;
                             break;
                     }
@@ -788,7 +833,7 @@ namespace Arcade
                     {
                         switch (TableColumn.ColumnName)
                         {
-                            case "Description":
+                            case CDescriptionColumnName:
                                 LogLens.nLogDescriptionLen = TableColumn.ColumnLength;
                                 break;
                         }
@@ -1221,9 +1266,7 @@ namespace Arcade
             {
                 sb = new System.Text.StringBuilder();
 
-                sb.Append("The part data name \"");
-                sb.Append(sNewPartDataName);
-                sb.Append("\" already exists.");
+                sb.AppendFormat("The part data name \"{0}\" already exists.", sNewPartDataName);
 
                 nNewPartDataId = -1;
                 sErrorMessage = sb.ToString();
@@ -1559,9 +1602,7 @@ namespace Arcade
             {
                 sb = new System.Text.StringBuilder();
 
-                sb.Append("The game data name \"");
-                sb.Append(sNewGameDataName);
-                sb.Append("\" already exists.");
+                sb.AppendFormat("The game data name \"{0}\" already exists.", sNewGameDataName);
 
                 nNewGameDataId = -1;
                 sErrorMessage = sb.ToString();
@@ -1661,9 +1702,7 @@ namespace Arcade
             {
                 sb = new System.Text.StringBuilder();
 
-                sb.Append("The manual data name \"");
-                sb.Append(sNewManualDataName);
-                sb.Append("\" already exists.");
+                sb.AppendFormat("The manual data name \"{0}\" already exists.", sNewManualDataName);
 
                 nNewManualDataId = -1;
                 sErrorMessage = sb.ToString();
@@ -1765,9 +1804,7 @@ namespace Arcade
             {
                 sb = new System.Text.StringBuilder();
 
-                sb.Append("The display data name \"");
-                sb.Append(sNewDisplayDataName);
-                sb.Append("\" already exists.");
+                sb.AppendFormat("The display data name \"{0}\" already exists.", sNewDisplayDataName);
 
                 nNewDisplayDataId = -1;
                 sErrorMessage = sb.ToString();
@@ -1973,13 +2010,14 @@ namespace Arcade
             out System.Collections.Generic.List<DatabaseDefs.TPart> PartList,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             DatabaseDefs.TPart Part;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+            System.DateTime EndDateTime;
 
             PartList = new System.Collections.Generic.List<DatabaseDefs.TPart>();
             sErrorMessage = "";
@@ -2021,50 +2059,47 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Part = new DatabaseDefs.TPart();
-
-                    Part.nPartId = DataReader.GetInt32(0);
-                    Part.sPartName = DataReader.GetString(1);
-                    Part.bPartIsDefault = DataReader.GetBoolean(2);
-
-                    if (false == GetTablePropertyValue(CPartTableName,
-                                                       Part.nPartId,
-                                                       CPartCategoryName,
-                                                       out Part.sPartCategoryName,
-                                                       out sErrorMessage) ||
-                        false == GetTablePropertyValue(CPartTableName,
-                                                       Part.nPartId,
-                                                       CPartTypeName,
-                                                       out Part.sPartTypeName,
-                                                       out sErrorMessage) ||
-                        false == GetTablePropertyValue(CPartTableName,
-                                                       Part.nPartId,
-                                                       CPartPackageName,
-                                                       out Part.sPartPackageName,
-                                                       out sErrorMessage) ||
-                        false == GetTablePropertyValues(CPartTableName,
-                                                        Part.nPartId,
-                                                        CPartDatasheetName,
-                                                        out Part.PartDatasheetColl,
-                                                        out sErrorMessage))
+                    while (DataReader.Read())
                     {
-                        DataReader.Close();
+                        Part = new DatabaseDefs.TPart();
 
-                        s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+                        Part.nPartId = DataReader.GetInt32(0);
+                        Part.sPartName = DataReader.GetString(1);
+                        Part.bPartIsDefault = DataReader.GetBoolean(2);
 
-                        PartList.Clear();
+                        if (false == GetTablePropertyValue(CPartTableName,
+                                                           Part.nPartId,
+                                                           CPartCategoryName,
+                                                           out Part.sPartCategoryName,
+                                                           out sErrorMessage) ||
+                            false == GetTablePropertyValue(CPartTableName,
+                                                           Part.nPartId,
+                                                           CPartTypeName,
+                                                           out Part.sPartTypeName,
+                                                           out sErrorMessage) ||
+                            false == GetTablePropertyValue(CPartTableName,
+                                                           Part.nPartId,
+                                                           CPartPackageName,
+                                                           out Part.sPartPackageName,
+                                                           out sErrorMessage) ||
+                            false == GetTablePropertyValues(CPartTableName,
+                                                            Part.nPartId,
+                                                            CPartDatasheetName,
+                                                            out Part.PartDatasheetColl,
+                                                            out sErrorMessage))
+                        {
+                            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
 
-                        return false;
+                            PartList.Clear();
+
+                            return false;
+                        }
+
+                        PartList.Add(Part);
                     }
-
-                    PartList.Add(Part);
                 }
-
-                DataReader.Close();
 
                 PartList.Sort(new PartComparer());
 
@@ -2073,21 +2108,17 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartsMatchingKeyword exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
 
             s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.GetPartsMatchingKeyword took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
 
             return bResult;
         }
@@ -2104,13 +2135,14 @@ namespace Arcade
             out System.Collections.Generic.List<DatabaseDefs.TPart> PartList,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             DatabaseDefs.TPart Part;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+            System.DateTime EndDateTime;
 
             PartList = new System.Collections.Generic.List<DatabaseDefs.TPart>();
             sErrorMessage = "";
@@ -2148,67 +2180,60 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Part = new DatabaseDefs.TPart();
-
-                    Part.nPartId = DataReader.GetInt32(0);
-                    Part.sPartName = DataReader.GetString(1);
-                    Part.bPartIsDefault = DataReader.GetBoolean(2);
-                    Part.sPartTypeName = sPartType;
-
-                    if (false == GetTablePropertyValue(CPartTableName,
-                                                       Part.nPartId,
-                                                       CPartCategoryName,
-                                                       out Part.sPartCategoryName,
-                                                       out sErrorMessage) ||
-                        false == GetTablePropertyValue(CPartTableName,
-                                                       Part.nPartId,
-                                                       CPartPackageName,
-                                                       out Part.sPartPackageName,
-                                                       out sErrorMessage) ||
-                        false == GetTablePropertyValues(CPartTableName,
-                                                        Part.nPartId,
-                                                        CPartDatasheetName,
-                                                        out Part.PartDatasheetColl,
-                                                        out sErrorMessage))
+                    while (DataReader.Read())
                     {
-                        DataReader.Close();
+                        Part = new DatabaseDefs.TPart();
 
-                        s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+                        Part.nPartId = DataReader.GetInt32(0);
+                        Part.sPartName = DataReader.GetString(1);
+                        Part.bPartIsDefault = DataReader.GetBoolean(2);
+                        Part.sPartTypeName = sPartType;
 
-                        PartList.Clear();
+                        if (false == GetTablePropertyValue(CPartTableName,
+                                                           Part.nPartId,
+                                                           CPartCategoryName,
+                                                           out Part.sPartCategoryName,
+                                                           out sErrorMessage) ||
+                            false == GetTablePropertyValue(CPartTableName,
+                                                           Part.nPartId,
+                                                           CPartPackageName,
+                                                           out Part.sPartPackageName,
+                                                           out sErrorMessage) ||
+                            false == GetTablePropertyValues(CPartTableName,
+                                                            Part.nPartId,
+                                                            CPartDatasheetName,
+                                                            out Part.PartDatasheetColl,
+                                                            out sErrorMessage))
+                        {
+                            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
 
-                        return false;
+                            PartList.Clear();
+
+                            return false;
+                        }
+
+                        PartList.Add(Part);
                     }
-
-                    PartList.Add(Part);
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartsMatchingType exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
 
             s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.GetPartsMatchingType took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
 
             return bResult;
         }
@@ -2229,7 +2254,6 @@ namespace Arcade
             System.Int32 nPartPinoutsId;
             System.String sPinouts;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -2267,56 +2291,46 @@ namespace Arcade
  
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Part = new DatabaseDefs.TPart();
+                    while (DataReader.Read())
+                    {
+                        Part = new DatabaseDefs.TPart();
 
-                    Part.nPartId = DataReader.GetInt32(0);
-                    Part.sPartName = DataReader.GetString(1);
-                    Part.bPartIsDefault = DataReader.GetBoolean(2);
+                        Part.nPartId = DataReader.GetInt32(0);
+                        Part.sPartName = DataReader.GetString(1);
+                        Part.bPartIsDefault = DataReader.GetBoolean(2);
 
-                    GetTablePropertyValue(CPartTableName, Part.nPartId,
-                                          CPartCategoryName,
-                                          out Part.sPartCategoryName,
-                                          out sErrorMessage);
+                        GetTablePropertyValue(CPartTableName, Part.nPartId,
+                                              CPartCategoryName,
+                                              out Part.sPartCategoryName,
+                                              out sErrorMessage);
 
-                    GetTablePropertyValue(CPartTableName, Part.nPartId,
-                                          CPartTypeName,
-                                          out Part.sPartTypeName,
-                                          out sErrorMessage);
+                        GetTablePropertyValue(CPartTableName, Part.nPartId,
+                                              CPartTypeName,
+                                              out Part.sPartTypeName,
+                                              out sErrorMessage);
 
-                    GetTablePropertyValue(CPartTableName, Part.nPartId,
-                                          CPartPackageName,
-                                          out Part.sPartPackageName,
-                                          out sErrorMessage);
+                        GetTablePropertyValue(CPartTableName, Part.nPartId,
+                                              CPartPackageName,
+                                              out Part.sPartPackageName,
+                                              out sErrorMessage);
 
-                    GetTablePropertyValues(CPartTableName, Part.nPartId,
-                                           CPartDatasheetName,
-                                           out Part.PartDatasheetColl,
-                                           out sErrorMessage);
+                        GetTablePropertyValues(CPartTableName, Part.nPartId,
+                                               CPartDatasheetName,
+                                               out Part.PartDatasheetColl,
+                                               out sErrorMessage);
 
-                    PartList.Add(Part);
+                        PartList.Add(Part);
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartsWithSamePinouts exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -2341,7 +2355,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -2370,43 +2383,33 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                if (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    nPartPinoutsId = DataReader.GetInt32(0);
-
-                    if (DataReader.IsDBNull(1) == false)
+                    if (DataReader.Read())
                     {
-                        sPartPinouts = DataReader.GetString(1);
+                        nPartPinoutsId = DataReader.GetInt32(0);
+
+                        if (DataReader.IsDBNull(1) == false)
+                        {
+                            sPartPinouts = DataReader.GetString(1);
+                        }
+                        else
+                        {
+                            sPartPinouts = "";
+                        }
+
+                        bResult = true;
                     }
                     else
                     {
-                        sPartPinouts = "";
+                        sErrorMessage = "No pinouts found for the given part.  (Does this part exist?)";
                     }
-
-                    bResult = true;
                 }
-                else
-                {
-                    sErrorMessage = "No pinouts found for the given part.  (Does this part exist?)";
-                }
-
-                DataReader.Close();
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartPinouts exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -2498,10 +2501,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartGroup rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartGroup exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -2512,7 +2518,7 @@ namespace Arcade
         }
 
         /// <summary>
-        /// Adds a new part to a the cross reference of equivalent parts.
+        /// Adds a new part to the cross reference of equivalent parts.
         /// <param name="sErrorMessage">
         /// On return will contain a message if an error occurred.
         /// </param>
@@ -2616,10 +2622,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPart rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -2764,10 +2773,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditPart rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -2889,10 +2901,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePart rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -2914,13 +2929,14 @@ namespace Arcade
             out System.Collections.Generic.List<DatabaseDefs.TGame> GamesList,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             DatabaseDefs.TGame Game;
             System.String sTmpErrorMessage = null;
+            System.DateTime EndDateTime;
 
             GamesList = new System.Collections.Generic.List<DatabaseDefs.TGame>();
             sErrorMessage = "";
@@ -2955,85 +2971,80 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Game = new DatabaseDefs.TGame();
+                    while (DataReader.Read())
+                    {
+                        Game = new DatabaseDefs.TGame();
 
-                    Game.nGameId = DataReader.GetInt32(0);
-                    Game.sGameName = DataReader.GetString(1);
+                        Game.nGameId = DataReader.GetInt32(0);
+                        Game.sGameName = DataReader.GetString(1);
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Game.sGamePinouts = DataReader.GetString(3);
-                    }
-                    else
-                    {
-                        Game.sGamePinouts = "";
-                    }
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Game.sGamePinouts = DataReader.GetString(3);
+                        }
+                        else
+                        {
+                            Game.sGamePinouts = "";
+                        }
 
-                    if (DataReader.IsDBNull(4) == false)
-                    {
-                        Game.sGameDipSwitches = DataReader.GetString(4);
-                    }
-                    else
-                    {
-                        Game.sGameDipSwitches = "";
-                    }
+                        if (DataReader.IsDBNull(4) == false)
+                        {
+                            Game.sGameDipSwitches = DataReader.GetString(4);
+                        }
+                        else
+                        {
+                            Game.sGameDipSwitches = "";
+                        }
 
-                    if (DataReader.IsDBNull(2) == false)
-                    {
-                        Game.sGameDescription = DataReader.GetString(2);
-                    }
-                    else
-                    {
-                        Game.sGameDescription = "";
-                    }
+                        if (DataReader.IsDBNull(2) == false)
+                        {
+                            Game.sGameDescription = DataReader.GetString(2);
+                        }
+                        else
+                        {
+                            Game.sGameDescription = "";
+                        }
 
-                    if (DataReader.IsDBNull(5) == false)
-                    {
-                        Game.bGameHaveWiringHarness = DataReader.GetBoolean(5);
-                    }
-                    else
-                    {
-                        Game.bGameHaveWiringHarness = false;
-                    }
+                        if (DataReader.IsDBNull(5) == false)
+                        {
+                            Game.bGameHaveWiringHarness = DataReader.GetBoolean(5);
+                        }
+                        else
+                        {
+                            Game.bGameHaveWiringHarness = false;
+                        }
 
-                    if (DataReader.IsDBNull(6) == false)
-                    {
-                        Game.bGameNeedPowerOnReset = DataReader.GetBoolean(6);
+                        if (DataReader.IsDBNull(6) == false)
+                        {
+                            Game.bGameNeedPowerOnReset = DataReader.GetBoolean(6);
+                        }
+                        else
+                        {
+                            Game.bGameNeedPowerOnReset = false;
+                        }
+
+                        GamesList.Add(Game);
                     }
-                    else
-                    {
-                        Game.bGameNeedPowerOnReset = false;
-                    }
-                    
-                    GamesList.Add(Game);
                 }
-                
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGamesWithPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
 
             s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.GetGamesWithPart took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
 
             return bResult;
         }
@@ -3050,8 +3061,10 @@ namespace Arcade
             out System.Collections.Generic.List<DatabaseDefs.TGame> GamesList,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Collections.Generic.List<DatabaseDefs.TPart> TmpPartList;
             System.Collections.Generic.List<DatabaseDefs.TGame> TmpGamesList;
+            System.DateTime EndDateTime;
 
             GamesList = new System.Collections.Generic.List<DatabaseDefs.TGame>();
             sErrorMessage = "";
@@ -3085,6 +3098,11 @@ namespace Arcade
 
             GamesList.Sort(new GameComparer());
 
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.GetGamesWithPartIncludeAllMatchingParts took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
+
             return true;
         }
 
@@ -3099,15 +3117,17 @@ namespace Arcade
             out System.Collections.Generic.List<DatabaseDefs.TGame> GamesList,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Boolean bResult = false;
             System.Boolean bQuit = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             Common.Collections.StringCollection WiringHarnessColl;
             Common.Collections.StringCollection CocktailColl;
+            DatabaseDefs.TGame Game;
+            System.DateTime EndDateTime;
 
             GamesList = new System.Collections.Generic.List<DatabaseDefs.TGame>();
             sErrorMessage = "";
@@ -3138,139 +3158,122 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (bQuit == false && DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    DatabaseDefs.TGame Game = new DatabaseDefs.TGame();
+                    while (bQuit == false && DataReader.Read())
+                    {
+                        Game = new DatabaseDefs.TGame();
 
-                    Game.nGameId = DataReader.GetInt32(0);
-                    Game.sGameName = DataReader.GetString(1);
+                        Game.nGameId = DataReader.GetInt32(0);
+                        Game.sGameName = DataReader.GetString(1);
 
-                    if (DataReader.IsDBNull(2) == false)
-                    {
-                        Game.sGameDescription = DataReader.GetString(2);
-                    }
-                    else
-                    {
-                        Game.sGameDescription = "";
-                    }
-
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Game.sGamePinouts = DataReader.GetString(3);
-                    }
-                    else
-                    {
-                        Game.sGamePinouts = "";
-                    }
-
-                    if (DataReader.IsDBNull(4) == false)
-                    {
-                        Game.sGameDipSwitches = DataReader.GetString(4);
-                    }
-                    else
-                    {
-                        Game.sGameDipSwitches = "";
-                    }
-
-                    if (DataReader.IsDBNull(5) == false)
-                    {
-                        Game.bGameHaveWiringHarness = DataReader.GetBoolean(5);
-                    }
-                    else
-                    {
-                        Game.bGameHaveWiringHarness = false;
-                    }
-
-                    if (DataReader.IsDBNull(6) == false)
-                    {
-                        Game.bGameNeedPowerOnReset = DataReader.GetBoolean(6);
-                    }
-                    else
-                    {
-                        Game.bGameNeedPowerOnReset = false;
-                    }
-
-                    Game.sManufacturer = DataReader.GetString(7);
-
-                    WiringHarnessColl = null;
-                    CocktailColl = null;
-
-                    if (true == GetTableProperties(CGameTableName,
-                                                   Game.nGameId,
-                                                   s_GamePropertyNameDictionary[CGameControlsName],
-                                                   out Game.GameControlsColl,
-                                                   out sErrorMessage) &&
-                        true == GetTableProperties(CGameTableName,
-                                                   Game.nGameId,
-                                                   s_GamePropertyNameDictionary[CGameVideoName],
-                                                   out Game.GameVideoColl,
-                                                   out sErrorMessage) &&
-                        true == GetTableProperties(CGameTableName,
-                                                   Game.nGameId,
-                                                   s_GamePropertyNameDictionary[CGameAudioName],
-                                                   out Game.GameAudioColl,
-                                                   out sErrorMessage) &&
-                        true == GetTableProperties(CGameTableName,
-                                                   Game.nGameId,
-                                                   s_GamePropertyNameDictionary[CGameWiringName],
-                                                   out WiringHarnessColl,
-                                                   out sErrorMessage) &&
-                        true == GetTableProperties(CGameTableName,
-                                                   Game.nGameId,
-                                                   s_GamePropertyNameDictionary[CGameCocktailName],
-                                                   out CocktailColl,
-                                                   out sErrorMessage) &&
-                        WiringHarnessColl.Count == 1 &&
-                        CocktailColl.Count == 1)
-                    {
-                        Game.sGameWiringHarness = WiringHarnessColl[0];
-                        Game.sGameCocktail = CocktailColl[0];
-
-                        GamesList.Add(Game);
-                    }
-                    else
-                    {
-                        if (sErrorMessage.Length == 0)
+                        if (DataReader.IsDBNull(2) == false)
                         {
-                            if (WiringHarnessColl != null &&
-                                WiringHarnessColl.Count != 1)
-                            {
-                                sb.Length = 0;
-
-                                sb.Append("The Game \"");
-                                sb.Append(Game.sGameName);
-                                sb.Append("\" has ");
-                                sb.Append(WiringHarnessColl.Count);
-                                sb.Append(" wiring harnesses.  ");
-                                sb.Append("(The game should have only one.)");
-
-                                sErrorMessage = sb.ToString();
-                            }
-                            else if (CocktailColl != null &&
-                                     CocktailColl.Count != 1)
-                            {
-                                sb.Length = 0;
-
-                                sb.Append("The Game \"");
-                                sb.Append(Game.sGameName);
-                                sb.Append("\" has ");
-                                sb.Append(CocktailColl.Count);
-                                sb.Append(" cocktails.  ");
-                                sb.Append("(The game should have only one.)");
-
-                                sErrorMessage = sb.ToString();
-                            }
+                            Game.sGameDescription = DataReader.GetString(2);
                         }
-                       
-                        GamesList.Clear();
+                        else
+                        {
+                            Game.sGameDescription = "";
+                        }
 
-                        bQuit = true;
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Game.sGamePinouts = DataReader.GetString(3);
+                        }
+                        else
+                        {
+                            Game.sGamePinouts = "";
+                        }
+
+                        if (DataReader.IsDBNull(4) == false)
+                        {
+                            Game.sGameDipSwitches = DataReader.GetString(4);
+                        }
+                        else
+                        {
+                            Game.sGameDipSwitches = "";
+                        }
+
+                        if (DataReader.IsDBNull(5) == false)
+                        {
+                            Game.bGameHaveWiringHarness = DataReader.GetBoolean(5);
+                        }
+                        else
+                        {
+                            Game.bGameHaveWiringHarness = false;
+                        }
+
+                        if (DataReader.IsDBNull(6) == false)
+                        {
+                            Game.bGameNeedPowerOnReset = DataReader.GetBoolean(6);
+                        }
+                        else
+                        {
+                            Game.bGameNeedPowerOnReset = false;
+                        }
+
+                        Game.sManufacturer = DataReader.GetString(7);
+
+                        WiringHarnessColl = null;
+                        CocktailColl = null;
+
+                        if (true == GetTableProperties(CGameTableName,
+                                                       Game.nGameId,
+                                                       s_GamePropertyNameDictionary[CGameControlsName],
+                                                       out Game.GameControlsColl,
+                                                       out sErrorMessage) &&
+                            true == GetTableProperties(CGameTableName,
+                                                       Game.nGameId,
+                                                       s_GamePropertyNameDictionary[CGameVideoName],
+                                                       out Game.GameVideoColl,
+                                                       out sErrorMessage) &&
+                            true == GetTableProperties(CGameTableName,
+                                                       Game.nGameId,
+                                                       s_GamePropertyNameDictionary[CGameAudioName],
+                                                       out Game.GameAudioColl,
+                                                       out sErrorMessage) &&
+                            true == GetTableProperties(CGameTableName,
+                                                       Game.nGameId,
+                                                       s_GamePropertyNameDictionary[CGameWiringName],
+                                                       out WiringHarnessColl,
+                                                       out sErrorMessage) &&
+                            true == GetTableProperties(CGameTableName,
+                                                       Game.nGameId,
+                                                       s_GamePropertyNameDictionary[CGameCocktailName],
+                                                       out CocktailColl,
+                                                       out sErrorMessage) &&
+                            WiringHarnessColl.Count == 1 &&
+                            CocktailColl.Count == 1)
+                        {
+                            Game.sGameWiringHarness = WiringHarnessColl[0];
+                            Game.sGameCocktail = CocktailColl[0];
+
+                            GamesList.Add(Game);
+                        }
+                        else
+                        {
+                            if (sErrorMessage.Length == 0)
+                            {
+                                if (WiringHarnessColl != null &&
+                                    WiringHarnessColl.Count != 1)
+                                {
+                                    sErrorMessage = System.String.Format("The Game \"{0}\" has {1} wiring harnesses.  (The game should have only one.)",
+                                                                         Game.sGameName, WiringHarnessColl.Count);
+                                }
+                                else if (CocktailColl != null &&
+                                         CocktailColl.Count != 1)
+                                {
+                                    sErrorMessage = System.String.Format("The Game \"{0}\" has {1} cocktails.  (The game should have only one.)",
+                                                                         Game.sGameName, CocktailColl.Count);
+                                }
+                            }
+
+                            GamesList.Clear();
+
+                            bQuit = true;
+                        }
                     }
                 }
-
-                DataReader.Close();
 
                 if (bQuit == false)
                 {
@@ -3280,21 +3283,16 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGames exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
 
             s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.GetGames took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
 
             return bResult;
         }
@@ -3313,10 +3311,10 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
-            System.String sTmpErrorMessage =null;
+            System.String sTmpErrorMessage = null;
+            DatabaseDefs.TDisplay Display;
 
             DisplaysList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
             sErrorMessage = "";
@@ -3344,57 +3342,47 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    DatabaseDefs.TDisplay Display = new DatabaseDefs.TDisplay();
-
-                    Display.nDisplayId = DataReader.GetInt32(0);
-                    Display.sDisplayName = DataReader.GetString(1);
-
-                    if (GetTablePropertyValue(CDisplayTableName,
-                                              Display.nDisplayId,
-                                              CDisplayTypeName,
-                                              out Display.sDisplayType,
-                                              out sErrorMessage) &&
-                        GetTablePropertyValue(CDisplayTableName,
-                                              Display.nDisplayId,
-                                              CDisplayResolutionName,
-                                              out Display.sDisplayResolution,
-                                              out sErrorMessage) &&
-                        GetTablePropertyValue(CDisplayTableName,
-                                              Display.nDisplayId,
-                                              CDisplayColorsName,
-                                              out Display.sDisplayColors,
-                                              out sErrorMessage) &&
-                        GetTablePropertyValue(CDisplayTableName,
-                                              Display.nDisplayId,
-                                              CDisplayOrientationName,
-                                              out Display.sDisplayOrientation,
-                                              out sErrorMessage))
+                    while (DataReader.Read())
                     {
-                        DisplaysList.Add(Display);
+                        Display = new DatabaseDefs.TDisplay();
+
+                        Display.nDisplayId = DataReader.GetInt32(0);
+                        Display.sDisplayName = DataReader.GetString(1);
+
+                        if (GetTablePropertyValue(CDisplayTableName,
+                                                  Display.nDisplayId,
+                                                  CDisplayTypeName,
+                                                  out Display.sDisplayType,
+                                                  out sErrorMessage) &&
+                            GetTablePropertyValue(CDisplayTableName,
+                                                  Display.nDisplayId,
+                                                  CDisplayResolutionName,
+                                                  out Display.sDisplayResolution,
+                                                  out sErrorMessage) &&
+                            GetTablePropertyValue(CDisplayTableName,
+                                                  Display.nDisplayId,
+                                                  CDisplayColorsName,
+                                                  out Display.sDisplayColors,
+                                                  out sErrorMessage) &&
+                            GetTablePropertyValue(CDisplayTableName,
+                                                  Display.nDisplayId,
+                                                  CDisplayOrientationName,
+                                                  out Display.sDisplayOrientation,
+                                                  out sErrorMessage))
+                        {
+                            DisplaysList.Add(Display);
+                        }
                     }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDisplaysForGame exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -3418,10 +3406,10 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+            DatabaseDefs.TBoard Board;
 
             BoardsList = new System.Collections.Generic.List<DatabaseDefs.TBoard>();
             sErrorMessage = "";
@@ -3453,63 +3441,53 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    DatabaseDefs.TBoard Board = new DatabaseDefs.TBoard();
-
-                    Board.nBoardId = DataReader.GetInt32(0);
-
-                    if (DataReader.IsDBNull(1) == false)
+                    while (DataReader.Read())
                     {
-                        Board.sBoardName = DataReader.GetString(1);
-                    }
-                    else
-                    {
-                        Board.sBoardName = "";
-                    }
+                        Board = new DatabaseDefs.TBoard();
 
-                    if (DataReader.IsDBNull(2) == false)
-                    {
-                        Board.sBoardDescription = DataReader.GetString(2);
-                    }
-                    else
-                    {
-                        Board.sBoardDescription = "";
-                    }
+                        Board.nBoardId = DataReader.GetInt32(0);
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Board.sBoardSize = DataReader.GetString(3);
-                    }
-                    else
-                    {
-                        Board.sBoardSize = "";
-                    }
+                        if (DataReader.IsDBNull(1) == false)
+                        {
+                            Board.sBoardName = DataReader.GetString(1);
+                        }
+                        else
+                        {
+                            Board.sBoardName = "";
+                        }
 
-                    Board.sBoardTypeName = DataReader.GetString(4);
+                        if (DataReader.IsDBNull(2) == false)
+                        {
+                            Board.sBoardDescription = DataReader.GetString(2);
+                        }
+                        else
+                        {
+                            Board.sBoardDescription = "";
+                        }
 
-                    BoardsList.Add(Board);
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Board.sBoardSize = DataReader.GetString(3);
+                        }
+                        else
+                        {
+                            Board.sBoardSize = "";
+                        }
+
+                        Board.sBoardTypeName = DataReader.GetString(4);
+
+                        BoardsList.Add(Board);
+                    }
                 }
-                
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetBoardsForGame exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -3534,7 +3512,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -3572,47 +3549,46 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Board = new DatabaseDefs.TBoard();
-
-                    Board.nBoardId = DataReader.GetInt32(0);
-
-                    if (DataReader.IsDBNull(1) == false)
+                    while (DataReader.Read())
                     {
-                        Board.sBoardName = DataReader.GetString(1);
-                    }
-                    else
-                    {
-                        Board.sBoardName = "";
-                    }
+                        Board = new DatabaseDefs.TBoard();
 
-                    if (DataReader.IsDBNull(2) == false)
-                    {
-                        Board.sBoardDescription = DataReader.GetString(2);
-                    }
-                    else
-                    {
-                        Board.sBoardDescription = "";
-                    }
+                        Board.nBoardId = DataReader.GetInt32(0);
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Board.sBoardSize = DataReader.GetString(3);
-                    }
-                    else
-                    {
-                        Board.sBoardSize = "";
-                    }
+                        if (DataReader.IsDBNull(1) == false)
+                        {
+                            Board.sBoardName = DataReader.GetString(1);
+                        }
+                        else
+                        {
+                            Board.sBoardName = "";
+                        }
 
-                    Board.sBoardTypeName = DataReader.GetString(4);
+                        if (DataReader.IsDBNull(2) == false)
+                        {
+                            Board.sBoardDescription = DataReader.GetString(2);
+                        }
+                        else
+                        {
+                            Board.sBoardDescription = "";
+                        }
 
-                    BoardsList.Add(Board);
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Board.sBoardSize = DataReader.GetString(3);
+                        }
+                        else
+                        {
+                            Board.sBoardSize = "";
+                        }
+
+                        Board.sBoardTypeName = DataReader.GetString(4);
+
+                        BoardsList.Add(Board);
+                    }
                 }
-                
-                DataReader.Close();
 
                 BoardsList.Sort(new BoardComparer());
 
@@ -3621,16 +3597,7 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetBoardsWithPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -3653,8 +3620,10 @@ namespace Arcade
             out System.Collections.Generic.List<DatabaseDefs.TBoard> BoardsList,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Collections.Generic.List<DatabaseDefs.TPart> TmpPartList;
             System.Collections.Generic.List<DatabaseDefs.TBoard> TmpBoardsList;
+            System.DateTime EndDateTime;
 
             BoardsList = new System.Collections.Generic.List<DatabaseDefs.TBoard>();
             sErrorMessage = "";
@@ -3688,6 +3657,11 @@ namespace Arcade
 
             BoardsList.Sort(new BoardComparer());
 
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.GetBoardsWithPartIncludeAllMatchingParts took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
+
             return true;
         }
 
@@ -3706,7 +3680,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -3741,38 +3714,37 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Location = new DatabaseDefs.TBoardPartLocation();
-
-                    Location.nBoardPartId = DataReader.GetInt32(0);
-
-                    if (DataReader.IsDBNull(1) == false)
+                    while (DataReader.Read())
                     {
-                        Location.sBoardPartPosition = DataReader.GetString(1);
-                    }
-                    else
-                    {
-                        Location.sBoardPartPosition = "";
-                    }
+                        Location = new DatabaseDefs.TBoardPartLocation();
 
-                    Location.sBoardPartLocation = DataReader.GetString(2);
+                        Location.nBoardPartId = DataReader.GetInt32(0);
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Location.sBoardPartDescription = DataReader.GetString(3);
-                    }
-                    else
-                    {
-                        Location.sBoardPartDescription = "";
-                    }
+                        if (DataReader.IsDBNull(1) == false)
+                        {
+                            Location.sBoardPartPosition = DataReader.GetString(1);
+                        }
+                        else
+                        {
+                            Location.sBoardPartPosition = "";
+                        }
 
-                    LocationsList.Add(Location);
+                        Location.sBoardPartLocation = DataReader.GetString(2);
+
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Location.sBoardPartDescription = DataReader.GetString(3);
+                        }
+                        else
+                        {
+                            Location.sBoardPartDescription = "";
+                        }
+
+                        LocationsList.Add(Location);
+                    }
                 }
-                
-                DataReader.Close();
 
                 LocationsList.Sort(new PosAndLocComparer());
 
@@ -3781,16 +3753,7 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetBoardPartLocations exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -3861,7 +3824,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -3907,70 +3869,60 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Board = new DatabaseDefs.TBoard();
-
-                    Board.nBoardId = DataReader.GetInt32(1);
-
-                    if (DataReader.IsDBNull(2) == false)
+                    while (DataReader.Read())
                     {
-                        Board.sBoardName = DataReader.GetString(2);
-                    }
-                    else
-                    {
-                        Board.sBoardName = "";
-                    }
+                        Board = new DatabaseDefs.TBoard();
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Board.sBoardDescription = DataReader.GetString(3);
-                    }
-                    else
-                    {
-                        Board.sBoardDescription = "";
-                    }
+                        Board.nBoardId = DataReader.GetInt32(1);
 
-                    if (DataReader.IsDBNull(4) == false)
-                    {
-                        Board.sBoardSize = DataReader.GetString(4);
-                    }
-                    else
-                    {
-                        Board.sBoardSize = "";
-                    }
+                        if (DataReader.IsDBNull(2) == false)
+                        {
+                            Board.sBoardName = DataReader.GetString(2);
+                        }
+                        else
+                        {
+                            Board.sBoardName = "";
+                        }
 
-                    Board.sBoardTypeName = DataReader.GetString(5);
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Board.sBoardDescription = DataReader.GetString(3);
+                        }
+                        else
+                        {
+                            Board.sBoardDescription = "";
+                        }
 
-                    if (!GameBoardListDict.TryGetValue(DataReader.GetString(0), out BoardList))
-                    {
-                        BoardList = new System.Collections.Generic.List<DatabaseDefs.TBoard>();
-                        
-                        GameBoardListDict.Add(DataReader.GetString(0), BoardList);
+                        if (DataReader.IsDBNull(4) == false)
+                        {
+                            Board.sBoardSize = DataReader.GetString(4);
+                        }
+                        else
+                        {
+                            Board.sBoardSize = "";
+                        }
+
+                        Board.sBoardTypeName = DataReader.GetString(5);
+
+                        if (!GameBoardListDict.TryGetValue(DataReader.GetString(0), out BoardList))
+                        {
+                            BoardList = new System.Collections.Generic.List<DatabaseDefs.TBoard>();
+
+                            GameBoardListDict.Add(DataReader.GetString(0), BoardList);
+                        }
+
+                        BoardList.Add(Board);
                     }
-
-                    BoardList.Add(Board);
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGameBoardsMatchingKeyword exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -3994,7 +3946,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -4034,97 +3985,87 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Manual = new DatabaseDefs.TManual();
-
-                    Manual.nManualId = DataReader.GetInt32(0);
-                    Manual.sManualName = DataReader.GetString(1);
-
-                    if (DataReader.IsDBNull(2) == false)
+                    while (DataReader.Read())
                     {
-                        Manual.sManualPartNumber = DataReader.GetString(2);
-                    }
-                    else
-                    {
-                        Manual.sManualPartNumber = "";
-                    }
+                        Manual = new DatabaseDefs.TManual();
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Manual.nManualYearPrinted = DataReader.GetInt32(3);
-                    }
-                    else
-                    {
-                        Manual.nManualYearPrinted = 0;
-                    }
-            
-                    Manual.bManualComplete = DataReader.GetBoolean(4);
-                    Manual.bManualOriginal = DataReader.GetBoolean(5);
+                        Manual.nManualId = DataReader.GetInt32(0);
+                        Manual.sManualName = DataReader.GetString(1);
 
-                    if (DataReader.IsDBNull(6) == false)
-                    {
-                        Manual.sManualDescription = DataReader.GetString(6);
-                    }
-                    else
-                    {
-                        Manual.sManualDescription = "";
-                    }
+                        if (DataReader.IsDBNull(2) == false)
+                        {
+                            Manual.sManualPartNumber = DataReader.GetString(2);
+                        }
+                        else
+                        {
+                            Manual.sManualPartNumber = "";
+                        }
 
-                    Manual.sManufacturer = DataReader.GetString(7);
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Manual.nManualYearPrinted = DataReader.GetInt32(3);
+                        }
+                        else
+                        {
+                            Manual.nManualYearPrinted = 0;
+                        }
 
-                    if (true == GetTableProperties(CManualTableName,
-                                                   Manual.nManualId,
-                                                   s_ManualPropertyNameDictionary[CManualPrintEditionName],
-                                                   out PropertiesColl,
-                                                   out sErrorMessage) &&
-                        PropertiesColl.Count == 1)
-                    {
-                        Manual.sManualPrintEdition = PropertiesColl[0];
+                        Manual.bManualComplete = DataReader.GetBoolean(4);
+                        Manual.bManualOriginal = DataReader.GetBoolean(5);
+
+                        if (DataReader.IsDBNull(6) == false)
+                        {
+                            Manual.sManualDescription = DataReader.GetString(6);
+                        }
+                        else
+                        {
+                            Manual.sManualDescription = "";
+                        }
+
+                        Manual.sManufacturer = DataReader.GetString(7);
+
+                        if (true == GetTableProperties(CManualTableName,
+                                                       Manual.nManualId,
+                                                       s_ManualPropertyNameDictionary[CManualPrintEditionName],
+                                                       out PropertiesColl,
+                                                       out sErrorMessage) &&
+                            PropertiesColl.Count == 1)
+                        {
+                            Manual.sManualPrintEdition = PropertiesColl[0];
+                        }
+
+                        if (true == GetTableProperties(CManualTableName,
+                                                       Manual.nManualId,
+                                                       s_ManualPropertyNameDictionary[CManualConditionName],
+                                                       out PropertiesColl,
+                                                       out sErrorMessage) &&
+                            PropertiesColl.Count == 1)
+                        {
+                            Manual.sManualCondition = PropertiesColl[0];
+                        }
+
+                        if (true == GetTableProperties(CManualTableName,
+                                                       Manual.nManualId,
+                                                       s_ManualPropertyNameDictionary[CManualStorageBoxName],
+                                                       out PropertiesColl,
+                                                       out sErrorMessage) &&
+                            PropertiesColl.Count == 1)
+                        {
+                            Manual.sManualStorageBox = PropertiesColl[0];
+                        }
+
+                        ManualsList.Add(Manual);
                     }
-
-                    if (true == GetTableProperties(CManualTableName,
-                                                   Manual.nManualId,
-                                                   s_ManualPropertyNameDictionary[CManualConditionName],
-                                                   out PropertiesColl,
-                                                   out sErrorMessage) &&
-                        PropertiesColl.Count == 1)
-                    {
-                        Manual.sManualCondition = PropertiesColl[0];
-                    }
-
-                    if (true == GetTableProperties(CManualTableName,
-                                                   Manual.nManualId,
-                                                   s_ManualPropertyNameDictionary[CManualStorageBoxName],
-                                                   out PropertiesColl,
-                                                   out sErrorMessage) &&
-                        PropertiesColl.Count == 1)
-                    {
-                        Manual.sManualStorageBox = PropertiesColl[0];
-                    }
-
-                    ManualsList.Add(Manual);
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetManualsForGame exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4148,7 +4089,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -4181,37 +4121,27 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    Log = new DatabaseDefs.TLog();
+                    while (DataReader.Read())
+                    {
+                        Log = new DatabaseDefs.TLog();
 
-                    Log.nLogId = DataReader.GetInt32(0);
-                    Log.DateTime = DataReader.GetDateTime(1);
-                    Log.sLogType = DataReader.GetString(2);
-                    Log.sLogDescription = DataReader.GetString(3);
+                        Log.nLogId = DataReader.GetInt32(0);
+                        Log.DateTime = DataReader.GetDateTime(1);
+                        Log.sLogType = DataReader.GetString(2);
+                        Log.sLogDescription = DataReader.GetString(3);
 
-                    LogsList.Add(Log);
+                        LogsList.Add(Log);
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetLogsForGame exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4319,12 +4249,15 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGame rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
 
                 nNewGameId = -1;
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGame exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4434,10 +4367,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGame rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGame exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4464,7 +4400,6 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.Boolean bQuitDeleting = false;
             System.Collections.Generic.List<System.Int32> BoardIdsList;
-            System.Collections.IEnumerator Enum;
             System.String sTmpErrorMessage = null;
 
             sErrorMessage = "";
@@ -4489,21 +4424,19 @@ namespace Arcade
 
                 Command.Transaction = Transaction;
 
-                Enum = BoardIdsList.GetEnumerator();
-
-                while (Enum.MoveNext() && bQuitDeleting == false)
+                for (System.Int32 nIndex = 0;
+                     nIndex < BoardIdsList.Count && bQuitDeleting == false;
+                     ++nIndex)
                 {
-                    // BoardId contained within enum.current
-
                     if (false == DeleteBoardParts(Command,
-                                     (System.Int32)Enum.Current,
-                                     out sErrorMessage) ||
+                                                  BoardIdsList[nIndex],
+                                                  out sErrorMessage) ||
                         false == DeleteTable1Table2ByTable2Id(
                                      Command, CGameTableName, CBoardTableName,
-                                     (System.Int32)Enum.Current,
+                                     BoardIdsList[nIndex],
                                      out sErrorMessage) ||
                         false == DeleteNameFromTable(Command, CBoardTableName,
-                                                     (System.Int32)Enum.Current,
+                                                     BoardIdsList[nIndex],
                                                      out sErrorMessage))
                     {
                         bQuitDeleting = true;
@@ -4547,10 +4480,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGame rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGame exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4627,12 +4563,15 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameBoard rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
 
                 nNewBoardId = -1;
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameBoard exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4702,10 +4641,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameBoard rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameBoard exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4773,10 +4715,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameBoard rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameBoard exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4860,12 +4805,15 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameBoardPart rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
 
                 nNewBoardPartId = -1;
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameBoardPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -4946,10 +4894,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameBoardPart rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameBoardPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5013,10 +4964,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameBoardPart rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameBoardPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5082,10 +5036,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameManual rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameManual exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5150,10 +5107,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameManual rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameManual exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5183,7 +5143,6 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplaysList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
             System.Collections.Hashtable DisplaysHashTable = new System.Collections.Hashtable();
-            System.Collections.Specialized.StringEnumerator StringEnum;
             System.Int32 nGameDisplayId;
 
             sErrorMessage = "";
@@ -5218,15 +5177,13 @@ namespace Arcade
                                                          nGameId,
                                                          out sErrorMessage))
                 {
-                    StringEnum = DisplayColl.GetEnumerator();
-
-                    while (bDisplaysAdded == true && StringEnum.MoveNext())
+                    for (System.Int32 nIndex = 0;
+                         nIndex < DisplayColl.Count && bDisplaysAdded == true;
+                         ++nIndex)
                     {
-                        if (false == DisplaysHashTable.ContainsKey(StringEnum.Current))
+                        if (false == DisplaysHashTable.ContainsKey(DisplayColl[nIndex]))
                         {
-                            sErrorMessage = "The display \"";
-                            sErrorMessage += StringEnum.Current;
-                            sErrorMessage += "\" was not found.";
+                            sErrorMessage = System.String.Format("The display \"{0}\" was not found.", DisplayColl[nIndex]);
 
                             bDisplaysAdded = false;
                         }
@@ -5235,7 +5192,7 @@ namespace Arcade
                             false == AddTable1Table2Value(
                                          Command, CGameTableName,
                                          CDisplayTableName, nGameId,
-                                         (System.Int32)DisplaysHashTable[StringEnum.Current],
+                                         (System.Int32)DisplaysHashTable[DisplayColl[nIndex]],
                                          out nGameDisplayId,
                                          out sErrorMessage))
                         {
@@ -5268,10 +5225,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameDisplays rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameDisplays exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5341,10 +5301,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameLogEntry rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameLogEntry exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5412,10 +5375,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameLogEntry rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditGameLogEntry exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5478,10 +5444,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameLogEntry rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameLogEntry exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5506,10 +5475,10 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Boolean bQuit = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+            DatabaseDefs.TBoardPart BoardPart;
 
             GameBoardPartsList = new System.Collections.Generic.List<DatabaseDefs.TBoardPart>();
             sErrorMessage = "";
@@ -5543,71 +5512,70 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (bQuit == false && DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    DatabaseDefs.TBoardPart BoardPart = new DatabaseDefs.TBoardPart();
-
-                    BoardPart.BoardPartLocation.nBoardPartId = DataReader.GetInt32(0);
-
-                    if (DataReader.IsDBNull(1) == false)
+                    while (bQuit == false && DataReader.Read())
                     {
-                        BoardPart.BoardPartLocation.sBoardPartPosition = DataReader.GetString(1);
-                    }
-                    else
-                    {
-                        BoardPart.BoardPartLocation.sBoardPartPosition = "";
-                    }
+                        BoardPart = new DatabaseDefs.TBoardPart();
 
-                    BoardPart.BoardPartLocation.sBoardPartLocation = DataReader.GetString(2);
+                        BoardPart.BoardPartLocation.nBoardPartId = DataReader.GetInt32(0);
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        BoardPart.BoardPartLocation.sBoardPartDescription = DataReader.GetString(3);
-                    }
-                    else
-                    {
-                        BoardPart.BoardPartLocation.sBoardPartDescription = "";
-                    }
+                        if (DataReader.IsDBNull(1) == false)
+                        {
+                            BoardPart.BoardPartLocation.sBoardPartPosition = DataReader.GetString(1);
+                        }
+                        else
+                        {
+                            BoardPart.BoardPartLocation.sBoardPartPosition = "";
+                        }
 
-                    BoardPart.Part.nPartId = DataReader.GetInt32(4);
-                    BoardPart.Part.sPartName = DataReader.GetString(5);
-                    BoardPart.Part.bPartIsDefault = DataReader.GetBoolean(6);
-                    BoardPart.Part.PartDatasheetColl = new Common.Collections.StringCollection();
+                        BoardPart.BoardPartLocation.sBoardPartLocation = DataReader.GetString(2);
 
-                    if (true == GetTablePropertyValue(CPartTableName,
-                                                      BoardPart.Part.nPartId,
-                                                      CPartCategoryName,
-                                                      out BoardPart.Part.sPartCategoryName,
-                                                      out sErrorMessage) &&
-                        true == GetTablePropertyValue(CPartTableName,
-                                                      BoardPart.Part.nPartId,
-                                                      CPartTypeName,
-                                                      out BoardPart.Part.sPartTypeName,
-                                                      out sErrorMessage) &&
-                        true == GetTablePropertyValue(CPartTableName,
-                                                      BoardPart.Part.nPartId,
-                                                      CPartPackageName,
-                                                      out BoardPart.Part.sPartPackageName,
-                                                      out sErrorMessage) &&
-                        true == GetTablePropertyValues(CPartTableName,
-                                                       BoardPart.Part.nPartId,
-                                                       CPartDatasheetName,
-                                                       out BoardPart.Part.PartDatasheetColl,
-                                                       out sErrorMessage))
-                    {
-                        GameBoardPartsList.Add(BoardPart);
-                    }
-                    else
-                    {
-                        GameBoardPartsList.Clear();
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            BoardPart.BoardPartLocation.sBoardPartDescription = DataReader.GetString(3);
+                        }
+                        else
+                        {
+                            BoardPart.BoardPartLocation.sBoardPartDescription = "";
+                        }
 
-                        bQuit = true;
+                        BoardPart.Part.nPartId = DataReader.GetInt32(4);
+                        BoardPart.Part.sPartName = DataReader.GetString(5);
+                        BoardPart.Part.bPartIsDefault = DataReader.GetBoolean(6);
+                        BoardPart.Part.PartDatasheetColl = new Common.Collections.StringCollection();
+
+                        if (true == GetTablePropertyValue(CPartTableName,
+                                                          BoardPart.Part.nPartId,
+                                                          CPartCategoryName,
+                                                          out BoardPart.Part.sPartCategoryName,
+                                                          out sErrorMessage) &&
+                            true == GetTablePropertyValue(CPartTableName,
+                                                          BoardPart.Part.nPartId,
+                                                          CPartTypeName,
+                                                          out BoardPart.Part.sPartTypeName,
+                                                          out sErrorMessage) &&
+                            true == GetTablePropertyValue(CPartTableName,
+                                                          BoardPart.Part.nPartId,
+                                                          CPartPackageName,
+                                                          out BoardPart.Part.sPartPackageName,
+                                                          out sErrorMessage) &&
+                            true == GetTablePropertyValues(CPartTableName,
+                                                           BoardPart.Part.nPartId,
+                                                           CPartDatasheetName,
+                                                           out BoardPart.Part.PartDatasheetColl,
+                                                           out sErrorMessage))
+                        {
+                            GameBoardPartsList.Add(BoardPart);
+                        }
+                        else
+                        {
+                            GameBoardPartsList.Clear();
+
+                            bQuit = true;
+                        }
                     }
                 }
-
-                DataReader.Close();
 
                 if (bQuit == false)
                 {
@@ -5617,16 +5585,7 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGameBoardParts exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -5649,13 +5608,15 @@ namespace Arcade
             out System.Collections.Generic.List<DatabaseDefs.TManual> ManualsList,
             out System.String sErrorMessage)
         {
+            System.DateTime StartDateTime = System.DateTime.Now;
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             Common.Collections.StringCollection PropertiesColl;
+            DatabaseDefs.TManual Manual;
+            System.DateTime EndDateTime;
 
             ManualsList = new System.Collections.Generic.List<DatabaseDefs.TManual>();
             sErrorMessage = "";
@@ -5697,102 +5658,97 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    DatabaseDefs.TManual Manual = new DatabaseDefs.TManual();
-
-                    Manual.nManualId = DataReader.GetInt32(0);
-                    Manual.sManualName = DataReader.GetString(1);
-
-                    if (DataReader.IsDBNull(2) == false)
+                    while (DataReader.Read())
                     {
-                        Manual.sManualPartNumber = DataReader.GetString(2);
-                    }
-                    else
-                    {
-                        Manual.sManualPartNumber = "";
-                    }
+                        Manual = new DatabaseDefs.TManual();
 
-                    if (DataReader.IsDBNull(3) == false)
-                    {
-                        Manual.nManualYearPrinted = DataReader.GetInt32(3);
-                    }
-                    else
-                    {
-                        Manual.nManualYearPrinted = 0;
-                    }
+                        Manual.nManualId = DataReader.GetInt32(0);
+                        Manual.sManualName = DataReader.GetString(1);
 
-                    Manual.bManualComplete = DataReader.GetBoolean(4);
-                    Manual.bManualOriginal = DataReader.GetBoolean(5);
+                        if (DataReader.IsDBNull(2) == false)
+                        {
+                            Manual.sManualPartNumber = DataReader.GetString(2);
+                        }
+                        else
+                        {
+                            Manual.sManualPartNumber = "";
+                        }
 
-                    if (DataReader.IsDBNull(6) == false)
-                    {
-                        Manual.sManualDescription = DataReader.GetString(6);
+                        if (DataReader.IsDBNull(3) == false)
+                        {
+                            Manual.nManualYearPrinted = DataReader.GetInt32(3);
+                        }
+                        else
+                        {
+                            Manual.nManualYearPrinted = 0;
+                        }
+
+                        Manual.bManualComplete = DataReader.GetBoolean(4);
+                        Manual.bManualOriginal = DataReader.GetBoolean(5);
+
+                        if (DataReader.IsDBNull(6) == false)
+                        {
+                            Manual.sManualDescription = DataReader.GetString(6);
+                        }
+                        else
+                        {
+                            Manual.sManualDescription = "";
+                        }
+
+                        Manual.sManufacturer = DataReader.GetString(7);
+
+                        if (true == GetTableProperties(CManualTableName,
+                                                       Manual.nManualId,
+                                                       s_ManualPropertyNameDictionary[CManualPrintEditionName],
+                                                       out PropertiesColl,
+                                                       out sErrorMessage) &&
+                            PropertiesColl.Count == 1)
+                        {
+                            Manual.sManualPrintEdition = PropertiesColl[0];
+                        }
+
+                        if (true == GetTableProperties(CManualTableName,
+                                                       Manual.nManualId,
+                                                       s_ManualPropertyNameDictionary[CManualConditionName],
+                                                       out PropertiesColl,
+                                                       out sErrorMessage) &&
+                            PropertiesColl.Count == 1)
+                        {
+                            Manual.sManualCondition = PropertiesColl[0];
+                        }
+
+                        if (true == GetTableProperties(CManualTableName,
+                                                       Manual.nManualId,
+                                                       s_ManualPropertyNameDictionary[CManualStorageBoxName],
+                                                       out PropertiesColl,
+                                                       out sErrorMessage) &&
+                            PropertiesColl.Count == 1)
+                        {
+                            Manual.sManualStorageBox = PropertiesColl[0];
+                        }
+
+                        ManualsList.Add(Manual);
                     }
-                    else
-                    {
-                        Manual.sManualDescription = "";
-                    }
-
-                    Manual.sManufacturer = DataReader.GetString(7);
-
-                    if (true == GetTableProperties(CManualTableName,
-                                                   Manual.nManualId,
-                                                   s_ManualPropertyNameDictionary[CManualPrintEditionName],
-                                                   out PropertiesColl,
-                                                   out sErrorMessage) &&
-                        PropertiesColl.Count == 1)
-                    {
-                        Manual.sManualPrintEdition = PropertiesColl[0];
-                    }
-
-                    if (true == GetTableProperties(CManualTableName,
-                                                   Manual.nManualId,
-                                                   s_ManualPropertyNameDictionary[CManualConditionName],
-                                                   out PropertiesColl,
-                                                   out sErrorMessage) &&
-                        PropertiesColl.Count == 1)
-                    {
-                        Manual.sManualCondition = PropertiesColl[0];
-                    }
-
-                    if (true == GetTableProperties(CManualTableName,
-                                                   Manual.nManualId,
-                                                   s_ManualPropertyNameDictionary[CManualStorageBoxName],
-                                                   out PropertiesColl,
-                                                   out sErrorMessage) &&
-                        PropertiesColl.Count == 1)
-                    {
-                        Manual.sManualStorageBox = PropertiesColl[0];
-                    }
-
-                    ManualsList.Add(Manual);
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetManuals exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
 
             s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            EndDateTime = System.DateTime.Now;
+
+            s_DatabaseLogging.DatabaseMessage(System.String.Format("ArcadeDatabase.GetManuals took {0}",
+                                              FormatEllapsedTime(StartDateTime, EndDateTime)));
 
             return bResult;
         }
@@ -5881,10 +5837,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddManual rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddManual exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6001,10 +5960,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditManual rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditManual exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6077,10 +6039,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteManual rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteManual exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6103,10 +6068,10 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Boolean bQuit = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+            DatabaseDefs.TDisplay Display;
 
             DisplaysList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
             sErrorMessage = "";
@@ -6129,47 +6094,46 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (bQuit == false && DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    DatabaseDefs.TDisplay Display = new DatabaseDefs.TDisplay();
-
-                    Display.nDisplayId = DataReader.GetInt32(0);
-                    Display.sDisplayName = DataReader.GetString(1);
-
-                    if (true == GetTablePropertyValue(CDisplayTableName,
-                                                      Display.nDisplayId,
-                                                      CDisplayTypeName,
-                                                      out Display.sDisplayType,
-                                                      out sErrorMessage) &&
-                        true == GetTablePropertyValue(CDisplayTableName,
-                                                      Display.nDisplayId,
-                                                      CDisplayResolutionName,
-                                                      out Display.sDisplayResolution,
-                                                      out sErrorMessage) &&
-                        true == GetTablePropertyValue(CDisplayTableName,
-                                                      Display.nDisplayId,
-                                                      CDisplayColorsName,
-                                                      out Display.sDisplayColors,
-                                                      out sErrorMessage) &&
-                        true == GetTablePropertyValue(CDisplayTableName,
-                                                      Display.nDisplayId,
-                                                      CDisplayOrientationName,
-                                                      out Display.sDisplayOrientation,
-                                                      out sErrorMessage))
+                    while (bQuit == false && DataReader.Read())
                     {
-                        DisplaysList.Add(Display);
-                    }
-                    else
-                    {
-                        DisplaysList.Clear();
+                        Display = new DatabaseDefs.TDisplay();
 
-                        bQuit = true;
+                        Display.nDisplayId = DataReader.GetInt32(0);
+                        Display.sDisplayName = DataReader.GetString(1);
+
+                        if (true == GetTablePropertyValue(CDisplayTableName,
+                                                          Display.nDisplayId,
+                                                          CDisplayTypeName,
+                                                          out Display.sDisplayType,
+                                                          out sErrorMessage) &&
+                            true == GetTablePropertyValue(CDisplayTableName,
+                                                          Display.nDisplayId,
+                                                          CDisplayResolutionName,
+                                                          out Display.sDisplayResolution,
+                                                          out sErrorMessage) &&
+                            true == GetTablePropertyValue(CDisplayTableName,
+                                                          Display.nDisplayId,
+                                                          CDisplayColorsName,
+                                                          out Display.sDisplayColors,
+                                                          out sErrorMessage) &&
+                            true == GetTablePropertyValue(CDisplayTableName,
+                                                          Display.nDisplayId,
+                                                          CDisplayOrientationName,
+                                                          out Display.sDisplayOrientation,
+                                                          out sErrorMessage))
+                        {
+                            DisplaysList.Add(Display);
+                        }
+                        else
+                        {
+                            DisplaysList.Clear();
+
+                            bQuit = true;
+                        }
                     }
                 }
-
-                DataReader.Close();
 
                 if (bQuit == false)
                 {
@@ -6179,16 +6143,7 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDisplays exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6280,10 +6235,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddDisplay rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddDisplay exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6357,33 +6315,33 @@ namespace Arcade
                                               nDisplayId, sDisplayName,
                                               out sErrorMessage) &&
                     true == UpdateTableTableProperty(Command, CDisplayTableName,
-                                nDisplayId,
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Type,
-                                                 sOriginalDisplayType),
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Type,
-                                                 sDisplayType),
+                                                     nDisplayId,
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Type,
+                                                                     sOriginalDisplayType),
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Type,
+                                                                      sDisplayType),
                                 out sErrorMessage) &&
                     true == UpdateTableTableProperty(Command, CDisplayTableName,
-                                nDisplayId,
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Resolution,
-                                                 sOriginalDisplayResolution),
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Resolution,
-                                                 sDisplayResolution),
-                                out sErrorMessage) &&
+                                                     nDisplayId,
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Resolution,
+                                                                      sOriginalDisplayResolution),
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Resolution,
+                                                                      sDisplayResolution),
+                                                     out sErrorMessage) &&
                     true == UpdateTableTableProperty(Command, CDisplayTableName,
-                                nDisplayId,
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Colors,
-                                                 sOriginalDisplayColors),
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Colors,
-                                                 sDisplayColors),
-                                out sErrorMessage) &&
+                                                     nDisplayId,
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Colors,
+                                                                      sOriginalDisplayColors),
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Colors,
+                                                                      sDisplayColors),
+                                                     out sErrorMessage) &&
                     true == UpdateTableTableProperty(Command, CDisplayTableName,
-                                nDisplayId,
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Orientation,
-                                                 sOriginalDisplayOrientation),
-                                GetDisplayDataId(DatabaseDefs.EDisplayDataType.Orientation,
-                                                 sDisplayOrientation),
-                                out sErrorMessage))
+                                                     nDisplayId,
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Orientation,
+                                                                      sOriginalDisplayOrientation),
+                                                     GetDisplayDataId(DatabaseDefs.EDisplayDataType.Orientation,
+                                                                      sDisplayOrientation),
+                                                     out sErrorMessage))
                 {
                     Transaction.Commit();
 
@@ -6403,10 +6361,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditDisplay transaction rollback exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditDisplay exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6477,10 +6438,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteDisplay rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteDisplay exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6489,6 +6453,10 @@ namespace Arcade
 
             return bResult;
         }
+
+        #endregion
+
+        #region "Internal Helpers"
 
         /// <summary>
         /// Loads the database data after the database has been Initialized.
@@ -6608,7 +6576,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -6639,30 +6606,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                if (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    bExists = true;
+                    if (DataReader.Read())
+                    {
+                        bExists = true;
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DoesPartNameExist exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6715,6 +6672,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPart exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -6739,7 +6698,6 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.String sTmpErrorMessage = null;
 
@@ -6767,30 +6725,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                if (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    nNextPartId = DataReader.GetInt32(0);
+                    if (DataReader.Read())
+                    {
+                        nNextPartId = DataReader.GetInt32(0);
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetFirstAvailablePart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6814,7 +6762,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -6847,34 +6794,24 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                if (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    nDefPartId = DataReader.GetInt32(0);
+                    if (DataReader.Read())
+                    {
+                        nDefPartId = DataReader.GetInt32(0);
 
-                    bResult = true;
+                        bResult = true;
+                    }
+                    else
+                    {
+                        sErrorMessage = "No default part was found.";
+                    }
                 }
-                else
-                {
-                    sErrorMessage = "No default part was found.";
-                }
-
-                DataReader.Close();
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDefaultPart exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -6948,6 +6885,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartDatasheets exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7070,6 +7009,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartDatasheets(Command, nPartId, PartDatasheetColl, sErrorMessage) exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7117,6 +7058,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartDatasheets(Command, nPartId, sErrorMessage) exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7163,6 +7106,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartPinouts exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7207,6 +7152,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdatePartPinouts exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7254,6 +7201,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdatePart exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7298,6 +7247,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateIsDefaultPartFlag exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7362,6 +7313,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGame exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7426,6 +7379,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateGame exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7479,6 +7434,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddBoard exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7532,6 +7489,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateGameBoard exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7589,6 +7548,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameBoardPart exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7643,6 +7604,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateGameBoardPart exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7687,6 +7650,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameManual exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7766,6 +7731,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddManual exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7838,6 +7805,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateManual exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -7892,7 +7861,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -7920,30 +7888,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    BoardIdsList.Add(DataReader.GetInt32(0));
+                    while (DataReader.Read())
+                    {
+                        BoardIdsList.Add(DataReader.GetInt32(0));
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGameBoardIds exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -8040,6 +7998,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddLog exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -8090,6 +8050,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditLog exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -8130,6 +8092,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteLog exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -8160,7 +8124,6 @@ namespace Arcade
             System.String sTmpPartPackageName = "";
             System.Data.Common.DbConnection Connection = null;
             System.Data.Common.DbCommand Command = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             System.Int32 nTmpPartId;
@@ -8188,56 +8151,45 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read() && bQuit == false)
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    nTmpPartId = DataReader.GetInt32(0);
-
-                    if (false == GetTablePropertyValue(CPartTableName, nTmpPartId,
-                                                       CPartCategoryName,
-                                                       out sTmpPartCategoryName,
-                                                       out sErrorMessage) ||
-                        false == GetTablePropertyValue(CPartTableName, nTmpPartId,
-                                                       CPartTypeName,
-                                                       out sTmpPartTypeName,
-                                                       out sErrorMessage) ||
-                        false == GetTablePropertyValue(CPartTableName, nTmpPartId,
-                                                       CPartPackageName,
-                                                       out sTmpPartPackageName,
-                                                       out sErrorMessage))
+                    while (DataReader.Read() && bQuit == false)
                     {
-                        bQuit = true;
-                    }
+                        nTmpPartId = DataReader.GetInt32(0);
 
-                    if (bQuit == false &&
-                        sPartCategoryName.CompareTo(sTmpPartCategoryName) == 0 &&
-                        sPartTypeName.CompareTo(sTmpPartTypeName) == 0 &&
-                        sPartPackageName.CompareTo(sTmpPartPackageName) == 0)
-                    {
-                        nPartId = nTmpPartId;
+                        if (false == GetTablePropertyValue(CPartTableName, nTmpPartId,
+                                                           CPartCategoryName,
+                                                           out sTmpPartCategoryName,
+                                                           out sErrorMessage) ||
+                            false == GetTablePropertyValue(CPartTableName, nTmpPartId,
+                                                           CPartTypeName,
+                                                           out sTmpPartTypeName,
+                                                           out sErrorMessage) ||
+                            false == GetTablePropertyValue(CPartTableName, nTmpPartId,
+                                                           CPartPackageName,
+                                                           out sTmpPartPackageName,
+                                                           out sErrorMessage))
+                        {
+                            bQuit = true;
+                        }
 
-                        bQuit = true;
-                        bResult = true;
+                        if (bQuit == false &&
+                            sPartCategoryName.CompareTo(sTmpPartCategoryName) == 0 &&
+                            sPartTypeName.CompareTo(sTmpPartTypeName) == 0 &&
+                            sPartPackageName.CompareTo(sTmpPartPackageName) == 0)
+                        {
+                            nPartId = nTmpPartId;
+
+                            bQuit = true;
+                            bResult = true;
+                        }
                     }
                 }
-
-                DataReader.Close();
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartId exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -8262,7 +8214,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -8294,31 +8245,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                if (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    nPartPropertyId = DataReader.GetInt32(0);
+                    if (DataReader.Read())
+                    {
+                        nPartPropertyId = DataReader.GetInt32(0);
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartPropertyId exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -8361,6 +8301,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteBoardParts exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -8425,7 +8367,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -8509,30 +8450,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    PropertiesColl.Add(DataReader.GetString(0));
+                    while (DataReader.Read())
+                    {
+                        PropertiesColl.Add(DataReader.GetString(0));
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetTableProperties exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -8585,6 +8516,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTable1Table2Value exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -8642,6 +8575,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTable1Table2Value exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -8715,10 +8650,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTableProperty transaction rollback exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTableProperty exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -8788,6 +8726,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTableProperty exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -8857,10 +8797,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateTableProperty transaction rollback exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateTableProperty exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -8943,6 +8886,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateTableProperty exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9014,10 +8959,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartPropertyValue rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartPropertyValue exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -9084,7 +9032,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -9154,30 +9101,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    StringColl.Add(DataReader.GetString(0));
+                    while (DataReader.Read())
+                    {
+                        StringColl.Add(DataReader.GetString(0));
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetTablePropertyValues exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -9203,7 +9140,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -9278,31 +9214,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    StringColl.Add(DataReader.GetString(0));
+                    while (DataReader.Read())
+                    {
+                        StringColl.Add(DataReader.GetString(0));
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDataForPropertyNameAndValue exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -9372,10 +9297,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddNameToTable transaction rollback exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddNameToTable exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -9428,6 +9356,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddNameToTable exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9478,6 +9408,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTableTableProperty exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9541,6 +9473,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateTableTableProperty exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9590,6 +9524,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTableTableProperties exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9658,10 +9594,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateNameOfTable transaction rollback exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateNameOfTable exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -9716,6 +9655,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateNameOfTable exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9766,6 +9707,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTable1Table2ByTable1Id exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9844,6 +9787,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteUnusedFromTableProperty exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9895,6 +9840,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteUnusedFromTablePropertyName exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9946,6 +9893,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteUnusedFromTablePropertyValue exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -9996,6 +9945,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTable1Table2ByTable2Id exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -10065,10 +10016,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteNameFromTable rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteNameFromTable exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -10118,6 +10072,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteNameFromTable exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -10188,10 +10144,13 @@ namespace Arcade
                     {
                         Transaction.Rollback();
                     }
-                    catch (System.Data.Common.DbException)
+                    catch (System.Data.Common.DbException Exception2)
                     {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTableProperty rollback transaction exception: {0}", Exception2.Message));
                     }
                 }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTableProperty exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -10242,6 +10201,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTablePropertyName exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -10292,6 +10253,8 @@ namespace Arcade
 
             catch (System.Data.Common.DbException Exception)
             {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTablePropertyValues exception: {0}", Exception.Message));
+
                 sErrorMessage = Exception.Message;
             }
 
@@ -10315,7 +10278,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -10374,31 +10336,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    PropertyList.Add(DataReader.GetString(1), DataReader.GetInt32(0));
+                    while (DataReader.Read())
+                    {
+                        PropertyList.Add(DataReader.GetString(1), DataReader.GetInt32(0));
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("InitTablePropertyValues exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -10422,7 +10373,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -10456,31 +10406,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    DataList.Add(DataReader.GetString(1), DataReader.GetInt32(0));
+                    while (DataReader.Read())
+                    {
+                        DataList.Add(DataReader.GetString(1), DataReader.GetInt32(0));
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("InitTableDataList exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -10504,7 +10443,6 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Data.Common.DbConnection Connection = null;
-            System.Data.Common.DbDataReader DataReader = null;
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
@@ -10535,31 +10473,20 @@ namespace Arcade
 
                 Command.CommandText = sb.ToString();
 
-                DataReader = Command.ExecuteReader();
-
-                while (DataReader.Read())
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
                 {
-                    PropertyNameDictionary.Add(DataReader.GetString(1), DataReader.GetInt32(0));
+                    while (DataReader.Read())
+                    {
+                        PropertyNameDictionary.Add(DataReader.GetString(1), DataReader.GetInt32(0));
+                    }
                 }
-
-                DataReader.Close();
 
                 bResult = true;
             }
 
             catch (System.Data.Common.DbException Exception)
             {
-                if (DataReader != null)
-                {
-                    try
-                    {
-                        DataReader.Close();
-                    }
-
-                    catch (System.Data.Common.DbException)
-                    {
-                    }
-                }
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("InitTablePropertyNames exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -10584,8 +10511,29 @@ namespace Arcade
                 return -1;
             }
 
-            return (System.Int32)List.GetValueList()[nIndex];
+            return List.GetValueList()[nIndex];
         }
+
+        private static System.String FormatEllapsedTime(
+            System.DateTime StartDateTime,
+            System.DateTime EndDateTime)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            System.TimeSpan ts = EndDateTime.Subtract(StartDateTime);
+
+            if (ts.Minutes > 0)
+            {
+                sb.Append(ts.Minutes.ToString());
+                sb.Append(" minute(s), ");
+            }
+
+            sb.Append(ts.Seconds.ToString());
+            sb.Append(" second(s)");
+
+            return sb.ToString();
+        }
+
+        #endregion
     }
 }
 

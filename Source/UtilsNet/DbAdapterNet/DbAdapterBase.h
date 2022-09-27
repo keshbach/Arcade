@@ -16,9 +16,10 @@ namespace Common
         protected:
             ~DbAdapterBase();
 
-            // Common::Data::IDbAdapter interface overrides
+        // Common::Data::IDbAdapter interface overrides
         public:
             virtual System::Boolean Initialize(Microsoft::Win32::RegistryKey^ RegKey,
+                                               Common::Data::IDbLogging^ Logging,
                                                System::String^% sErrorMessage);
             virtual System::Boolean Uninitialize(System::String^% sErrorMessage);
             virtual System::Boolean GetIdentityValue(System::Data::Common::DbCommand^ Command,
@@ -73,12 +74,14 @@ namespace Common
             System::Boolean CreateConnection(System::Data::Common::DbConnection^% Connection,
                                              System::String^% sErrorMessage);
 
-            static void EmptyConnectionPool(System::Collections::Generic::List<System::Data::Common::DbConnection^>^ ConnectionList);
+             void EmptyConnectionPool(System::Collections::Generic::List<System::Data::Common::DbConnection^>^ ConnectionList);
 
             static void CopySchema(System::Collections::Generic::List<Common::Data::DbTableColumn^>^ SrcTableColumnArrayList,
                                    System::Collections::Generic::List<Common::Data::DbTableColumn^>^% DestTableColumnArrayList);
 
         private:
+            Common::Data::IDbLogging^ m_Logging;
+
             System::Threading::Mutex^ m_ConnectionPoolMutex;
             System::Threading::Mutex^ m_TableSchemaMutex;
 

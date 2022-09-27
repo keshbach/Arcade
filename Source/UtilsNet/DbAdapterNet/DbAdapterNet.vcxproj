@@ -282,6 +282,7 @@
   <ItemGroup>
     <ClInclude Include="DbAdapterBase.h" />
     <ClInclude Include="IDbAdapter.h" />
+    <ClInclude Include="IDbLogging.h" />
     <ClInclude Include="IDbProvider.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />

@@ -6,7 +6,8 @@ using System;
 
 namespace Arcade.Forms
 {
-    public partial class MainForm : Common.Forms.MainForm
+    public partial class MainForm : Common.Forms.MainForm,
+                                    Arcade.IArcadeDatabaseLogging
     {
         #region "Constants"
         private const string CEndOfLine = "\r\n";
@@ -78,6 +79,18 @@ namespace Arcade.Forms
         }
         #endregion
 
+        #region "Arcade.IArcadeDatabaseLogging"
+        public void ArcadeDatabaseMessage(System.String sMessage)
+        {
+            Common.Debug.Thread.IsWorkerThread();
+
+            RunOnUIThreadWait(() =>
+            {
+                LogMessage(sMessage);
+            });
+        }
+        #endregion
+
         #region "MainForm Event Handlers"
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -102,8 +115,6 @@ namespace Arcade.Forms
 
         private void MainForm_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
         {
-            System.String sErrorMessage;
-
             e.Cancel = !m_bAllowClose;
 
             if (!m_bAllowClose)
@@ -113,21 +124,12 @@ namespace Arcade.Forms
 
             if (m_State == State.Running)
             {
-                UpdateState(State.Uninitializing);
+                e.Cancel = true;
 
-                if (Database.Uninit(out sErrorMessage))
+                Common.Threading.Thread.RunWorkerThread(() =>
                 {
-                    UpdateState(State.UninitializatedSuccess);
-                }
-                else
-                {
-                    UpdateState(State.UninitializatedFailed);
-
-                    LogMessage("An error occurred during the uninitialization of the database.");
-                    LogMessage(sErrorMessage);
-
-                    e.Cancel = true;
-                }
+                    UninitDatabase();
+                }, "Main Form Uninitialize Database Thread");
             }
         }
 
@@ -685,7 +687,7 @@ namespace Arcade.Forms
                     break;
             }
 
-            if (Database.Init(DatabaseAdapter, m_sDatabaseRegistryKey, out bDatabaseAvailable, out sErrorMessage))
+            if (Database.Init(DatabaseAdapter, m_sDatabaseRegistryKey, this, out bDatabaseAvailable, out sErrorMessage))
             {
                 if (bDatabaseAvailable)
                 {
@@ -718,8 +720,44 @@ namespace Arcade.Forms
             }
         }
 
+        private void UninitDatabase()
+        {
+            System.String sErrorMessage;
+            System.Boolean bError;
+    
+            Common.Debug.Thread.IsWorkerThread();
+
+            RunOnUIThreadWait(() =>
+            {
+                UpdateState(State.Uninitializing);
+
+                LogMessage("Uninitializing the database.");
+            });
+
+            bError = Database.Uninit(out sErrorMessage);
+
+            RunOnUIThreadNoWait(() =>
+            {
+                if (bError)
+                {
+                    UpdateState(State.UninitializatedSuccess);
+
+                    this.Close();
+                }
+                else
+                {
+                    UpdateState(State.UninitializatedFailed);
+
+                    LogMessage("An error occurred during the uninitialization of the database.");
+                    LogMessage(sErrorMessage);
+                }
+            });
+        }
+
         private void InitImageLists()
         {
+            Common.Debug.Thread.IsUIThread();
+
             if (s_bInitializeImages)
             {
                 Common.Forms.ImageManager.AddToolbarSmallImages(Arcade.Forms.Resources.Resources.ResourceManager);

@@ -84,7 +84,9 @@
     <Compile Include="ArcadeDatabase.cs" />
     <Compile Include="ArcadeDatabaseDefs.cs" />
     <Compile Include="BoardComparer.cs" />
+    <Compile Include="DatabaseLogging.cs" />
     <Compile Include="GameComparer.cs" />
+    <Compile Include="IArcadeDatabaseLogging.cs" />
     <Compile Include="PartComparer.cs" />
     <Compile Include="PosAndLocComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

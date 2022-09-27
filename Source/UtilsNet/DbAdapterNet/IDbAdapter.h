@@ -23,6 +23,7 @@ namespace Common
             /// <returns></returns>
 
             virtual System::Boolean Initialize(Microsoft::Win32::RegistryKey^ RegKey,
+                                               Common::Data::IDbLogging^ Logging,
                                                System::String^% sErrorMessage);
 
             /// <summary>
