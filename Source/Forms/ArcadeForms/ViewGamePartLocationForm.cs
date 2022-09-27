@@ -90,7 +90,7 @@ namespace Arcade.Forms
         #region "Internal Helpers"
         private void RefreshGames()
         {
-            System.Boolean bIncludeAllParts = (checkBoxIncludeAllParts.CheckState == CheckState.Unchecked);
+            System.Boolean bIncludeAllParts = (checkBoxIncludeAllParts.CheckState == CheckState.Checked);
             System.Collections.Generic.List<DatabaseDefs.TGame> GamesList;
             System.Boolean bResult;
             System.String sErrorMessage;
