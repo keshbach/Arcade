@@ -217,6 +217,7 @@ namespace Arcade.Forms
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Board Parts...";
+            this.Load += new System.EventHandler(this.BoardPartDetailsForm_Load);
             this.Shown += new System.EventHandler(this.BoardPartDetailsForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();

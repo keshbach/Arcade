@@ -12,6 +12,13 @@ namespace Arcade.Forms
     /// </summary>
     public partial class BoardPartDetailsForm : Arcade.Forms.Form
     {
+        #region "Constants"
+        private const System.String CAscendingSortName = "Ascending";
+        private const System.String CGroupSortName = "Group";
+        private const System.String CSequentialSortName = "Sequential";
+        private const System.String CGroupSequentialSortName = "Group Sequential";
+        #endregion
+
         #region "Member Variables"
         private System.Int32 m_nBoardId = -1;
 
@@ -59,7 +66,7 @@ namespace Arcade.Forms
 
             foreach (System.String sLabel in m_LabelSortOrderDict.Keys)
             {
-                if (sLabel == "Group Sequential")
+                if (sLabel == CGroupSequentialSortName)
                 {
                     return nIndex;
                 }
@@ -72,6 +79,18 @@ namespace Arcade.Forms
         #endregion
 
         #region "Board Part Details Event Handlers"
+        private void BoardPartDetailsForm_Load(object sender, EventArgs e)
+        {
+            comboBoxSorting.BeginUpdate();
+
+            foreach (System.String sLabel in m_LabelSortOrderDict.Keys)
+            {
+                comboBoxSorting.Items.Add(sLabel);
+            }
+
+            comboBoxSorting.EndUpdate();
+        }
+
         private void BoardPartDetailsForm_Shown(object sender, EventArgs e)
         {
             this.BusyControlVisible = true;
@@ -381,10 +400,10 @@ namespace Arcade.Forms
         {
             Common.Debug.Thread.IsUIThread();
 
-            m_LabelSortOrderDict["Ascending"] = Common.Forms.ListView.ESortOrder.Ascending;
-            m_LabelSortOrderDict["Group"] = Common.Forms.ListView.ESortOrder.Group;
-            m_LabelSortOrderDict["Sequential"] = Common.Forms.ListView.ESortOrder.Sequential;
-            m_LabelSortOrderDict["Group Sequential"] = Common.Forms.ListView.ESortOrder.GroupSequential;
+            m_LabelSortOrderDict[CAscendingSortName] = Common.Forms.ListView.ESortOrder.Ascending;
+            m_LabelSortOrderDict[CGroupSortName] = Common.Forms.ListView.ESortOrder.Group;
+            m_LabelSortOrderDict[CSequentialSortName] = Common.Forms.ListView.ESortOrder.Sequential;
+            m_LabelSortOrderDict[CGroupSequentialSortName] = Common.Forms.ListView.ESortOrder.GroupSequential;
         }
 
         private void InitializeControls()
@@ -402,15 +421,6 @@ namespace Arcade.Forms
 
             RunOnUIThreadWait(() =>
             {
-                comboBoxSorting.BeginUpdate();
-
-                foreach (System.String sLabel in m_LabelSortOrderDict.Keys)
-                {
-                    comboBoxSorting.Items.Add(sLabel);
-                }
-
-                comboBoxSorting.EndUpdate();
-
                 if (bResult)
                 {
                     listViewBoardParts.BeginUpdate();
