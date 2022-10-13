@@ -33,7 +33,7 @@
             this.labelType = new System.Windows.Forms.Label();
             this.comboBoxType = new Common.Forms.ComboBox();
             this.labelDate = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.labelDescription = new System.Windows.Forms.Label();
             this.textBoxDescription = new Common.Forms.TextBox();
             this.dateTimePickerLog = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
@@ -89,14 +89,14 @@
             this.labelDate.TabIndex = 0;
             this.labelDate.Text = "&Date:";
             // 
-            // label3
+            // labelDescription
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 74);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(63, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "D&escription:";
+            this.labelDescription.AutoSize = true;
+            this.labelDescription.Location = new System.Drawing.Point(12, 74);
+            this.labelDescription.Name = "labelDescription";
+            this.labelDescription.Size = new System.Drawing.Size(63, 13);
+            this.labelDescription.TabIndex = 4;
+            this.labelDescription.Text = "D&escription:";
             // 
             // textBoxDescription
             // 
@@ -130,7 +130,7 @@
             this.ClientSize = new System.Drawing.Size(484, 262);
             this.Controls.Add(this.dateTimePickerLog);
             this.Controls.Add(this.textBoxDescription);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.labelDescription);
             this.Controls.Add(this.labelDate);
             this.Controls.Add(this.comboBoxType);
             this.Controls.Add(this.labelType);
@@ -157,7 +157,7 @@
         private System.Windows.Forms.Label labelType;
         private Common.Forms.ComboBox comboBoxType;
         private System.Windows.Forms.Label labelDate;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label labelDescription;
         private Common.Forms.TextBox textBoxDescription;
         private System.Windows.Forms.DateTimePicker dateTimePickerLog;
     }
