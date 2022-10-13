@@ -25,6 +25,7 @@ namespace Arcade.Forms
 
         #region "Member Variables"
         private EPartEntryFormType m_PartEntryFormType = EPartEntryFormType.AddPartName;
+        private System.Int32 m_nPartId = -1;
         private System.String m_sPartName = "";
         private System.String m_sPartCategoryName = "";
         private System.String m_sPartTypeName = "";
@@ -53,6 +54,18 @@ namespace Arcade.Forms
             set
             {
                 m_PartEntryFormType = value;
+            }
+        }
+
+        public System.Int32 PartId
+        {
+            get
+            {
+                return m_nPartId;
+            }
+            set
+            {
+                m_nPartId = value;
             }
         }
 
@@ -452,6 +465,7 @@ namespace Arcade.Forms
         private void InitializeControls()
         {
             DatabaseDefs.TPartLens PartLens;
+            System.Boolean bPartMaxLensResult;
 
             Common.Debug.Thread.IsWorkerThread();
 
@@ -461,6 +475,8 @@ namespace Arcade.Forms
                                          out m_PartTypeList);
             Database.GetPartCategoryList(DatabaseDefs.EPartDataType.Package,
                                          out m_PartPackageList);
+
+            bPartMaxLensResult = Database.GetPartMaxLens(out PartLens);
 
             RunOnUIThreadWait(() =>
             {
@@ -560,7 +576,7 @@ namespace Arcade.Forms
                     buttonOK.Enabled = false;
                 }
 
-                if (Database.GetPartMaxLens(out PartLens))
+                if (bPartMaxLensResult)
                 {
                     textBoxName.MaxLength = PartLens.nPartNameLen;
                     textBoxPartPinouts.MaxLength = PartLens.nPartPinoutsLen;
