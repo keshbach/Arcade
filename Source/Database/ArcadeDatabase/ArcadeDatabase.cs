@@ -37,6 +37,7 @@ namespace Arcade
         private static System.String CBoardPartLocationTableName = "BoardPartLocation";
         private static System.String CLogTypeTableName = "LogType";
         private static System.String CLogTableName = "Log";
+        private static System.String CInventoryTableName = "Inventory";
 
         // Column names
         private const System.String CNameColumnName = "Name";
@@ -193,6 +194,8 @@ namespace Arcade
             System.String sTmpErrorMessage;
             System.DateTime EndDateTime;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             bDatabaseAvailable = false;
             sErrorMessage = "";
 
@@ -299,6 +302,8 @@ namespace Arcade
         {
             System.Boolean bResult = true;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             if (s_bInitialized == true)
@@ -404,6 +409,8 @@ namespace Arcade
             System.Int32 nTableTotal = 0;
             System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             PartLens = new DatabaseDefs.TPartLens();
 
             if (s_DbAdapter.GetTableSchema(CPartTableName,
@@ -476,6 +483,8 @@ namespace Arcade
             System.String sErrorMessage = "";
             System.Int32 nTableTotal = 0;
             System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             GameLens = new DatabaseDefs.TGameLens();
 
@@ -560,6 +569,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             BoardLens = new DatabaseDefs.TBoardLens();
 
             if (s_DbAdapter.GetTableSchema(CBoardTableName,
@@ -616,6 +627,8 @@ namespace Arcade
             System.String sErrorMessage = "";
             System.Int32 nTableTotal = 0;
             System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             BoardPartLocationLens = new DatabaseDefs.TBoardPartLocationLens();
 
@@ -674,6 +687,8 @@ namespace Arcade
             System.String sErrorMessage = "";
             System.Int32 nTableTotal = 0;
             System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             ManualLens = new DatabaseDefs.TManualLens();
 
@@ -753,6 +768,8 @@ namespace Arcade
             System.Int32 nTableTotal = 0;
             System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             DisplayLens = new DatabaseDefs.TDisplayLens();
 
             if (s_DbAdapter.GetTableSchema(CDisplayTableName,
@@ -809,6 +826,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             LogLens = new DatabaseDefs.TLogLens();
 
             if (s_DbAdapter.GetTableSchema(CLogTypeTableName,
@@ -847,6 +866,44 @@ namespace Arcade
         }
 
         /// <summary>
+        /// Retrieves the maximum length of the strings in a inventory.
+        /// <param name="InventoryLens">
+        /// On return will contain the maximum lengths.
+        /// </param>
+        /// </summary>
+
+        public static System.Boolean GetInventoryMaxLens(
+            out DatabaseDefs.TInventoryLens InventoryLens)
+        {
+            System.String sErrorMessage = "";
+            System.Boolean bResult = false;
+            System.Collections.Generic.List<Common.Data.DbTableColumn> TableColumnList = new System.Collections.Generic.List<Common.Data.DbTableColumn>();
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            InventoryLens = new DatabaseDefs.TInventoryLens();
+
+            if (s_DbAdapter.GetTableSchema(CInventoryTableName,
+                                           ref TableColumnList,
+                                           ref sErrorMessage))
+            {
+                foreach (Common.Data.DbTableColumn TableColumn in TableColumnList)
+                {
+                    switch (TableColumn.ColumnName)
+                    {
+                        case CDescriptionColumnName:
+                            InventoryLens.nInventoryDescriptionLen = TableColumn.ColumnLength;
+                            break;
+                    }
+                }
+
+                bResult = true;
+            }
+
+            return bResult;
+        }
+
+        /// <summary>
         /// Retrieves all of the available manufacturers.
         /// <param name="ManufacturerList">
         /// List of the manufacturers.
@@ -856,6 +913,8 @@ namespace Arcade
         public static System.Boolean GetManufacturerList(
             out Common.Collections.StringSortedList<System.Int32> ManufacturerList)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             ManufacturerList = new Common.Collections.StringSortedList<System.Int32>();
 
             s_ManufacturerMutex.WaitOne();
@@ -877,6 +936,8 @@ namespace Arcade
         public static System.Boolean GetBoardTypeList(
             out Common.Collections.StringSortedList<System.Int32> BoardTypeList)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             s_BoardTypeMutex.WaitOne();
 
             BoardTypeList = s_BoardTypeList.MakeCopy();
@@ -896,6 +957,8 @@ namespace Arcade
         public static System.Boolean GetBoardPartLocationList(
             out Common.Collections.StringSortedList<System.Int32> BoardPartLocationList)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             s_BoardPartLocationMutex.WaitOne();
 
             BoardPartLocationList = s_BoardPartLocationList.MakeCopy();
@@ -915,6 +978,8 @@ namespace Arcade
         public static System.Boolean GetLogTypeList(
             out Common.Collections.StringSortedList<System.Int32> LogTypeList)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             s_LogTypeMutex.WaitOne();
 
             LogTypeList = s_LogTypeList.MakeCopy();
@@ -936,6 +1001,8 @@ namespace Arcade
             out Common.Collections.StringSortedList<System.Int32> GameDataList)
         {
             System.Int32 nIndex = (System.Int32)GameDataType;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_GameDataMutex[nIndex].WaitOne();
 
@@ -959,6 +1026,8 @@ namespace Arcade
         {
             System.Int32 nIndex = (System.Int32)PartDataType;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_PartDataMutex[nIndex].WaitOne();
 
             PartDataList = s_PartDataList[nIndex].MakeCopy();
@@ -980,6 +1049,8 @@ namespace Arcade
             out Common.Collections.StringSortedList<System.Int32> DisplayDataList)
         {
             System.Int32 nIndex = (System.Int32)DisplayDataType;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_DisplayDataMutex[nIndex].WaitOne();
 
@@ -1003,6 +1074,8 @@ namespace Arcade
         {
             System.Int32 nIndex = (System.Int32)ManualDataType;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_ManualDataMutex[nIndex].WaitOne();
 
             ManualDataList = s_ManualDataList[nIndex].MakeCopy();
@@ -1025,6 +1098,8 @@ namespace Arcade
             out System.Collections.Specialized.StringCollection GameColl,
             out System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             return GetDataForPropertyNameAndValue(
                        CPartTableName, nCategoryNameId, sCategoryValue,
                        out GameColl, out sErrorMessage);
@@ -1043,6 +1118,8 @@ namespace Arcade
             out System.Collections.Specialized.StringCollection GameColl,
             out System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             return GetDataForPropertyNameAndValue(
                        CGameTableName, nCategoryNameId, sCategoryValue,
                        out GameColl, out sErrorMessage);
@@ -1061,6 +1138,8 @@ namespace Arcade
             out System.Collections.Specialized.StringCollection GameColl,
             out System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             return GetDataForPropertyNameAndValue(
                        CManualTableName, nCategoryNameId, sCategoryValue,
                        out GameColl, out sErrorMessage);
@@ -1074,6 +1153,8 @@ namespace Arcade
             System.String sManufacturer)
         {
             System.Int32 nResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_ManufacturerMutex.WaitOne();
 
@@ -1093,6 +1174,8 @@ namespace Arcade
         {
             System.Int32 nResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_BoardTypeMutex.WaitOne();
 
             nResult = GetListDataId(sBoardType, s_BoardTypeList);
@@ -1109,6 +1192,8 @@ namespace Arcade
         public static System.Int32 GetBoardPartLocationId(
             System.String sBoardPartLocation)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             System.Int32 nResult;
 
             s_BoardPartLocationMutex.WaitOne();
@@ -1128,6 +1213,8 @@ namespace Arcade
             System.String sLogType)
         {
             System.Int32 nResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_LogTypeMutex.WaitOne();
 
@@ -1149,6 +1236,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)GameDataType;
             System.Int32 nResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_GameDataMutex[nIndex].WaitOne();
 
             nResult = GetListDataId(sGameData, s_GameDataList[nIndex]);
@@ -1168,6 +1257,8 @@ namespace Arcade
         {
             System.Int32 nIndex = (System.Int32)PartDataType;
             System.Int32 nResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_PartDataMutex[nIndex].WaitOne();
 
@@ -1190,6 +1281,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)ManualDataType;
             System.Int32 nResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_ManualDataMutex[nIndex].WaitOne();
 
             nResult = GetListDataId(sManualData,
@@ -1211,6 +1304,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)DisplayDataType;
             System.Int32 nResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_DisplayDataMutex[nIndex].WaitOne();
 
             nResult = GetListDataId(sDisplayData,
@@ -1230,6 +1325,8 @@ namespace Arcade
         {
             System.Int32 nIndex = (System.Int32)GameDataType;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             return s_GamePropertyDupsAllowed[nIndex];
         }
 
@@ -1239,6 +1336,8 @@ namespace Arcade
 
         public static System.Boolean GetGameDisplayDupsAllowed()
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             return true;
         }
 
@@ -1259,6 +1358,8 @@ namespace Arcade
             System.String sPropertyName = s_PartDataName[nIndex];            
             System.Boolean bResult;
             System.Text.StringBuilder sb;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_PartDataMutex[nIndex].WaitOne();
 
@@ -1304,6 +1405,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)PartDataType;
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_PartDataMutex[nIndex].WaitOne();
 
             bResult = UpdateTableProperty(CPartTableName, nPartDataId,
@@ -1331,6 +1434,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)PartDataType;
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_PartDataMutex[nIndex].WaitOne();
 
             bResult = DeletePartPropertyValue(nPartDataId,
@@ -1355,6 +1460,8 @@ namespace Arcade
             out System.String sErrorMessage)
         {
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_BoardTypeMutex.WaitOne();
 
@@ -1383,6 +1490,8 @@ namespace Arcade
         {
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_BoardTypeMutex.WaitOne();
 
             bResult = UpdateNameOfTable(CBoardTypeTableName,
@@ -1407,6 +1516,8 @@ namespace Arcade
             out System.String sErrorMessage)
         {
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_BoardTypeMutex.WaitOne();
 
@@ -1433,6 +1544,8 @@ namespace Arcade
             out System.String sErrorMessage)
         {
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_BoardPartLocationMutex.WaitOne();
 
@@ -1461,6 +1574,8 @@ namespace Arcade
         {
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_BoardPartLocationMutex.WaitOne();
 
             bResult = UpdateNameOfTable(CBoardPartLocationTableName,
@@ -1487,6 +1602,8 @@ namespace Arcade
         {
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_BoardPartLocationMutex.WaitOne();
 
             bResult = DeleteNameFromTable(CBoardPartLocationTableName,
@@ -1512,6 +1629,8 @@ namespace Arcade
             out System.String sErrorMessage)
         {
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_LogTypeMutex.WaitOne();
 
@@ -1540,6 +1659,8 @@ namespace Arcade
         {
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_LogTypeMutex.WaitOne();
 
             bResult = UpdateNameOfTable(CLogTypeTableName,
@@ -1565,6 +1686,8 @@ namespace Arcade
             out System.String sErrorMessage)
         {
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_LogTypeMutex.WaitOne();
 
@@ -1595,6 +1718,8 @@ namespace Arcade
             System.String sPropertyName = s_GameDataName[nIndex];
             System.Boolean bResult;
             System.Text.StringBuilder sb;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_GameDataMutex[nIndex].WaitOne();
 
@@ -1640,6 +1765,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)GameDataType;
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_GameDataMutex[nIndex].WaitOne();
 
             bResult = UpdateTableProperty(CGameTableName, nGameDataId,
@@ -1666,6 +1793,8 @@ namespace Arcade
         {
             System.Int32 nIndex = (System.Int32)GameDataType;
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_GameDataMutex[nIndex].WaitOne();
 
@@ -1695,6 +1824,8 @@ namespace Arcade
             System.String sPropertyName = s_ManualDataName[nIndex];
             System.Boolean bResult;
             System.Text.StringBuilder sb;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_ManualDataMutex[nIndex].WaitOne();
 
@@ -1737,9 +1868,10 @@ namespace Arcade
             System.String sManualDataName,
             out System.String sErrorMessage)
         {
-
             System.Int32 nIndex = (System.Int32)ManualDataType;
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_ManualDataMutex[nIndex].WaitOne();
 
@@ -1767,6 +1899,8 @@ namespace Arcade
         {
             System.Int32 nIndex = (System.Int32)ManualDataType;
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_ManualDataMutex[nIndex].WaitOne();
 
@@ -1797,6 +1931,8 @@ namespace Arcade
             System.String sPropertyName = s_DisplayDataName[nIndex];
             System.Boolean bResult;
             System.Text.StringBuilder sb;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_DisplayDataMutex[nIndex].WaitOne();
 
@@ -1842,6 +1978,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)DisplayDataType;
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_DisplayDataMutex[nIndex].WaitOne();
 
             bResult = UpdateTableProperty(CDisplayTableName, nDisplayDataId,
@@ -1869,6 +2007,8 @@ namespace Arcade
             System.Int32 nIndex = (System.Int32)DisplayDataType;
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_DisplayDataMutex[nIndex].WaitOne();
 
             bResult = DeleteTableProperty(CDisplayTableName, nDisplayDataId,
@@ -1893,6 +2033,8 @@ namespace Arcade
             out System.String sErrorMessage)
         {
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_ManufacturerMutex.WaitOne();
 
@@ -1921,6 +2063,8 @@ namespace Arcade
         {
             System.Boolean bResult;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             s_ManufacturerMutex.WaitOne();
 
             bResult = UpdateNameOfTable(CManufacturerTableName,
@@ -1946,6 +2090,8 @@ namespace Arcade
             out System.String sErrorMessage)
         {
             System.Boolean bResult;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             s_ManufacturerMutex.WaitOne();
 
@@ -1973,6 +2119,8 @@ namespace Arcade
             ref System.String sPartPackageName,
             ref System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             sPartCategoryName = "";
             sPartTypeName = "";
             sPartPackageName = "";
@@ -2018,6 +2166,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             System.DateTime EndDateTime;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             PartList = new System.Collections.Generic.List<DatabaseDefs.TPart>();
             sErrorMessage = "";
@@ -2088,7 +2238,10 @@ namespace Arcade
                                                             Part.nPartId,
                                                             CPartDatasheetName,
                                                             out Part.PartDatasheetColl,
-                                                            out sErrorMessage))
+                                                            out sErrorMessage) ||
+                            false == GetPartInventoryTotal(Part.nPartId,
+                                                           out Part.nPartTotalInventory,
+                                                           out sErrorMessage))
                         {
                             s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
 
@@ -2143,6 +2296,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             System.DateTime EndDateTime;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             PartList = new System.Collections.Generic.List<DatabaseDefs.TPart>();
             sErrorMessage = "";
@@ -2205,7 +2360,10 @@ namespace Arcade
                                                             Part.nPartId,
                                                             CPartDatasheetName,
                                                             out Part.PartDatasheetColl,
-                                                            out sErrorMessage))
+                                                            out sErrorMessage) ||
+                            false == GetPartInventoryTotal(Part.nPartId,
+                                                           out Part.nPartTotalInventory,
+                                                           out sErrorMessage))
                         {
                             s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
 
@@ -2258,6 +2416,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TPart Part;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             PartList = new System.Collections.Generic.List<DatabaseDefs.TPart>();
             sErrorMessage = "";
@@ -2321,6 +2481,10 @@ namespace Arcade
                                                out Part.PartDatasheetColl,
                                                out sErrorMessage);
 
+                        GetPartInventoryTotal(Part.nPartId,
+                                              out Part.nPartTotalInventory,
+                                              out sTmpErrorMessage);
+
                         PartList.Add(Part);
                     }
                 }
@@ -2358,6 +2522,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nPartPinoutsId = -1;
             sPartPinouts = "";
@@ -2442,6 +2608,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.Int32 nNewPartPinoutsId = -1;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewPartId = -1;
             sErrorMessage = "";
@@ -2542,6 +2710,8 @@ namespace Arcade
             System.String sPartType;
             System.String sPartPinouts;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewPartId = -1;
             sErrorMessage = "";
@@ -2664,6 +2834,8 @@ namespace Arcade
             System.Int32 nPartPinoutsId, nDefPartId;
             System.String sTmpPinouts, sOriginalPartCategory;
             System.String sOriginalPartType, sOriginalPartPackage;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -2809,6 +2981,8 @@ namespace Arcade
             System.String sPartPinouts;
             System.Int32 nPartPinoutsId, nDefPartId, nNextPartId;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewDefPartId = -1;
             sErrorMessage = "";
 
@@ -2838,6 +3012,8 @@ namespace Arcade
 
                 if (true == DeletePartDatasheets(Command, nPartId,
                                                  out sErrorMessage) &&
+                    true == DeletePartInventories(Command, nPartId,
+                                                  out sErrorMessage) &&
                     true == DeleteTableTableProperties(Command, CPartTableName,
                                                        nPartId,
                                                        out sErrorMessage) &&
@@ -2937,6 +3113,8 @@ namespace Arcade
             DatabaseDefs.TGame Game;
             System.String sTmpErrorMessage = null;
             System.DateTime EndDateTime;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             GamesList = new System.Collections.Generic.List<DatabaseDefs.TGame>();
             sErrorMessage = "";
@@ -3066,6 +3244,8 @@ namespace Arcade
             System.Collections.Generic.List<DatabaseDefs.TGame> TmpGamesList;
             System.DateTime EndDateTime;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             GamesList = new System.Collections.Generic.List<DatabaseDefs.TGame>();
             sErrorMessage = "";
 
@@ -3128,6 +3308,8 @@ namespace Arcade
             Common.Collections.StringCollection CocktailColl;
             DatabaseDefs.TGame Game;
             System.DateTime EndDateTime;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             GamesList = new System.Collections.Generic.List<DatabaseDefs.TGame>();
             sErrorMessage = "";
@@ -3316,6 +3498,8 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TDisplay Display;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             DisplaysList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
             sErrorMessage = "";
 
@@ -3410,6 +3594,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TBoard Board;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             BoardsList = new System.Collections.Generic.List<DatabaseDefs.TBoard>();
             sErrorMessage = "";
@@ -3516,6 +3702,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TBoard Board;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             BoardsList = new System.Collections.Generic.List<DatabaseDefs.TBoard>();
             sErrorMessage = "";
@@ -3625,6 +3813,8 @@ namespace Arcade
             System.Collections.Generic.List<DatabaseDefs.TBoard> TmpBoardsList;
             System.DateTime EndDateTime;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             BoardsList = new System.Collections.Generic.List<DatabaseDefs.TBoard>();
             sErrorMessage = "";
 
@@ -3684,6 +3874,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TBoardPartLocation Location;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             LocationsList = new System.Collections.Generic.List<DatabaseDefs.TBoardPartLocation>();
             sErrorMessage = "";
@@ -3779,6 +3971,8 @@ namespace Arcade
             System.Collections.Generic.List<DatabaseDefs.TPart> TmpPartList;
             System.Collections.Generic.List<DatabaseDefs.TBoardPartLocation> TmpLocationsList;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             LocationsList = new System.Collections.Generic.List<DatabaseDefs.TBoardPartLocation>();
             sErrorMessage = "";
 
@@ -3829,6 +4023,8 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TBoard Board;
             System.Collections.Generic.List<DatabaseDefs.TBoard> BoardList;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             GameBoardListDict = new System.Collections.Generic.Dictionary<System.String, System.Collections.Generic.List<DatabaseDefs.TBoard>>();
             sErrorMessage = "";
@@ -3951,6 +4147,8 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             Common.Collections.StringCollection PropertiesColl;
             DatabaseDefs.TManual Manual;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             ManualsList = new System.Collections.Generic.List<DatabaseDefs.TManual>();
             sErrorMessage = "";
@@ -4094,6 +4292,8 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TLog Log;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             LogsList = new System.Collections.Generic.List<DatabaseDefs.TLog>();
             sErrorMessage = "";
 
@@ -4179,6 +4379,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewGameId = -1;
             sErrorMessage = "";
@@ -4296,6 +4498,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             if (!AreGamePropertyDupsValid(GameAudioColl, GameVideoColl,
@@ -4401,6 +4605,8 @@ namespace Arcade
             System.Boolean bQuitDeleting = false;
             System.Collections.Generic.List<System.Int32> BoardIdsList;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -4518,6 +4724,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewBoardId = -1;
             sErrorMessage = "";
 
@@ -4602,6 +4810,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -4673,6 +4883,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -4756,6 +4968,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewBoardPartId = -1;
             nPartId = -1;
@@ -4848,6 +5062,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nPartId = -1;
             sErrorMessage = "";
 
@@ -4927,6 +5143,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -4997,6 +5215,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -5069,6 +5289,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -5144,6 +5366,8 @@ namespace Arcade
             System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplaysList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
             System.Collections.Hashtable DisplaysHashTable = new System.Collections.Hashtable();
             System.Int32 nGameDisplayId;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -5262,6 +5486,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nLogId = -1;
             sErrorMessage = "";
 
@@ -5337,6 +5563,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -5407,6 +5635,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -5479,6 +5709,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TBoardPart BoardPart;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             GameBoardPartsList = new System.Collections.Generic.List<DatabaseDefs.TBoardPart>();
             sErrorMessage = "";
@@ -5617,6 +5849,8 @@ namespace Arcade
             Common.Collections.StringCollection PropertiesColl;
             DatabaseDefs.TManual Manual;
             System.DateTime EndDateTime;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             ManualsList = new System.Collections.Generic.List<DatabaseDefs.TManual>();
             sErrorMessage = "";
@@ -5780,6 +6014,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewManualId = -1;
             sErrorMessage = "";
 
@@ -5881,6 +6117,8 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             System.String sOriginalManualStorageBox, sOriginalManualPrintEdition;
             System.String sOriginalManualCondition;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -5993,6 +6231,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -6072,6 +6312,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             DatabaseDefs.TDisplay Display;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             DisplaysList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
             sErrorMessage = "";
@@ -6175,6 +6417,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewDisplayId = -1;
             sErrorMessage = "";
 
@@ -6274,6 +6518,8 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             System.String sOriginalDisplayType, sOriginalDisplayResolution;
             System.String sOriginalDisplayColors, sOriginalDisplayOrientation;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -6394,6 +6640,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -6454,6 +6702,324 @@ namespace Arcade
             return bResult;
         }
 
+        /// <summary>
+        /// Finds the inventory total for the given part.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        public static System.Boolean GetInventoryTotalForPart(
+            System.Int32 nPartId,
+            out System.Int32 nInventoryTotal,
+            out System.String sErrorMessage)
+        {
+            Common.Debug.Thread.IsWorkerThread();
+
+            return GetPartInventoryTotal(nPartId, out nInventoryTotal, out sErrorMessage);
+        }
+
+        /// <summary>
+        /// Finds the inventory for the given part.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        public static System.Boolean GetInventoryForPart(
+            System.Int32 nPartId,
+            out System.Collections.Generic.List<DatabaseDefs.TInventory> InventoryList,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Data.Common.DbConnection Connection = null;
+            System.Data.Common.DbCommand Command;
+            System.Text.StringBuilder sb;
+            System.String sTmpErrorMessage = null;
+            DatabaseDefs.TInventory Inventory;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            InventoryList = new System.Collections.Generic.List<DatabaseDefs.TInventory>();
+            sErrorMessage = "";
+
+            try
+            {
+                if (!s_DbAdapter.AllocConnection(ref Connection,
+                                                 ref sErrorMessage))
+                {
+                    return false;
+                }
+
+                Command = Connection.CreateCommand();
+
+                sb = new System.Text.StringBuilder();
+
+                sb.Append("SELECT Inventory.InventoryID, ");
+                sb.Append("       Inventory.DateTime, ");
+                sb.Append("       Inventory.Count, ");
+                sb.Append("       Inventory.Description ");
+                sb.Append("FROM Inventory ");
+                sb.Append("INNER JOIN PartInventory ON PartInventory.InventoryID = Inventory.InventoryID ");
+                sb.Append("WHERE PartInventory.PartID = ? ");
+                sb.Append("ORDER BY Inventory.DateTime DESC;");
+
+                s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
+
+                Command.CommandText = sb.ToString();
+
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
+                {
+                    while (DataReader.Read())
+                    {
+                        Inventory = new DatabaseDefs.TInventory();
+
+                        Inventory.nInventoryId = DataReader.GetInt32(0);
+                        Inventory.DateTime = DataReader.GetDateTime(1);
+                        Inventory.nCount = DataReader.GetInt32(2);
+                        Inventory.sInventoryDescription = DataReader.GetString(3);
+
+                        InventoryList.Add(Inventory);
+                    }
+                }
+
+                bResult = true;
+            }
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetLogsForGame exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Adds a new inventory entry for a part.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        public static System.Boolean AddPartInventoryEntry(
+            System.Int32 nPartId,
+            System.DateTime DateTime,
+            System.Int32 nCount,
+            System.String sDescription,
+            out System.Int32 nInventoryId,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Data.Common.DbConnection Connection = null;
+            System.Data.Common.DbTransaction Transaction = null;
+            System.Data.Common.DbCommand Command = null;
+            System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            nInventoryId = -1;
+            sErrorMessage = "";
+
+            try
+            {
+                if (!s_DbAdapter.AllocConnection(ref Connection,
+                                                 ref sErrorMessage))
+                {
+                    return false;
+                }
+
+                Transaction = Connection.BeginTransaction();
+
+                Command = Connection.CreateCommand();
+
+                Command.Transaction = Transaction;
+
+                if (true == AddInventory(Command, DateTime, sDescription, nCount, out nInventoryId, out sErrorMessage) &&
+                    true == AddPartInventory(Command, nPartId, nInventoryId, out sErrorMessage))
+                {
+                    Transaction.Commit();
+
+                    bResult = true;
+                }
+                else
+                {
+                    Transaction.Rollback();
+                }
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                if (Transaction != null)
+                {
+                    try
+                    {
+                        Transaction.Rollback();
+                    }
+                    catch (System.Data.Common.DbException Exception2)
+                    {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartInventoryEntry rollback transaction exception: {0}", Exception2.Message));
+                    }
+                }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartInventoryEntry exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Edits an existing inventory entry for a part.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        public static System.Boolean EditPartInventoryEntry(
+            System.Int32 nInventoryId,
+            System.DateTime DateTime,
+            System.Int32 nCount,
+            System.String sDescription,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Data.Common.DbConnection Connection = null;
+            System.Data.Common.DbTransaction Transaction = null;
+            System.Data.Common.DbCommand Command = null;
+            System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            sErrorMessage = "";
+
+            try
+            {
+                if (!s_DbAdapter.AllocConnection(ref Connection,
+                                                 ref sErrorMessage))
+                {
+                    return false;
+                }
+
+                Transaction = Connection.BeginTransaction();
+
+                Command = Connection.CreateCommand();
+
+                Command.Transaction = Transaction;
+
+                if (true == EditInventory(Command, nInventoryId, DateTime, sDescription,
+                                          nCount, out sErrorMessage))
+                {
+                    Transaction.Commit();
+
+                    bResult = true;
+                }
+                else
+                {
+                    Transaction.Rollback();
+                }
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                if (Transaction != null)
+                {
+                    try
+                    {
+                        Transaction.Rollback();
+                    }
+                    catch (System.Data.Common.DbException Exception2)
+                    {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("EditPartInventoryEntry rollback transaction exception: {0}", Exception2.Message));
+                    }
+                }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditPartInventoryEntry exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Deletes an existing inventory entry for a part.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        public static System.Boolean DeletePartInventoryEntry(
+            System.Int32 nInventoryId,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Data.Common.DbConnection Connection = null;
+            System.Data.Common.DbTransaction Transaction = null;
+            System.Data.Common.DbCommand Command = null;
+            System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            sErrorMessage = "";
+
+            try
+            {
+                if (!s_DbAdapter.AllocConnection(ref Connection,
+                                                 ref sErrorMessage))
+                {
+                    return false;
+                }
+
+                Transaction = Connection.BeginTransaction();
+
+                Command = Connection.CreateCommand();
+
+                Command.Transaction = Transaction;
+
+                if (DeletePartInventory(Command, nInventoryId, out sErrorMessage) &&
+                    DeleteInventory(Command, nInventoryId, out sErrorMessage))
+                {
+                    Transaction.Commit();
+
+                    bResult = true;
+                }
+                else
+                {
+                    Transaction.Rollback();
+                }
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                if (Transaction != null)
+                {
+                    try
+                    {
+                        Transaction.Rollback();
+                    }
+                    catch (System.Data.Common.DbException Exception2)
+                    {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameLogEntry rollback transaction exception: {0}", Exception2.Message));
+                    }
+                }
+
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameLogEntry exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            return bResult;
+        }
         #endregion
 
         #region "Internal Helpers"
@@ -6468,6 +7034,8 @@ namespace Arcade
         private static System.Boolean LoadDatabaseData(
             out System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             if (false == InitTablePropertyNames(CGameTableName,
@@ -6580,6 +7148,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             bExists = false;
 
             sErrorMessage = "";
@@ -6647,6 +7217,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewPartId = -1;
             sErrorMessage = "";
 
@@ -6700,6 +7272,8 @@ namespace Arcade
             System.Data.Common.DbConnection Connection = null;
             System.Data.Common.DbCommand Command;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNextPartId = -1;
             sErrorMessage = "";
@@ -6765,6 +7339,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nDefPartId = -1;
             sErrorMessage = "";
@@ -6837,6 +7413,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             System.Int32 nPartPropertyId;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -6912,6 +7490,8 @@ namespace Arcade
             Common.Collections.StringCollection AddPartDatasheetColl;
             Common.Collections.StringCollection DeletePartDatasheetColl;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             CurPartDatasheetColl = new Common.Collections.StringCollection();
             AddPartDatasheetColl = new Common.Collections.StringCollection();
             DeletePartDatasheetColl = new Common.Collections.StringCollection();
@@ -6975,6 +7555,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7034,6 +7616,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7069,6 +7653,41 @@ namespace Arcade
         }
 
         /// <summary>
+        /// Deletes all inventory entries associated with a part.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        private static System.Boolean DeletePartInventories(
+            System.Data.Common.DbCommand Command,
+            System.Int32 nPartId,
+            out System.String sErrorMessage)
+        {
+            System.Collections.Generic.List<System.Int32> InventoryIdsList;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            sErrorMessage = "";
+
+            if (!GetPartInventoryIds(nPartId, out InventoryIdsList, out sErrorMessage))
+            {
+                return false;
+            }
+
+            foreach (int nInventoryId in InventoryIdsList)
+            {
+                if (!DeletePartInventory(Command, nInventoryId, out sErrorMessage) ||
+                    !DeleteInventory(Command, nInventoryId, out sErrorMessage))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Adds the given part pinouts as a new row to the PartPinouts table.
         /// <param name="sErrorMessage">
         /// On return will contain a message if an error occurred.
@@ -7083,6 +7702,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewPartPinoutsId = -1;
             sErrorMessage = "";
@@ -7132,6 +7753,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7178,6 +7801,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -7227,6 +7852,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7258,6 +7885,142 @@ namespace Arcade
         }
 
         /// <summary>
+        /// Get the total inventory for the given part.
+        /// </summary>
+        /// <param name="nPartId"></param>
+        /// <param name="nPartInventoryTotal"></param>
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// <returns></returns>
+
+        private static System.Boolean GetPartInventoryTotal(
+            System.Int32 nPartId,
+            out System.Int32 nPartInventoryTotal,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Data.Common.DbConnection Connection = null;
+            System.Data.Common.DbCommand Command;
+            System.Text.StringBuilder sb;
+            System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            nPartInventoryTotal = 0;
+            sErrorMessage = "";
+
+            try
+            {
+                if (!s_DbAdapter.AllocConnection(ref Connection,
+                                                 ref sErrorMessage))
+                {
+                    return false;
+                }
+
+                Command = Connection.CreateCommand();
+
+                sb = new System.Text.StringBuilder();
+
+                sb.Append("SELECT SUM(Inventory.Count) AS InventoryTotal ");
+                sb.Append("FROM Inventory ");
+                sb.Append("INNER JOIN PartInventory ON PartInventory.InventoryID = Inventory.InventoryID ");
+                sb.Append("WHERE PartInventory.PartID = ?");
+
+                s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
+
+                Command.CommandText = sb.ToString();
+
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
+                {
+                    if (DataReader.Read() && !DataReader.IsDBNull(0))
+                    {
+                        nPartInventoryTotal = System.Convert.ToInt32(DataReader.GetDouble(0));
+                    }
+                }
+
+                bResult = true;
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartInventoryTotal exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Gets all of the inventory ids associated with a part.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        private static System.Boolean GetPartInventoryIds(
+            System.Int32 nPartId,
+            out System.Collections.Generic.List<System.Int32> InventoryIdsList,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Data.Common.DbConnection Connection = null;
+            System.Data.Common.DbCommand Command;
+            System.Text.StringBuilder sb;
+            System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            InventoryIdsList = new System.Collections.Generic.List<System.Int32>();
+            sErrorMessage = "";
+
+            try
+            {
+                if (!s_DbAdapter.AllocConnection(ref Connection,
+                                                 ref sErrorMessage))
+                {
+                    return false;
+                }
+
+                Command = Connection.CreateCommand();
+
+                sb = new System.Text.StringBuilder();
+
+                sb.Append("SELECT PartInventory.InventoryID ");
+                sb.Append("FROM PartInventory ");
+                sb.Append("WHERE PartInventory.PartID = ?;");
+
+                s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
+
+                Command.CommandText = sb.ToString();
+
+                using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
+                {
+                    while (DataReader.Read())
+                    {
+                        InventoryIdsList.Add(DataReader.GetInt32(0));
+                    }
+                }
+
+                bResult = true;
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartInventoryIds exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            s_DbAdapter.FreeConnection(Connection, ref sTmpErrorMessage);
+
+            return bResult;
+        }
+
+        /// <summary>
         /// Adds a new row to the Game table as part of a transaction.
         /// <param name="sErrorMessage">
         /// On return will contain a message if an error occurred.
@@ -7278,6 +8041,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewGameId = -1;
             sErrorMessage = "";
@@ -7345,6 +8110,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7408,6 +8175,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewBoardId = -1;
             sErrorMessage = "";
 
@@ -7462,6 +8231,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -7518,6 +8289,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewBoardPartId = -1;
             sErrorMessage = "";
@@ -7577,6 +8350,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7630,6 +8405,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7681,6 +8458,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewManualId = -1;
             sErrorMessage = "";
@@ -7763,6 +8542,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -7829,6 +8610,8 @@ namespace Arcade
             System.Collections.Specialized.StringCollection PropertiesColl,
             out System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             for (System.Int32 nIndex = 0; nIndex < PropertiesColl.Count;
@@ -7864,6 +8647,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             BoardIdsList = new System.Collections.Generic.List<System.Int32>();
             sErrorMessage = "";
@@ -7924,6 +8709,8 @@ namespace Arcade
             Common.Collections.StringCollection GameControlsColl,
             out System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             if (!s_GamePropertyDupsAllowed[(System.Int32)DatabaseDefs.EGameDataType.AudioProperty] &&
@@ -7971,6 +8758,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewLogId = -1;
             sErrorMessage = "";
@@ -8026,6 +8815,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -8074,7 +8865,9 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-           
+
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -8093,6 +8886,252 @@ namespace Arcade
             catch (System.Data.Common.DbException Exception)
             {
                 s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteLog exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            Command.Parameters.Clear();
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Adds a new row to the PartInventory table as part of a transaction.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        private static System.Boolean AddPartInventory(
+            System.Data.Common.DbCommand Command,
+            System.Int32 nPartId,
+            System.Int32 nInventoryId,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            sErrorMessage = "";
+
+            try
+            {
+                sb.Append("INSERT INTO PartInventory ([PartID], [InventoryID]) ");
+                sb.Append("VALUES (?, ?);");
+
+                s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
+                s_DbAdapter.AddCommandParameter(Command, "@InventoryID", nInventoryId);
+
+                Command.CommandText = sb.ToString();
+
+                Command.ExecuteNonQuery();
+
+                bResult = true;
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartInventory exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            Command.Parameters.Clear();
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Deletes a row from to the PartInventory table as part of a transaction.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        private static System.Boolean DeletePartInventory(
+            System.Data.Common.DbCommand Command,
+            System.Int32 nInventoryId,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            sErrorMessage = "";
+
+            try
+            {
+                sb.Append("DELETE FROM PartInventory ");
+                sb.Append("WHERE [InventoryID] = ?;");
+
+                s_DbAdapter.AddCommandParameter(Command, "@InventoryID", nInventoryId);
+
+                Command.CommandText = sb.ToString();
+
+                Command.ExecuteNonQuery();
+
+                bResult = true;
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartInventory exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            Command.Parameters.Clear();
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Adds a new row to the Inventory table as part of a transaction.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        private static System.Boolean AddInventory(
+            System.Data.Common.DbCommand Command,
+            System.DateTime DateTime,
+            System.String sDescription,
+            System.Int32 nCount,
+            out System.Int32 nInventoryId,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            nInventoryId = -1;
+            sErrorMessage = "";
+
+            try
+            {
+                sb.Append("INSERT INTO Inventory ([Count], [Description], [DateTime]) ");
+                sb.Append("VALUES (?, ?, ?);");
+
+                s_DbAdapter.AddCommandParameter(Command, "@Count", nCount);
+                s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
+                s_DbAdapter.AddCommandParameter(Command, "@DateTime", DateTime.ToShortDateString());
+
+                Command.CommandText = sb.ToString();
+
+                Command.ExecuteNonQuery();
+
+                if (s_DbAdapter.GetIdentityValue(Command, ref nInventoryId,
+                                                 ref sErrorMessage))
+                {
+                    bResult = true;
+                }
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("AddInventory exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            Command.Parameters.Clear();
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Edits an existing row in the Inventory table as part of a transaction.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        private static System.Boolean EditInventory(
+            System.Data.Common.DbCommand Command,
+            System.Int32 nInventoryId,
+            System.DateTime DateTime,
+            System.String sDescription,
+            System.Int32 nCount,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            sErrorMessage = "";
+
+            try
+            {
+                sb.Append("UPDATE INVENTORY ");
+                sb.Append("SET [DateTime] = ?, ");
+                sb.Append("[Description] = ?, ");
+                sb.Append("[Count] = ? ");
+                sb.Append("WHERE InventoryID = ?");
+
+                s_DbAdapter.AddCommandParameter(Command, "@DateTime", DateTime.ToShortDateString());
+                s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
+                s_DbAdapter.AddCommandParameter(Command, "@Count", nCount);
+                s_DbAdapter.AddCommandParameter(Command, "@InventoryID", nInventoryId);
+
+                Command.CommandText = sb.ToString();
+
+                Command.ExecuteNonQuery();
+
+                bResult = true;
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("EditInventory exception: {0}", Exception.Message));
+
+                sErrorMessage = Exception.Message;
+            }
+
+            Command.Parameters.Clear();
+
+            return bResult;
+        }
+
+        /// <summary>
+        /// Deletes a row from the Inventory table as part of a transaction.
+        /// <param name="sErrorMessage">
+        /// On return will contain a message if an error occurred.
+        /// </param>
+        /// </summary>
+
+        private static System.Boolean DeleteInventory(
+            System.Data.Common.DbCommand Command,
+            System.Int32 nInventoryId,
+            out System.String sErrorMessage)
+        {
+            System.Boolean bResult = false;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
+
+            sErrorMessage = "";
+
+            try
+            {
+                sb.Append("DELETE FROM Inventory ");
+                sb.Append("WHERE InventoryID = ?;");
+
+                s_DbAdapter.AddCommandParameter(Command, "@InventoryID", nInventoryId);
+
+                Command.CommandText = sb.ToString();
+
+                Command.ExecuteNonQuery();
+
+                bResult = true;
+            }
+
+            catch (System.Data.Common.DbException Exception)
+            {
+                s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteInventory exception: {0}", Exception.Message));
 
                 sErrorMessage = Exception.Message;
             }
@@ -8127,6 +9166,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
             System.Int32 nTmpPartId;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nPartId = -1;
             sErrorMessage = "";
@@ -8218,6 +9259,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nPartPropertyId = -1;
             sErrorMessage = "";
 
@@ -8283,6 +9326,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -8320,6 +9365,8 @@ namespace Arcade
             System.Int32 nGameId,
             System.Collections.Generic.List<DatabaseDefs.TGame> GamesList)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             foreach (DatabaseDefs.TGame Game in GamesList)
             {
                 if (Game.nGameId == nGameId)
@@ -8340,6 +9387,8 @@ namespace Arcade
             System.Int32 nBoardId,
             System.Collections.Generic.List<DatabaseDefs.TBoard> BoardsList)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             foreach (DatabaseDefs.TBoard Board in BoardsList)
             {
                 if (Board.nBoardId == nBoardId)
@@ -8370,6 +9419,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             PropertiesColl = new Common.Collections.StringCollection();
             sErrorMessage = "";
@@ -8491,6 +9542,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -8544,6 +9597,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             nNewTable1Table2Id = -1;
             sErrorMessage = "";
@@ -8605,6 +9660,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
             nNewPropertyId = -1;
@@ -8685,6 +9742,8 @@ namespace Arcade
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             System.Int32 nNewPropertyValueId = -1;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewPropertyId = -1;
             sErrorMessage = "";
 
@@ -8755,6 +9814,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -8829,6 +9890,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -8915,6 +9978,8 @@ namespace Arcade
             System.String sTmpErrorMessage = null;
             System.Int32 nIndex;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -8992,6 +10057,8 @@ namespace Arcade
             System.Boolean bResult = false;
             Common.Collections.StringCollection StringColl;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sPropertyValue = "";
             sErrorMessage = "";
 
@@ -9035,6 +10102,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             StringColl = new Common.Collections.StringCollection();
             sErrorMessage = "";
@@ -9143,6 +10212,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             StringColl = new System.Collections.Specialized.StringCollection();
             sErrorMessage = "";
@@ -9257,6 +10328,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewNameId = -1;
             sErrorMessage = "";
 
@@ -9330,6 +10403,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             nNewNameId = -1;
             sErrorMessage = "";
 
@@ -9383,6 +10458,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -9435,6 +10512,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -9499,6 +10578,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -9553,6 +10634,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -9627,6 +10710,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -9682,6 +10767,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -9730,6 +10817,8 @@ namespace Arcade
             System.String sTableName,
             out System.String sErrorMessage)
         {
+            Common.Debug.Thread.IsWorkerThread();
+
             if (true == DeleteUnusedFromTableProperty(Command, sTableName,
                                                       out sErrorMessage) &&
                 true == DeleteUnusedFromTablePropertyName(Command, sTableName,
@@ -9757,6 +10846,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -9813,6 +10904,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -9865,6 +10958,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -9920,6 +11015,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -9974,6 +11071,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
             System.Int32 nIndex;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -10048,6 +11147,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -10100,6 +11201,8 @@ namespace Arcade
             System.Data.Common.DbTransaction Transaction = null;
             System.Data.Common.DbCommand Command = null;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -10176,6 +11279,8 @@ namespace Arcade
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -10225,6 +11330,8 @@ namespace Arcade
         {
             System.Boolean bResult = false;
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -10281,6 +11388,8 @@ namespace Arcade
             System.Data.Common.DbCommand Command;
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
+
+            Common.Debug.Thread.IsWorkerThread();
 
             sErrorMessage = "";
 
@@ -10377,6 +11486,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -10447,6 +11558,8 @@ namespace Arcade
             System.Text.StringBuilder sb;
             System.String sTmpErrorMessage = null;
 
+            Common.Debug.Thread.IsWorkerThread();
+
             sErrorMessage = "";
 
             try
@@ -10506,6 +11619,8 @@ namespace Arcade
         {
             System.Int32 nIndex = List.IndexOfKey(sListData);
 
+            Common.Debug.Thread.IsWorkerThread();
+
             if (nIndex == -1)
             {
                 return -1;
@@ -10520,6 +11635,8 @@ namespace Arcade
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             System.TimeSpan ts = EndDateTime.Subtract(StartDateTime);
+
+            Common.Debug.Thread.IsWorkerThread();
 
             if (ts.Minutes > 0)
             {

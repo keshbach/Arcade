@@ -47,10 +47,12 @@ namespace Arcade.Forms
             this.listViewKeywords = new Common.Forms.ListView();
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderDataSheets = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderInventory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buttonEdit = new System.Windows.Forms.Button();
             this.buttonDelete = new System.Windows.Forms.Button();
             this.buttonDatasheets = new System.Windows.Forms.Button();
             this.splitContainerPart = new System.Windows.Forms.SplitContainer();
+            this.buttonInventory = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerPart)).BeginInit();
             this.splitContainerPart.Panel1.SuspendLayout();
             this.splitContainerPart.Panel2.SuspendLayout();
@@ -164,7 +166,7 @@ namespace Arcade.Forms
             this.buttonClose.Location = new System.Drawing.Point(584, 248);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(75, 23);
-            this.buttonClose.TabIndex = 5;
+            this.buttonClose.TabIndex = 6;
             this.buttonClose.Text = "Close";
             this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
@@ -176,7 +178,8 @@ namespace Arcade.Forms
             this.listViewKeywords.AutoArrange = false;
             this.listViewKeywords.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderName,
-            this.columnHeaderDataSheets});
+            this.columnHeaderDataSheets,
+            this.columnHeaderInventory});
             this.listViewKeywords.ComboBoxItems = ((System.Collections.Specialized.StringCollection)(resources.GetObject("listViewKeywords.ComboBoxItems")));
             this.listViewKeywords.FullRowSelect = true;
             this.listViewKeywords.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -203,6 +206,10 @@ namespace Arcade.Forms
             // columnHeaderDataSheets
             // 
             this.columnHeaderDataSheets.Text = "Datasheets";
+            // 
+            // columnHeaderInventory
+            // 
+            this.columnHeaderInventory.Text = "Inventory";
             // 
             // buttonEdit
             // 
@@ -233,7 +240,7 @@ namespace Arcade.Forms
             this.buttonDatasheets.Name = "buttonDatasheets";
             this.buttonDatasheets.Size = new System.Drawing.Size(80, 23);
             this.buttonDatasheets.TabIndex = 4;
-            this.buttonDatasheets.Text = "Datasheets...";
+            this.buttonDatasheets.Text = "Data&sheets...";
             this.buttonDatasheets.UseVisualStyleBackColor = true;
             this.buttonDatasheets.Click += new System.EventHandler(this.buttonDatasheets_Click);
             // 
@@ -264,12 +271,24 @@ namespace Arcade.Forms
             this.splitContainerPart.SplitterDistance = 274;
             this.splitContainerPart.TabIndex = 0;
             // 
+            // buttonInventory
+            // 
+            this.buttonInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonInventory.Location = new System.Drawing.Point(338, 248);
+            this.buttonInventory.Name = "buttonInventory";
+            this.buttonInventory.Size = new System.Drawing.Size(75, 23);
+            this.buttonInventory.TabIndex = 5;
+            this.buttonInventory.Text = "&Inventory...";
+            this.buttonInventory.UseVisualStyleBackColor = true;
+            this.buttonInventory.Click += new System.EventHandler(this.buttonInventory_Click);
+            // 
             // PartDetailsForm
             // 
             this.AcceptButton = this.buttonClose;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.buttonClose;
             this.ClientSize = new System.Drawing.Size(664, 278);
+            this.Controls.Add(this.buttonInventory);
             this.Controls.Add(this.splitContainerPart);
             this.Controls.Add(this.buttonDatasheets);
             this.Controls.Add(this.buttonDelete);
@@ -314,6 +333,8 @@ namespace Arcade.Forms
         private System.Windows.Forms.Button buttonDatasheets;
         private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.SplitContainer splitContainerPart;
+        private System.Windows.Forms.ColumnHeader columnHeaderInventory;
+        private System.Windows.Forms.Button buttonInventory;
     }
 }
 

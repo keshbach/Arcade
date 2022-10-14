@@ -1,5 +1,5 @@
-﻿
-//  Copyright (C) 2006-2016 Kevin Eshbach
+﻿/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -20,6 +20,7 @@ namespace Arcade
             public System.String sPartTypeName;
             public System.String sPartPackageName;
             public System.Boolean bPartIsDefault;
+            public System.Int32 nPartTotalInventory;
             public Common.Collections.StringCollection PartDatasheetColl;
         };
 
@@ -161,6 +162,20 @@ namespace Arcade
             public System.Int32 nLogTypeLen;
         };
 
+        public struct TInventory
+        {
+            public System.Int32 nInventoryId;
+            public System.Int32 nCount;
+            public System.DateTime DateTime;
+            public System.String sInventoryDescription;
+        }
+
+        public struct TInventoryLens
+        {
+            public System.Int32 nInventoryDescriptionLen;
+        };
+
+        #region "Enumerations"
         public enum EKeywordMatchingCriteria
         {
             Start = 0,
@@ -197,15 +212,20 @@ namespace Arcade
             PrintEdition = 1,
             Condition = 2
         }
+        #endregion
 
+        #region "Constants"
         public static System.String CCartridgeName = "Cartridge";
+        #endregion
 
+        #region "Constructor"
         private DatabaseDefs()
         {
         }
+        #endregion
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2016 Kevin Eshbach
+//  Copyright (C) 2006-2022 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
