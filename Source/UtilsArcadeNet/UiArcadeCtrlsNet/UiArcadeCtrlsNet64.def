@@ -2,7 +2,7 @@
 ;  Copyright (C) 2010-2022 Kevin Eshbach
 ;
 
-LIBRARY UiArcadeCtrlsNet BASE=0x400070000
+LIBRARY UiArcadeCtrlsNet BASE=0x400110000
 VERSION 1.0
 
 ;

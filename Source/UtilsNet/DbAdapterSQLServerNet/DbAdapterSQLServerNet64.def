@@ -2,7 +2,7 @@
 ;  Copyright (C) 2009-2016 Kevin Eshbach
 ;
 
-LIBRARY DbAdapterSQLServerNet BASE=0x4000e0000
+LIBRARY DbAdapterSQLServerNet BASE=0x4000f0000
 
 ;
 ;  Copyright (C) 2009-2016 Kevin Eshbach
