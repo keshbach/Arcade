@@ -1325,7 +1325,7 @@ namespace Arcade
         {
             System.Int32 nIndex = (System.Int32)GameDataType;
 
-            Common.Debug.Thread.IsWorkerThread();
+            Common.Debug.Thread.IsAnyThread();
 
             return s_GamePropertyDupsAllowed[nIndex];
         }
@@ -1336,7 +1336,7 @@ namespace Arcade
 
         public static System.Boolean GetGameDisplayDupsAllowed()
         {
-            Common.Debug.Thread.IsWorkerThread();
+            Common.Debug.Thread.IsAnyThread();
 
             return true;
         }
