@@ -29,6 +29,8 @@ namespace Arcade.Forms
             InitializatedSuccessDatabaseNotAvailable,
             InitializatedFailed,
             Running,
+            AddingNewPart,
+            AddedNewPart,
             Uninitializing,
             UninitializatedSuccess,
             UninitializatedFailed
@@ -183,6 +185,7 @@ namespace Arcade.Forms
             PartEntryForm PartEntry = new Arcade.Forms.PartEntryForm();
             System.Int32 nPartId;
             System.String sErrorMessage;
+            System.Boolean bResult;
 
             new Common.Forms.FormLocation(PartEntry, m_sFormLocationsRegistryKey);
 
@@ -190,24 +193,33 @@ namespace Arcade.Forms
 
             if (PartEntry.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
             {
-                using (new Common.Forms.WaitCursor(this))
-                {
-                    if (false == Database.AddPartGroup(PartEntry.PartName,
-                                                       PartEntry.PartCategoryName,
-                                                       PartEntry.PartTypeName,
-                                                       PartEntry.PartPackageName,
-                                                       PartEntry.PartPinouts,
-                                                       PartEntry.PartDatasheetColl,
-                                                       out nPartId, out sErrorMessage))
-                    {
-                        Common.Forms.MessageBox.Show(this, sErrorMessage,
-                            System.Windows.Forms.MessageBoxButtons.OK,
-                            System.Windows.Forms.MessageBoxIcon.Information);
-                    }
-                }
-            }
+                UpdateState(State.AddingNewPart);
 
-            PartEntry.Dispose();
+                Common.Threading.Thread.RunWorkerThread(() =>
+                {
+                    bResult = Database.AddPartGroup(PartEntry.PartName,
+                                                    PartEntry.PartCategoryName,
+                                                    PartEntry.PartTypeName,
+                                                    PartEntry.PartPackageName,
+                                                    PartEntry.PartPinouts,
+                                                    PartEntry.PartDatasheetColl,
+                                                    out nPartId, 
+                                                    out sErrorMessage);
+                    RunOnUIThreadWait(() =>
+                    {
+                        if (!bResult)
+                        {
+                            Common.Forms.MessageBox.Show(this, sErrorMessage,
+                                                         System.Windows.Forms.MessageBoxButtons.OK,
+                                                         System.Windows.Forms.MessageBoxIcon.Information);
+                        }
+
+                        UpdateState(State.AddedNewPart);
+
+                        PartEntry.Dispose();
+                    });
+                }, "Main Form Adding New Part Thread");
+            }
         }
 
         private void menuPartsCategoryList_Click(object sender, EventArgs e)
@@ -615,6 +627,18 @@ namespace Arcade.Forms
                     menuAppStrip.DisableAllItems(InitFailedExcludedMenuItems);
 
                     toolStripDatabaseConnectionStatusLabel.Text = "Failed";
+
+                    m_State = State.Running;
+                    m_bAllowClose = true;
+                    break;
+                case State.AddingNewPart:
+                    menuAppStrip.SaveItemsEnableState();
+                    menuAppStrip.DisableAllItems(NoneExcludedMenuItems);
+
+                    m_bAllowClose = false;
+                    break;
+                case State.AddedNewPart:
+                    menuAppStrip.RestoreItemsEnableState();
 
                     m_State = State.Running;
                     m_bAllowClose = true;
