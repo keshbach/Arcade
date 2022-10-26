@@ -9,7 +9,7 @@ namespace Common
     namespace Data
     {
         /// <summary>
-        /// Interface not to be implemented.
+        /// Interface to be implemented by a database adapter.
         /// </summary>
         public interface class IDbProvider
         {
@@ -23,10 +23,12 @@ namespace Common
                                                        System::Collections::Generic::List<Common::Data::DbTableColumn^>^% TableColumnList,
                                                        System::String^% sErrorMessage);
             virtual System::String^ ProvideSQLBooleanValue(System::Boolean bValue);
+            virtual System::String^ ProvideSQLSumInt32Function(System::String^ sColumnName);
             virtual System::Boolean ProvideSnapshotIsolationSupported(System::Boolean% bSnapshotSupported,
                                                                       System::String^% sErrorMessage);
             virtual System::Boolean ProvideUpdateWithParameterizedSubQuerySupported();
             virtual System::Data::Common::DbConnection^ ProvideConnection(void);
+            virtual System::Boolean ProvideConnectionActive(System::Data::Common::DbConnection^ Connection);
             virtual System::Boolean ProvideAddCommandParameter(System::Data::Common::DbCommand^ Command,
                                                                System::String^ sParameterName,
                                                                System::Object^ Value);

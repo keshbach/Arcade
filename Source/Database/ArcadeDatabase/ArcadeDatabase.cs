@@ -7922,7 +7922,8 @@ namespace Arcade
 
                 sb = new System.Text.StringBuilder();
 
-                sb.Append("SELECT SUM(Inventory.Count) AS InventoryTotal ");
+                sb.AppendFormat("SELECT {0} AS InventoryTotal ",
+                                s_DbAdapter.GetSQLSumInt32Function("Inventory.Count"));
                 sb.Append("FROM Inventory ");
                 sb.Append("INNER JOIN PartInventory ON PartInventory.InventoryID = Inventory.InventoryID ");
                 sb.Append("WHERE PartInventory.PartID = ?");
@@ -7935,7 +7936,7 @@ namespace Arcade
                 {
                     if (DataReader.Read() && !DataReader.IsDBNull(0))
                     {
-                        nPartInventoryTotal = System.Convert.ToInt32(DataReader.GetDouble(0));
+                        nPartInventoryTotal = DataReader.GetInt32(0);
                     }
                 }
 

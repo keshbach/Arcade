@@ -185,6 +185,12 @@ System::String^ Common::Data::DbAdapterSQLServer::ProvideSQLBooleanValue(
 	return bValue ? L"1" : L"0";
 }
 
+System::String^ Common::Data::DbAdapterSQLServer::ProvideSQLSumInt32Function(
+  System::String^ sColumnName)
+{
+    return System::String::Format(L"CAST(SUM({0}) AS INT)", sColumnName);
+}
+
 System::Boolean Common::Data::DbAdapterSQLServer::ProvideSnapshotIsolationSupported(
   System::Boolean% bSnapshotSupported,
   System::String^% sErrorMessage)
@@ -227,6 +233,30 @@ System::Data::Common::DbConnection^ Common::Data::DbAdapterSQLServer::ProvideCon
     }
 
     return nullptr;
+}
+
+System::Boolean Common::Data::DbAdapterSQLServer::ProvideConnectionActive(
+  System::Data::Common::DbConnection^ Connection)
+{
+    System::Boolean bResult = false;
+    System::Data::Common::DbCommand^ Command;
+
+    try
+    {
+        Command = Connection->CreateCommand();
+
+        Command->CommandText = L"SELECT 1";
+
+        Command->ExecuteScalar();
+
+        bResult = true;
+    }
+    catch (System::Exception^ Exception)
+    {
+        m_Logging->DatabaseMessage(System::String::Format(L"Exception from SQL Server testing if connection active.  ({0})", Exception->Message));
+    }
+
+    return bResult;
 }
 
 System::Boolean Common::Data::DbAdapterSQLServer::ProvideAddCommandParameter(

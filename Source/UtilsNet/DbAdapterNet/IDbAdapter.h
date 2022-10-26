@@ -110,6 +110,8 @@ namespace Common
 
             virtual System::String^ GetSQLBooleanValue(System::Boolean bValue);
 
+            virtual System::String^ GetSQLSumInt32Function(System::String^ sColumnName);
+
             /// <summary>
             /// Retrieves whether the database supports snapshot isolation.
             /// <param name="bSnapshotSupported">

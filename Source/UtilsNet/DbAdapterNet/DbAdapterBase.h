@@ -33,6 +33,7 @@ namespace Common
                                                    System::Collections::Generic::List<Common::Data::DbTableColumn^>^% TableColumnList,
                                                    System::String^% sErrorMessage);
             virtual System::String^ GetSQLBooleanValue(System::Boolean bValue);
+            virtual System::String^ GetSQLSumInt32Function(System::String^ sColumnName);
             virtual System::Boolean GetSnapshotIsolationSupported(System::Boolean% bSnapshotSupported,
                                                                   System::String^% sErrorMessage);
             virtual System::Boolean GetUpdateWithParameterizedSubQuerySupported();
@@ -74,14 +75,15 @@ namespace Common
             System::Boolean CreateConnection(System::Data::Common::DbConnection^% Connection,
                                              System::String^% sErrorMessage);
 
-             void EmptyConnectionPool(System::Collections::Generic::List<System::Data::Common::DbConnection^>^ ConnectionList);
+            void EmptyConnectionPool(System::Collections::Generic::List<System::Data::Common::DbConnection^>^ ConnectionList);
 
             static void CopySchema(System::Collections::Generic::List<Common::Data::DbTableColumn^>^ SrcTableColumnArrayList,
                                    System::Collections::Generic::List<Common::Data::DbTableColumn^>^% DestTableColumnArrayList);
 
-        private:
+        protected:
             Common::Data::IDbLogging^ m_Logging;
 
+        private:
             System::Threading::Mutex^ m_ConnectionPoolMutex;
             System::Threading::Mutex^ m_TableSchemaMutex;
 

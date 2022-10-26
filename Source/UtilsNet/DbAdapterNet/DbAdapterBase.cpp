@@ -159,70 +159,66 @@ System::Boolean Common::Data::DbAdapterBase::AllocConnection(
   System::Data::Common::DbConnection^% Connection,
   System::String^% sErrorMessage)
 {
+    Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
     System::Boolean bResult = false;
     System::Data::Common::DbConnection^ TmpConnection = nullptr;
+    System::String^ sTmpLogMessage;
 
     Connection = nullptr;
     sErrorMessage = L"";
 
     m_ConnectionPoolMutex->WaitOne();
 
-    if (m_ConnectionPool->FreeList->Count == 0)
-    {
-        if (CreateConnection(TmpConnection, sErrorMessage))
-        {
-            m_ConnectionPool->FreeList->Add(TmpConnection);
-
-            bResult = true;
-
-            System::Diagnostics::Debug::Assert(m_ConnectionPool->FreeList->Count + m_ConnectionPool->UsedList->Count <= CMaxConnectionsAllowed);
-        }
-    }
-    else
-    {
-        bResult = true;
-    }
-
-    if (bResult)
+    while (m_ConnectionPool->FreeList->Count > 0)
     {
         TmpConnection = m_ConnectionPool->FreeList[0];
 
-        if (TmpConnection->State != System::Data::ConnectionState::Open)
-        {
-            m_Logging->DatabaseMessage(System::String::Format(L"AllocConnection connection state is {0}", TmpConnection->State.ToString()));
-        }
+        m_ConnectionPool->FreeList->RemoveAt(0);
 
-        if (TmpConnection->State == System::Data::ConnectionState::Closed)
-        {
-            // If the connection is closed try to re-open it because
-            // the connection could have been temporarily severed and
-            // forcing the user to re-open the application is very
-            // painful.
-
-            try
-            {
-                TmpConnection->Open();
-            }
-            catch (System::Data::Common::DbException^ Exception)
-            {
-                TmpConnection = nullptr;
-
-                sErrorMessage = Exception->Message;
-
-                bResult = false;
-            }
-        }
-
-        if (bResult == true)
+        if (pProvider->ProvideConnectionActive(TmpConnection))
         {
             Connection = TmpConnection;
 
-            m_ConnectionPool->FreeList->RemoveAt(0);
             m_ConnectionPool->UsedList->Add(Connection);
+
+            m_ConnectionPoolMutex->ReleaseMutex();
+
+            return true;
         }
+
+        TmpConnection->Close();
     }
 
-    m_ConnectionPoolMutex->ReleaseMutex();
+    if (CreateConnection(TmpConnection, sErrorMessage))
+    {
+        Connection = TmpConnection;
+
+        m_ConnectionPool->UsedList->Add(Connection);
+
+        if (m_ConnectionPool->FreeList->Count + m_ConnectionPool->UsedList->Count <= CMaxConnectionsAllowed)
+        {
+            sTmpLogMessage = nullptr;
+        }
+        else
+        {
+            sTmpLogMessage = L"Warning: Maximum database connections reached.";
+        }
+
+        m_ConnectionPoolMutex->ReleaseMutex();
+
+        if (sTmpLogMessage != nullptr)
+        {
+            m_Logging->DatabaseMessage(sTmpLogMessage);
+        }
+
+        bResult = true;
+    }
+    else
+    {
+        m_ConnectionPoolMutex->ReleaseMutex();
+
+        sErrorMessage = L"Could not allocate a database connection.";
+    }
 
     return bResult;
 }
@@ -288,6 +284,14 @@ System::String^ Common::Data::DbAdapterBase::GetSQLBooleanValue(
     Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
 
     return pProvider->ProvideSQLBooleanValue(bValue);
+}
+
+System::String^ Common::Data::DbAdapterBase::GetSQLSumInt32Function(
+  System::String^ sColumnName)
+{
+    Common::Data::IDbProvider^ pProvider = (Common::Data::IDbProvider^)this;
+
+    return pProvider->ProvideSQLSumInt32Function(sColumnName);
 }
 
 System::Boolean Common::Data::DbAdapterBase::GetSnapshotIsolationSupported(

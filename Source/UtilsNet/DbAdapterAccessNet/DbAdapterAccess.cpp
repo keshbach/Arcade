@@ -104,6 +104,12 @@ System::String^ Common::Data::DbAdapterAccess::ProvideSQLBooleanValue(
 	return bValue ? L"Yes" : L"No";
 }
 
+System::String^ Common::Data::DbAdapterAccess::ProvideSQLSumInt32Function(
+  System::String^ sColumnName)
+{
+    return System::String::Format(L"IIF(IsNull(SUM({0})), 0, CLNG(SUM({0})))", sColumnName);
+}
+
 System::Boolean Common::Data::DbAdapterAccess::ProvideSnapshotIsolationSupported(
   System::Boolean% bSnapshotSupported,
   System::String^% sErrorMessage)
@@ -122,6 +128,17 @@ System::Boolean Common::Data::DbAdapterAccess::ProvideUpdateWithParameterizedSub
 System::Data::Common::DbConnection^ Common::Data::DbAdapterAccess::ProvideConnection(void)
 {
     return gcnew System::Data::OleDb::OleDbConnection();
+}
+
+System::Boolean Common::Data::DbAdapterAccess::ProvideConnectionActive(
+  System::Data::Common::DbConnection^ Connection)
+{
+    // Need to implement and test where the database is on a network share or a
+    // removable drive and then the resource is not available.
+
+    Connection;
+
+    return true;
 }
 
 System::Boolean Common::Data::DbAdapterAccess::ProvideAddCommandParameter(
