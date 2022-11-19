@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[ManualProperty] WITH NOCHECK ADD CONSTRAINT [ManualProperty$ManualPropertyNameManualProperty] FOREIGN KEY([ManualPropertyNameID])
+REFERENCES [dbo].[ManualPropertyName] ([ManualPropertyNameID])
+GO
+
+ALTER TABLE [dbo].[ManualProperty] CHECK CONSTRAINT [ManualProperty$ManualPropertyNameManualProperty]
+GO
+
+ALTER TABLE [dbo].[ManualProperty] WITH NOCHECK ADD CONSTRAINT [ManualProperty$ManualPropertyValueManualProperty] FOREIGN KEY([ManualPropertyValueID])
+REFERENCES [dbo].[ManualPropertyValue] ([ManualPropertyValueID])
+GO
+
+ALTER TABLE [dbo].[ManualProperty] CHECK CONSTRAINT [ManualProperty$ManualPropertyValueManualProperty]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

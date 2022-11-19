@@ -1,0 +1,14 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[Game] ADD DEFAULT ((0)) FOR [NeedPowerOnReset]
+GO
+
+SELECT 'Default Values Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

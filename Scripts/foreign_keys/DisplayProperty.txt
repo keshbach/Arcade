@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[DisplayProperty] WITH NOCHECK ADD CONSTRAINT [DisplayProperty$DisplayPropertyName2DisplayProperty2] FOREIGN KEY([DisplayPropertyNameID])
+REFERENCES [dbo].[DisplayPropertyName] ([DisplayPropertyNameID])
+GO
+
+ALTER TABLE [dbo].[DisplayProperty] CHECK CONSTRAINT [DisplayProperty$DisplayPropertyName2DisplayProperty2]
+GO
+
+ALTER TABLE [dbo].[DisplayProperty] WITH NOCHECK ADD CONSTRAINT [DisplayProperty$DisplayPropertyValue2DisplayProperty2] FOREIGN KEY([DisplayPropertyValueID])
+REFERENCES [dbo].[DisplayPropertyValue] ([DisplayPropertyValueID])
+GO
+
+ALTER TABLE [dbo].[DisplayProperty] CHECK CONSTRAINT [DisplayProperty$DisplayPropertyValue2DisplayProperty2]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

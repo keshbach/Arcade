@@ -1,0 +1,32 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[BoardPart] WITH NOCHECK ADD CONSTRAINT [BoardPart$BoardBoardPart] FOREIGN KEY([BoardID])
+REFERENCES [dbo].[Board] ([BoardID])
+GO
+
+ALTER TABLE [dbo].[BoardPart] CHECK CONSTRAINT [BoardPart$BoardBoardPart]
+GO
+
+ALTER TABLE [dbo].[BoardPart] WITH NOCHECK ADD CONSTRAINT [BoardPart$BoardPartLocationBoardPart] FOREIGN KEY([BoardPartLocationID])
+REFERENCES [dbo].[BoardPartLocation] ([BoardPartLocationID])
+GO
+
+ALTER TABLE [dbo].[BoardPart] CHECK CONSTRAINT [BoardPart$BoardPartLocationBoardPart]
+GO
+
+ALTER TABLE [dbo].[BoardPart] WITH NOCHECK ADD CONSTRAINT [BoardPart$PartBoardPart] FOREIGN KEY([PartID])
+REFERENCES [dbo].[Part] ([PartID])
+GO
+
+ALTER TABLE [dbo].[BoardPart] CHECK CONSTRAINT [BoardPart$PartBoardPart]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

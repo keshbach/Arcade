@@ -1,0 +1,18 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[Manual] WITH NOCHECK ADD CONSTRAINT [Manual$ManufacturerManual] FOREIGN KEY([ManufacturerID])
+REFERENCES [dbo].[Manufacturer] ([ManufacturerID])
+GO
+
+ALTER TABLE [dbo].[Manual] CHECK CONSTRAINT [Manual$ManufacturerManual]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

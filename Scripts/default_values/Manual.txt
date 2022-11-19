@@ -1,0 +1,17 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[Manual] ADD DEFAULT ((1)) FOR [Complete]
+GO
+
+ALTER TABLE [dbo].[Manual] ADD DEFAULT ((1)) FOR [Original]
+GO
+
+SELECT 'Default Values Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

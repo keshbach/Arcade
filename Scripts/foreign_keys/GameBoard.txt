@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[GameBoard] WITH NOCHECK ADD CONSTRAINT [GameBoard$BoardGameBoard] FOREIGN KEY([BoardID])
+REFERENCES [dbo].[Board] ([BoardID])
+GO
+
+ALTER TABLE [dbo].[GameBoard] CHECK CONSTRAINT [GameBoard$BoardGameBoard]
+GO
+
+ALTER TABLE [dbo].[GameBoard] WITH NOCHECK ADD CONSTRAINT [GameBoard$GameGameBoard] FOREIGN KEY([GameID])
+REFERENCES [dbo].[Game] ([GameID])
+GO
+
+ALTER TABLE [dbo].[GameBoard] CHECK CONSTRAINT [GameBoard$GameGameBoard]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

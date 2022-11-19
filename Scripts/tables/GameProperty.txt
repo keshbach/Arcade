@@ -1,0 +1,22 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+CREATE TABLE [dbo].[GameProperty] (
+	[GamePropertyID] [int] IDENTITY(1,1) NOT NULL,
+	[GamePropertyNameID] [int] NOT NULL,
+	[GamePropertyValueID] [int] NOT NULL,
+ CONSTRAINT [GameProperty$PrimaryKey] PRIMARY KEY CLUSTERED
+(
+	[GamePropertyID] ASC
+) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+SELECT 'Table Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

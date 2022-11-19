@@ -1,0 +1,18 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[Board] WITH NOCHECK ADD CONSTRAINT [Board$BoardTypeBoard] FOREIGN KEY([BoardTypeID])
+REFERENCES [dbo].[BoardType] ([BoardTypeID])
+GO
+
+ALTER TABLE [dbo].[Board] CHECK CONSTRAINT [Board$BoardTypeBoard]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

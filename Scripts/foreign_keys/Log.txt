@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[Log] WITH CHECK ADD CONSTRAINT [Log$Game] FOREIGN KEY([GameID])
+REFERENCES [dbo].[Game] ([GameID])
+GO
+
+ALTER TABLE [dbo].[Log] CHECK CONSTRAINT [Log$Game]
+GO
+
+ALTER TABLE [dbo].[Log] WITH CHECK ADD CONSTRAINT [Log$LogType] FOREIGN KEY([LogTypeID])
+REFERENCES [dbo].[LogType] ([LogTypeID])
+GO
+
+ALTER TABLE [dbo].[Log] CHECK CONSTRAINT [Log$LogType]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

@@ -1,0 +1,24 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+CREATE TABLE [dbo].[Board] (
+	[BoardID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](50) NULL,
+	[Description] [nvarchar](max) NULL,
+	[Size] [nvarchar](100) NULL,
+	[BoardTypeID] [int] NOT NULL,
+ CONSTRAINT [Board$PrimaryKey] PRIMARY KEY CLUSTERED
+(
+	[BoardID] ASC
+) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+SELECT 'Table Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

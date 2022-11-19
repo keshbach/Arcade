@@ -1,0 +1,20 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+CREATE LOGIN %User% WITH PASSWORD = '%Password%';
+GO
+
+CREATE USER [%User%] FOR LOGIN [%User%] WITH DEFAULT_SCHEMA = [dbo]
+GO
+
+ALTER ROLE [db_owner] ADD MEMBER [%User%]
+GO
+
+SELECT 'User Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

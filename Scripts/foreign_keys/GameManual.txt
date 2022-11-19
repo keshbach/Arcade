@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[GameManual] WITH NOCHECK ADD CONSTRAINT [GameManual$GameGameManual] FOREIGN KEY([GameID])
+REFERENCES [dbo].[Game] ([GameID])
+GO
+
+ALTER TABLE [dbo].[GameManual] CHECK CONSTRAINT [GameManual$GameGameManual]
+GO
+
+ALTER TABLE [dbo].[GameManual] WITH NOCHECK ADD CONSTRAINT [GameManual$ManualGameManual] FOREIGN KEY([ManualID])
+REFERENCES [dbo].[Manual] ([ManualID])
+GO
+
+ALTER TABLE [dbo].[GameManual] CHECK CONSTRAINT [GameManual$ManualGameManual]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

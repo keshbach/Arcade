@@ -1,0 +1,18 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[Game] WITH NOCHECK ADD CONSTRAINT [Game$ManufacturerGame] FOREIGN KEY([ManufacturerID])
+REFERENCES [dbo].[Manufacturer] ([ManufacturerID])
+GO
+
+ALTER TABLE [dbo].[Game] CHECK CONSTRAINT [Game$ManufacturerGame]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

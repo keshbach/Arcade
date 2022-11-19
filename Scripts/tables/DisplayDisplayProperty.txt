@@ -1,0 +1,22 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+CREATE TABLE [dbo].[DisplayDisplayProperty] (
+	[DisplayID] [int] NOT NULL,
+	[DisplayPropertyID] [int] NOT NULL,
+ CONSTRAINT [DisplayDisplayProperty$PrimaryKey] PRIMARY KEY CLUSTERED
+(
+	[DisplayID] ASC,
+	[DisplayPropertyID] ASC
+) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+SELECT 'Table Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

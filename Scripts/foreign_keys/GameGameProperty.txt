@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[GameGameProperty] WITH NOCHECK ADD CONSTRAINT [GameGameProperty$Game2GameGameProperty2] FOREIGN KEY([GameID])
+REFERENCES [dbo].[Game] ([GameID])
+GO
+
+ALTER TABLE [dbo].[GameGameProperty] CHECK CONSTRAINT [GameGameProperty$Game2GameGameProperty2]
+GO
+
+ALTER TABLE [dbo].[GameGameProperty] WITH NOCHECK ADD CONSTRAINT [GameGameProperty$GameProperty2GameGameProperty2] FOREIGN KEY([GamePropertyID])
+REFERENCES [dbo].[GameProperty] ([GamePropertyID])
+GO
+
+ALTER TABLE [dbo].[GameGameProperty] CHECK CONSTRAINT [GameGameProperty$GameProperty2GameGameProperty2]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

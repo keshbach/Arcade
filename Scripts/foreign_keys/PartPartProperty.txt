@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[PartPartProperty] WITH NOCHECK ADD CONSTRAINT [PartPartProperty${71D0F15A-76EC-4BB9-9B72-B98182FB72DA}] FOREIGN KEY([PartPropertyID])
+REFERENCES [dbo].[PartProperty] ([PartPropertyID])
+GO
+
+ALTER TABLE [dbo].[PartPartProperty] CHECK CONSTRAINT [PartPartProperty${71D0F15A-76EC-4BB9-9B72-B98182FB72DA}]
+GO
+
+ALTER TABLE [dbo].[PartPartProperty] WITH NOCHECK ADD CONSTRAINT [PartPartProperty$PartPartPartProperty] FOREIGN KEY([PartID])
+REFERENCES [dbo].[Part] ([PartID])
+GO
+
+ALTER TABLE [dbo].[PartPartProperty] CHECK CONSTRAINT [PartPartProperty$PartPartPartProperty]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

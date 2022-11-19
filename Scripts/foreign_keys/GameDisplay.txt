@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[GameDisplay] WITH NOCHECK ADD CONSTRAINT [GameDisplay$Display2GameDisplay] FOREIGN KEY([DisplayID])
+REFERENCES [dbo].[Display] ([DisplayID])
+GO
+
+ALTER TABLE [dbo].[GameDisplay] CHECK CONSTRAINT [GameDisplay$Display2GameDisplay]
+GO
+
+ALTER TABLE [dbo].[GameDisplay] WITH NOCHECK ADD CONSTRAINT [GameDisplay$Game2GameDisplay] FOREIGN KEY([GameID])
+REFERENCES [dbo].[Game] ([GameID])
+GO
+
+ALTER TABLE [dbo].[GameDisplay] CHECK CONSTRAINT [GameDisplay$Game2GameDisplay]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

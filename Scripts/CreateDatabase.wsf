@@ -1,0 +1,874 @@
+<?xml version="1.0"?>
+<package>
+  <job id="Build">
+    <?job debug="true" error="true"?>
+    <runtime>
+      <description>
+        Create Database Script v1.00
+        Copyright (C) 2022 Kevin Eshbach
+        All Rights Reserved
+
+        This script creates the arcade database for Microsoft SQL Server 2019 Express.
+        This script assumes Microsoft SQL Server 2019 Express is also running on this machine.
+      </description>
+
+      <named name="databaseName"
+             type="string"
+             helpstring="Name of the database to create"
+             required="true" />
+
+      <named name="serverPort"
+             type="string"
+             helpstring="Port that SQL Server is listening on (default is 1433)"
+             required="false" />
+
+      <named name="user"
+             type="string"
+             helpstring="User account for the database"
+             required="true" />
+
+      <named name="password"
+             type="string"
+             helpstring="Password of the user account for the database"
+             required="true" />
+
+      <named name="verbose"
+             type="boolean"
+             helpstring="Dump all output"
+             required="false" />
+    </runtime>
+
+    <resource id="SqlCmdApp">C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\sqlcmd.exe</resource>
+    <resource id="SqlServerDataPath">C:\Program Files\Microsoft SQL Server\MSSQL15.SQLEXPRESS\MSSQL\DATA</resource>
+
+    <script language="VBScript">
+      <![CDATA[
+        ' OpenTextFile IO Mode constants
+        const ForReading   = 1 ' Open a file for reading only. You can't write to this file.
+        const ForWriting   = 2 ' Open a file for writing only. You can't read from this file.
+        const ForAppending = 8 ' Open a file and write to the end of the file.
+
+        ' OpenTextFile Format constants
+        const TristateUseDefault = 2 ' Opens the file using the system default.
+        const TristateTrue       = 1 ' Opens the file as Unicode.
+        const TristateFalse      = 0 ' Opens the file as ASCII.
+
+        ' GetSpecialFolder constants
+        Const WindowsFolder   = 0
+        Const SystemFolder    = 1
+        Const TemporaryFolder = 2
+      ]]>
+    </script>
+
+    <script language="JScript">
+      <![CDATA[
+        var g_Verbose = false;
+        var g_DatabaseName = "";
+        var g_SqlServerPort = 1433;
+        var g_User = "";
+        var g_Password = "";
+
+        function generateServerName()
+        {
+            return "localhost\\sqlexpress," + g_SqlServerPort;
+        }
+
+        function dumpFile(file)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var input, lineRead;
+
+            WScript.Echo("Dumping the file \"" + file + "\".");
+            WScript.Echo();
+
+            input = fso.OpenTextFile(file, ForReading, false, TristateFalse);
+
+            while (!input.AtEndOfStream)
+            {
+                lineRead = input.ReadLine();
+
+                WScript.Echo(lineRead);
+            }
+
+            input.Close();
+        }
+
+        function launchSqlCommand(inputFile, outputFile)
+        {
+            var WshShell = WScript.CreateObject("WScript.Shell");
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var command = "\"" + getResource("SqlCmdApp") + "\"";
+            var result;
+
+            command += " -l 1"; // login timeout in seconds
+            command += " -t 5"; // query timeout in seconds
+            command += " -S \"";
+            command += generateServerName();
+            command += "\"";
+            command += " -i \"";
+            command += inputFile;
+            command += "\"";
+            command += " -o \"";
+            command += outputFile;
+            command += "\"";
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Launching the sql command app: " + command);
+                WScript.Echo();
+            }
+
+            result = WshShell.Run(command, 0, true);
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Result from launching the sql command: " + result);
+                WScript.Echo();
+            }
+
+            if (result != 0)
+            {
+                if (fso.FileExists(outputFile))
+                {
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Deleting existing temporary output file.");
+                        WScript.Echo();
+                    }
+
+                    fso.DeleteFile(outputFile);
+                }
+            }
+
+            return result;
+        }
+
+        function findValueInFile(outputFile, value)
+        {
+            var result = 0;
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var input, lineRead;
+
+            input = fso.OpenTextFile(outputFile, ForReading, false, TristateFalse);
+
+            while (!input.AtEndOfStream)
+            {
+                lineRead = input.ReadLine();
+
+                if (-1 != lineRead.search(value))
+                {
+                    result = 1;
+                }
+            }
+
+            input.Close();
+
+	    return result;
+        }
+
+        function generateFile(inputFile, outputFile, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var input, output, lineRead;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("generateFile parameters.");
+                WScript.Echo();
+                WScript.Echo("Input File:  " + inputFile);
+                WScript.Echo("Output File: " + outputFile);
+                WScript.Echo();
+            }
+
+            input = fso.OpenTextFile(inputFile, ForReading, false, TristateFalse);
+
+            output = fso.CreateTextFile(outputFile, false, false);
+
+            while (!input.AtEndOfStream)
+            {
+                lineRead = input.ReadLine();
+
+                for (var key in dictionary)
+                {
+	            lineRead = lineRead.replace(new RegExp(key, 'g'), dictionary[key]);
+                }
+
+                output.WriteLine(lineRead);
+            }
+
+            input.Close();
+
+	    output.Close();
+        }
+
+        function generateCreateFile(inputFile, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var createFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateFile.txt");
+
+            if (g_Verbose)
+            {
+                WScript.Echo("generateCreateFile parameters.");
+                WScript.Echo();
+                WScript.Echo("Input File:            " + inputFile);
+                WScript.Echo("Temporary Create File: " + createFile);
+                WScript.Echo();
+            }
+
+            generateFile(inputFile, createFile, dictionary);
+
+            return createFile;
+        }
+
+        function buildDefaultValues(rootPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var folder = fso.GetFolder(rootPath);
+            var filesCollection = new Enumerator(folder.Files);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateDefaultValuesOutput.txt");
+            var fileName, defaultValueName, inputFile, defaultValueFile, result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Default Value Path: " + rootPath);
+                WScript.Echo();
+            }
+
+            while (!filesCollection.atEnd())
+            {
+                fileName = filesCollection.item().name;
+                defaultValueName = fso.GetBaseName(fileName);
+                inputFile = fso.BuildPath(rootPath, fileName);
+                defaultValueFile = generateCreateFile(inputFile, dictionary);
+
+                WScript.Echo("Creating the \"" + defaultValueName + "\" default value.");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo();
+                    WScript.Echo("Default Value Input File: " + inputFile);
+                    WScript.Echo("Default Value File:       " + defaultValueFile);
+                    WScript.Echo("Output File:              " + outputFile);
+                    WScript.Echo();
+                }
+
+                result = launchSqlCommand(defaultValueFile, outputFile);
+
+                if (fso.FileExists(defaultValueFile))
+                {
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Deleting existing temporary default value file.");
+                        WScript.Echo();
+                    }
+
+                    fso.DeleteFile(defaultValueFile);
+                }
+
+                if (result != 0)
+                {
+                    throw new Error("Could not establish a connection to the database.");
+                }
+
+                if (g_Verbose)
+                {
+                    dumpFile(outputFile)
+                }
+
+                result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary default value output file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(outputFile);
+
+                if (!result)
+                {
+                    return 0;
+                }
+
+                filesCollection.moveNext();
+            }
+
+            return 1;
+        }
+
+        function buildNoZeroLengthConstraints(rootPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var folder = fso.GetFolder(rootPath);
+            var filesCollection = new Enumerator(folder.Files);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateNoZeroLengthConstraintsOutput.txt");
+            var fileName, noZeroLengthConstraintName, inputFile, createNoZeroLengthConstraintFile, result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("No Zero Length Constraints Path: " + rootPath);
+                WScript.Echo();
+            }
+
+            while (!filesCollection.atEnd())
+            {
+                fileName = filesCollection.item().name;
+                noZeroLengthConstraintName = fso.GetBaseName(fileName);
+                inputFile = fso.BuildPath(rootPath, fileName);
+                createNoZeroLengthConstraintFile = generateCreateFile(inputFile, dictionary);
+
+                WScript.Echo("Creating the \"" + noZeroLengthConstraintName + "\" no zero length constraints.");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo();
+                    WScript.Echo("Create No Zero Length Constraint Input File:  " + inputFile);
+                    WScript.Echo("Create No Zero Length Constraint File:        " + createNoZeroLengthConstraintFile);
+                    WScript.Echo("Create No Zero Length Constraint Output File: " + outputFile);
+                    WScript.Echo();
+                }
+
+                result = launchSqlCommand(createNoZeroLengthConstraintFile, outputFile);
+
+                if (fso.FileExists(createNoZeroLengthConstraintFile))
+                {
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Deleting existing temporary create no zero length constraints file.");
+                        WScript.Echo();
+                    }
+
+                    fso.DeleteFile(createNoZeroLengthConstraintFile);
+                }
+
+                if (result != 0)
+                {
+                    throw new Error("Could not establish a connection to the database.");
+                }
+
+                if (g_Verbose)
+                {
+                    dumpFile(outputFile)
+                }
+
+                result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary create no zero length constraint output file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(outputFile);
+
+                if (!result)
+                {
+                    return 0;
+                }
+
+                filesCollection.moveNext();
+            }
+
+            return 1;
+        }
+
+        function buildForeignKeys(rootPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var folder = fso.GetFolder(rootPath);
+            var filesCollection = new Enumerator(folder.Files);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateForeignKeysOutput.txt");
+            var fileName, foreignKeyName, inputFile, createForeignKeyFile, result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Foreign Keys Path: " + rootPath);
+                WScript.Echo();
+            }
+
+            while (!filesCollection.atEnd())
+            {
+                fileName = filesCollection.item().name;
+                foreignKeyName = fso.GetBaseName(fileName);
+                inputFile = fso.BuildPath(rootPath, fileName);
+                createForeignKeyFile = generateCreateFile(inputFile, dictionary);
+
+                WScript.Echo("Creating the \"" + foreignKeyName + "\" table foreign keys.");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo();
+                    WScript.Echo("Create Foreign Key Input File:  " + inputFile);
+                    WScript.Echo("Create Foreign Key File:        " + createForeignKeyFile);
+                    WScript.Echo("Create Foreign Key Output File: " + outputFile);
+                    WScript.Echo();
+                }
+
+                result = launchSqlCommand(createForeignKeyFile, outputFile);
+
+                if (fso.FileExists(createForeignKeyFile))
+                {
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Deleting existing temporary create foreign keys file.");
+                        WScript.Echo();
+                    }
+
+                    fso.DeleteFile(createForeignKeyFile);
+                }
+
+                if (result != 0)
+                {
+                    throw new Error("Could not establish a connection to the database.");
+                }
+
+                if (g_Verbose)
+                {
+                    dumpFile(outputFile)
+                }
+
+                result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary create foreign key output file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(outputFile);
+
+                if (!result)
+                {
+                    return 0;
+                }
+
+                filesCollection.moveNext();
+            }
+
+            return 1;
+        }
+
+        function buildIndexes(rootPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var folder = fso.GetFolder(rootPath);
+            var filesCollection = new Enumerator(folder.Files);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateIndexOutput.txt");
+            var fileName, indexName, inputFile, createIndexFile, result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Indexes Path: " + rootPath);
+                WScript.Echo();
+            }
+
+            while (!filesCollection.atEnd())
+            {
+                fileName = filesCollection.item().name;
+                indexName = fso.GetBaseName(fileName);
+                inputFile = fso.BuildPath(rootPath, fileName);
+                createIndexFile = generateCreateFile(inputFile, dictionary);
+
+                WScript.Echo("Creating the \"" + indexName + "\" table indexes.");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo();
+                    WScript.Echo("Create Index Input File:  " + inputFile);
+                    WScript.Echo("Create Index File:        " + createIndexFile);
+                    WScript.Echo("Create Index Output File: " + outputFile);
+                    WScript.Echo();
+                }
+
+                result = launchSqlCommand(createIndexFile, outputFile);
+
+                if (fso.FileExists(createIndexFile))
+                {
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Deleting existing temporary create index file.");
+                        WScript.Echo();
+                    }
+
+                    fso.DeleteFile(createIndexFile);
+                }
+
+                if (result != 0)
+                {
+                    throw new Error("Could not establish a connection to the database.");
+                }
+
+                if (g_Verbose)
+                {
+                    dumpFile(outputFile)
+                }
+
+                result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary create index output file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(outputFile);
+
+                if (!result)
+                {
+                    return 0;
+                }
+
+                filesCollection.moveNext();
+            }
+
+            return 1;
+        }
+
+        function buildTables(rootPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var folder = fso.GetFolder(rootPath);
+            var filesCollection = new Enumerator(folder.Files);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateTableOutput.txt");
+            var fileName, tableName, inputFile, createTableFile, result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Tables Path: " + rootPath);
+                WScript.Echo();
+            }
+
+            while (!filesCollection.atEnd())
+            {
+                fileName = filesCollection.item().name;
+                tableName = fso.GetBaseName(fileName);
+                inputFile = fso.BuildPath(rootPath, fileName);
+                createTableFile = generateCreateFile(inputFile, dictionary);
+
+                WScript.Echo("Creating the \"" + tableName + "\" table.");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo();
+                    WScript.Echo("Create Table Input File:  " + inputFile);
+                    WScript.Echo("Create Table File:        " + createTableFile);
+                    WScript.Echo("Create Table Output File: " + outputFile);
+                    WScript.Echo();
+                }
+
+                result = launchSqlCommand(createTableFile, outputFile);
+
+                if (fso.FileExists(createTableFile))
+                {
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Deleting existing temporary create table file.");
+                        WScript.Echo();
+                    }
+
+                    fso.DeleteFile(createTableFile);
+                }
+
+                if (result != 0)
+                {
+                    throw new Error("Could not establish a connection to the database.");
+                }
+
+                if (g_Verbose)
+                {
+                    dumpFile(outputFile)
+                }
+
+                result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary create table output file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(outputFile);
+
+                if (!result)
+                {
+                    return 0;
+                }
+
+                filesCollection.moveNext();
+            }
+
+            return 1;
+        }
+
+        function buildUser(rootPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var inputFile = fso.BuildPath(rootPath, "create_user.txt");
+            var createUserFile = generateCreateFile(inputFile, dictionary);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateUserOutput.txt");
+            var result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("buildUser parameters.");
+                WScript.Echo();
+                WScript.Echo("Create User Input File:  " + inputFile);
+                WScript.Echo("Create User File:        " + createUserFile);
+                WScript.Echo("Create User Output File: " + outputFile);
+                WScript.Echo();
+            }
+
+            result = launchSqlCommand(createUserFile, outputFile);
+
+            if (fso.FileExists(createUserFile))
+            {
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary create user file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(createUserFile);
+            }
+
+            if (result != 0)
+            {
+                throw new Error("Could not establish a connection to the database.");
+            }
+
+            if (g_Verbose)
+            {
+                dumpFile(outputFile)
+            }
+
+            result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Deleting existing temporary build user output file.");
+                WScript.Echo();
+            }
+
+            fso.DeleteFile(outputFile);
+
+            return result;
+        }
+
+        function buildDatabase(rootPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var inputFile = fso.BuildPath(rootPath, "create_database.txt");
+            var createDatabaseFile = generateCreateFile(inputFile, dictionary);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCreateDatabaseOutput.txt");
+            var createDatabaseFile, result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("buildDatabase parameters.");
+                WScript.Echo();
+                WScript.Echo("Create Database Input File:  " + inputFile);
+                WScript.Echo("Create Database File:        " + createDatabaseFile);
+                WScript.Echo("Create Database Output File: " + outputFile);
+                WScript.Echo();
+            }
+
+            result = launchSqlCommand(createDatabaseFile, outputFile);
+
+            if (fso.FileExists(createDatabaseFile))
+            {
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary create database file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(createDatabaseFile);
+            }
+
+            if (result != 0)
+            {
+                throw new Error("Could not establish a connection to the database.");
+            }
+
+            if (g_Verbose)
+            {
+                dumpFile(outputFile)
+            }
+
+            result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Deleting existing temporary build database output file.");
+                WScript.Echo();
+            }
+
+            fso.DeleteFile(outputFile);
+
+            return result;
+        }
+
+        function mixedModeAuthenticationPresent(rootPath)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var inputFile = fso.BuildPath(rootPath, "check_sql_server.txt");
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempCheckSqlServerOutput.txt");
+            var result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Preparing to query the SQL Server authentication mode.");
+                WScript.Echo();
+                WScript.Echo("Input File:  " + inputFile);
+                WScript.Echo("Output File: " + outputFile);
+                WScript.Echo();
+            }
+
+            result = launchSqlCommand(inputFile, outputFile);
+
+            if (result != 0)
+            {
+                throw new Error("Could not establish a connection to the database.");
+            }
+
+            if (g_Verbose)
+            {
+                dumpFile(outputFile)
+            }
+
+            result = findValueInFile(outputFile, "Windows and SQL Server Authentication");
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Deleting existing temporary authentication mode output file.");
+                WScript.Echo();
+            }
+
+            fso.DeleteFile(outputFile);
+
+            return result;
+        }
+
+        function parseArgs()
+        {
+            g_DatabaseName = WScript.Arguments.Named.Item("databaseName");
+            g_User = WScript.Arguments.Named.Item("user");
+            g_Password = WScript.Arguments.Named.Item("password");
+
+            if (WScript.Arguments.Named.Item("verbose") == "+")
+            {
+                g_Verbose = true;
+            }
+
+            if (WScript.Arguments.Named.Item("serverPort"))
+            {
+                g_SqlServerPort = WScript.Arguments.Named.Item("serverPort");
+            }
+
+            if (g_DatabaseName == null || g_DatabaseName.length == 0)
+            {
+                throw new Error("Database name is missing.");
+            }
+
+            if (g_User == null || g_User.length == 0)
+            {
+                throw new Error("User is missing.");
+            }
+
+            if (g_Password == null || g_Password.length == 0)
+            {
+                throw new Error("Password is missing.");
+            }
+
+            return 1;
+        }
+
+        function main()
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var WshShell = WScript.CreateObject("WScript.Shell");
+            var dictionary = {};
+
+            if (!parseArgs())
+            {
+                WScript.Echo("Invalid command line arguments");
+
+                return 1;
+            }
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Current Path: " + WshShell.CurrentDirectory);
+                WScript.Echo();
+            }
+
+            WScript.Echo("Current Path:                 " + WshShell.CurrentDirectory);
+            WScript.Echo("SQL Server Command Line Tool: " + getResource("SqlCmdApp"));
+            WScript.Echo("SQL Server:                   " + generateServerName());
+            WScript.Echo("SQL Server Data Path:         " + getResource("SqlServerDataPath"));
+            WScript.Echo();
+
+            WScript.Echo("Checking for SQL Server Mixed Authentication support.");
+
+            if (!mixedModeAuthenticationPresent(WshShell.CurrentDirectory))
+            {
+                WScript.Echo("Error: SQL Server Mixed Authentication not present.");
+
+                return 0;
+            }
+
+            WScript.Echo("SQL Server Mixed Authentication supported.");
+            WScript.Echo();
+
+            WScript.Echo("Initializing dictionary.");
+            WScript.Echo();
+
+            dictionary['%SqlServerDataPath%'] = getResource("SqlServerDataPath");
+            dictionary['%Database%'] = g_DatabaseName;
+            dictionary['%User%'] = g_User;
+            dictionary['%Password%'] = g_Password;
+
+            WScript.Echo("Attempting to create the database.");
+            WScript.Echo();
+
+            if (!buildDatabase(WshShell.CurrentDirectory, dictionary) ||
+                !buildUser(WshShell.CurrentDirectory, dictionary) ||
+                !buildTables(fso.BuildPath(WshShell.CurrentDirectory, "tables"), dictionary) ||
+                !buildIndexes(fso.BuildPath(WshShell.CurrentDirectory, "indexes"), dictionary) ||
+                !buildForeignKeys(fso.BuildPath(WshShell.CurrentDirectory, "foreign_keys"), dictionary) ||
+                !buildNoZeroLengthConstraints(fso.BuildPath(WshShell.CurrentDirectory, "no_zero_length_constraints"), dictionary) ||
+                !buildDefaultValues(fso.BuildPath(WshShell.CurrentDirectory, "default_values"), dictionary))
+            {
+                WScript.Echo("Database creation failed.");
+
+                return 1;
+            }
+
+            WScript.Echo("Database successfully created.");
+
+            return 0;
+        }
+
+        try
+        {
+            // https://learn.microsoft.com/en-us/sql/tools/BCP-utility?view=sql-server-ver16
+
+            var result = main();
+
+            WScript.Quit(result);
+        }
+        catch (e)
+        {
+            WScript.Echo("Error Occurred");
+            WScript.Echo();
+            WScript.Echo("Name:        " + e.name);
+            WScript.Echo("Message:     " + e.message);
+            WScript.Echo("Number:      " + e.number);
+            WScript.Echo("Description: " + e.description);
+
+            WScript.Quit(1);
+        }
+      ]]>
+    </script>
+  </job>
+</package>

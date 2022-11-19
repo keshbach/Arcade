@@ -1,0 +1,22 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+CREATE TABLE [dbo].[GameManual] (
+	[GameID] [int] NOT NULL,
+	[ManualID] [int] NOT NULL,
+ CONSTRAINT [GameManual$PrimaryKey] PRIMARY KEY CLUSTERED
+(
+	[GameID] ASC,
+	[ManualID] ASC
+) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+SELECT 'Table Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

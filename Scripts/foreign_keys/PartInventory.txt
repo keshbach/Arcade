@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[PartInventory] WITH CHECK ADD CONSTRAINT [PartInventory$InventoryID] FOREIGN KEY([InventoryID])
+REFERENCES [dbo].[Inventory] ([InventoryID])
+GO
+
+ALTER TABLE [dbo].[PartInventory] CHECK CONSTRAINT [PartInventory$InventoryID]
+GO
+
+ALTER TABLE [dbo].[PartInventory] WITH CHECK ADD CONSTRAINT [PartInventory$PartID] FOREIGN KEY([PartID])
+REFERENCES [dbo].[Part] ([PartID])
+GO
+
+ALTER TABLE [dbo].[PartInventory] CHECK CONSTRAINT [PartInventory$PartID]
+GO
+
+SELECT 'Foreign Keys Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

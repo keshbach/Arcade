@@ -1,0 +1,17 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+ALTER TABLE [dbo].[Display] WITH NOCHECK ADD CONSTRAINT [SSMA_CC$Display$Name$disallow_zero_length] CHECK ((len([Name]) > (0)))
+GO
+
+ALTER TABLE [dbo].[Display] CHECK CONSTRAINT [SSMA_CC$Display$Name$disallow_zero_length]
+GO
+
+SELECT 'No Zero Length Constraint Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

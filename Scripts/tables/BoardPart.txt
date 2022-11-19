@@ -1,0 +1,25 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+CREATE TABLE [dbo].[BoardPart] (
+	[BoardPartID] [int] IDENTITY(1,1) NOT NULL,
+	[Position] [nvarchar](10) NOT NULL,
+	[Description] [nvarchar](max) NULL,
+	[BoardID] [int] NOT NULL,
+	[BoardPartLocationID] [int] NOT NULL,
+	[PartID] [int] NOT NULL,
+ CONSTRAINT [BoardPart$PrimaryKey] PRIMARY KEY CLUSTERED
+(
+	[BoardPartID] ASC
+) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+SELECT 'Table Created'
+GO
+
+SELECT 'Commands Successfully Executed'
+GO
