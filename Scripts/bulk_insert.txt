@@ -1,0 +1,21 @@
+SELECT 'Executing Commands'
+GO
+
+USE [%Database%]
+GO
+
+BULK INSERT [%Table%]
+FROM '%DataFile%'
+WITH (
+    CHECK_CONSTRAINTS,
+    KEEPIDENTITY,
+    FIELDQUOTE = '"',
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n',
+    FIRSTROW = 2,
+    FORMAT = 'CSV'
+);
+GO
+
+SELECT 'Commands Successfully Executed'
+GO

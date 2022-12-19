@@ -708,6 +708,88 @@
             return result;
         }
 
+        function importTableData(rootPath, dataPath, dictionary)
+        {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
+            var inputFile = fso.BuildPath(rootPath, "bulk_insert.txt");
+            var folder = fso.GetFolder(dataPath);
+            var filesCollection = new Enumerator(folder.Files);
+            var outputFile = fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder), "TempImportDataOutput.txt");
+            var importDataFile, fileName, tableName, inputDataFile, result;
+
+            if (g_Verbose)
+            {
+                WScript.Echo("Root Path:       " + rootPath);
+                WScript.Echo("Table Data Path: " + dataPath);
+                WScript.Echo();
+            }
+
+            while (!filesCollection.atEnd())
+            {
+                fileName = filesCollection.item().name;
+                tableName = fso.GetBaseName(fileName);
+                inputDataFile = fso.BuildPath(dataPath, fileName);
+
+                dictionary['%Table%'] = tableName;
+                dictionary['%DataFile%'] = inputDataFile;
+
+                importDataFile = generateCreateFile(inputFile, dictionary);
+
+                WScript.Echo("Importing the \"" + tableName + "\" data.");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo();
+                    WScript.Echo("Import Data File:       " + importDataFile);
+                    WScript.Echo("Table Data Input  File: " + inputDataFile);
+                    WScript.Echo("Table Data Output File: " + outputFile);
+                    WScript.Echo();
+                }
+
+                result = launchSqlCommand(importDataFile, outputFile);
+
+                if (fso.FileExists(importDataFile))
+                {
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Deleting existing temporary import data file.");
+                        WScript.Echo();
+                    }
+
+                    fso.DeleteFile(importDataFile);
+                }
+
+                if (result != 0)
+                {
+                    throw new Error("Could not establish a connection to the database.");
+                }
+
+                if (g_Verbose)
+                {
+                    dumpFile(outputFile)
+                }
+
+                result = findValueInFile(outputFile, "Commands Successfully Executed");
+
+                if (g_Verbose)
+                {
+                    WScript.Echo("Deleting existing temporary import data output file.");
+                    WScript.Echo();
+                }
+
+                fso.DeleteFile(outputFile);
+
+                if (!result)
+                {
+                    return 0;
+                }
+
+                filesCollection.moveNext();
+            }
+
+            return 1;
+        }
+
         function mixedModeAuthenticationPresent(rootPath)
         {
             var fso = new ActiveXObject("Scripting.FileSystemObject");
@@ -837,7 +919,8 @@
                 !buildIndexes(fso.BuildPath(WshShell.CurrentDirectory, "indexes"), dictionary) ||
                 !buildForeignKeys(fso.BuildPath(WshShell.CurrentDirectory, "foreign_keys"), dictionary) ||
                 !buildNoZeroLengthConstraints(fso.BuildPath(WshShell.CurrentDirectory, "no_zero_length_constraints"), dictionary) ||
-                !buildDefaultValues(fso.BuildPath(WshShell.CurrentDirectory, "default_values"), dictionary))
+                !buildDefaultValues(fso.BuildPath(WshShell.CurrentDirectory, "default_values"), dictionary) ||
+                !importTableData(WshShell.CurrentDirectory, fso.BuildPath(WshShell.CurrentDirectory, "data"), dictionary))
             {
                 WScript.Echo("Database creation failed.");
 
@@ -851,8 +934,6 @@
 
         try
         {
-            // https://learn.microsoft.com/en-us/sql/tools/BCP-utility?view=sql-server-ver16
-
             var result = main();
 
             WScript.Quit(result);
