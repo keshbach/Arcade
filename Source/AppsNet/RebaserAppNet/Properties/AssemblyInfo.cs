@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kevin Eshbach")]
 [assembly: AssemblyProduct("RebaserAppNet")]
-[assembly: AssemblyCopyright("© 2006-2022 Kevin Eshbach. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2006-2023 Kevin Eshbach. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
