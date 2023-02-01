@@ -2,11 +2,11 @@
 
 Application for tracking arcade game boards and their associated electronic components, controls and display information.
 
-Copyright (C) 2006-2022 Kevin Eshbach  
+Copyright (C) 2006-2023 Kevin Eshbach  
 
 ## Requirements
 
-Windows 7, Windows 8, Windows 8.1 and Windows 10
+Windows 7, Windows 8, Windows 8.1, Windows 10 or Windows 11
 
 The application requires either a Microsoft Access or SQL Server database.
 
