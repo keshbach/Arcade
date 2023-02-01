@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2022 Kevin Eshbach
+//  Copyright (C) 2019-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -21,6 +21,11 @@
 
 #define CNetFrameworkRuntimeVersion L"v4.0.30319"
 
+#define CUxThemeLibraryName L"UxTheme.dll"
+
+#define CBufferedPaintInitFuncName "BufferedPaintInit"
+#define CBufferedPaintUnInitFuncName "BufferedPaintUnInit"
+
 #define CArcadeAppHostNetLibraryName L"ArcadeAppHostNet.dll"
 
 #define CArcadeAppHostNetExecuteInAppDomainFuncName "ArcadeAppHostNetExecuteInAppDomain"
@@ -28,6 +33,9 @@
 #pragma endregion
 
 #pragma region "Type Defs"
+
+typedef HRESULT(STDAPICALLTYPE* TBufferedPaintInitFunc)(VOID);
+typedef HRESULT(STDAPICALLTYPE* TBufferedPaintUnInitFunc)(VOID);
 
 typedef HRESULT (__stdcall* TArcadeAppHostNetExecuteInAppDomainFunc)(void* cookie);
 
@@ -38,6 +46,7 @@ typedef HRESULT (__stdcall* TArcadeAppHostNetExecuteInAppDomainFunc)(void* cooki
 typedef struct tagTArcadeAppHostRuntimeData
 {
     BOOL bCOMInitialized;
+    BOOL bBufferPaintInitialized;
 	BOOL bArcadeAppHostTasksInitialized;
     BOOL bRuntimeStarted;
     ICLRMetaHost* pCLRMetaHost;
@@ -49,6 +58,10 @@ typedef struct tagTArcadeAppHostRuntimeData
     ICLRHostProtectionManager* pCLRHostProtectionManager;
     ArcadeAppHostControl* pArcadeAppHostControl;
     ArcadeAppActionOnCLREvent* pArcadeAppActionOnCLREvent;
+
+    HMODULE hUxThemeLibrary;
+    TBufferedPaintInitFunc pBufferedPaintInit;
+    TBufferedPaintUnInitFunc pBufferedPaintUnInit;
 
     HMODULE hHostNetLibrary;
     TArcadeAppHostNetExecuteInAppDomainFunc pArcadeAppHostNetExecuteInAppDomain;
@@ -77,6 +90,35 @@ static BOOL lInitialize(
     }
 
     pArcadeAppHostRuntimeData->bCOMInitialized = TRUE;
+
+    if (::IsWindowsVistaOrGreater())
+    {
+        pArcadeAppHostRuntimeData->hUxThemeLibrary = ::LoadLibrary(CUxThemeLibraryName);
+
+        if (pArcadeAppHostRuntimeData->hUxThemeLibrary)
+        {
+            pArcadeAppHostRuntimeData->pBufferedPaintInit = (TBufferedPaintInitFunc)::GetProcAddress(pArcadeAppHostRuntimeData->hUxThemeLibrary, CBufferedPaintInitFuncName);
+            pArcadeAppHostRuntimeData->pBufferedPaintUnInit = (TBufferedPaintUnInitFunc)::GetProcAddress(pArcadeAppHostRuntimeData->hUxThemeLibrary, CBufferedPaintUnInitFuncName);
+        }
+
+        if (pArcadeAppHostRuntimeData->hUxThemeLibrary == NULL ||
+            pArcadeAppHostRuntimeData->pBufferedPaintInit == NULL ||
+            pArcadeAppHostRuntimeData->pBufferedPaintUnInit == NULL)
+        {
+            lUninitialize(pArcadeAppHostRuntimeData);
+
+            return FALSE;
+        }
+
+        if (S_OK != pArcadeAppHostRuntimeData->pBufferedPaintInit())
+        {
+            lUninitialize(pArcadeAppHostRuntimeData);
+
+            return FALSE;
+        }
+
+        pArcadeAppHostRuntimeData->bBufferPaintInitialized = TRUE;
+    }
 
 	if (FALSE == UtArcadeAppHostTasksInitialize())
 	{
@@ -321,6 +363,19 @@ static BOOL lUninitialize(
 		pArcadeAppHostRuntimeData->bArcadeAppHostTasksInitialized = FALSE;
 	}
 
+    if (pArcadeAppHostRuntimeData->bBufferPaintInitialized)
+    {
+        pArcadeAppHostRuntimeData->pBufferedPaintUnInit();
+
+        ::FreeLibrary(pArcadeAppHostRuntimeData->hUxThemeLibrary);
+
+        pArcadeAppHostRuntimeData->hUxThemeLibrary = NULL;
+        pArcadeAppHostRuntimeData->pBufferedPaintInit = NULL;
+        pArcadeAppHostRuntimeData->pBufferedPaintUnInit = NULL;
+
+        pArcadeAppHostRuntimeData->bBufferPaintInitialized = FALSE;
+    }
+
     if (pArcadeAppHostRuntimeData->bCOMInitialized)
     {
         ::CoUninitialize();
@@ -388,5 +443,5 @@ MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(
 #pragma endregion
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2019-2022 Kevin Eshbach
+//  Copyright (C) 2019-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
