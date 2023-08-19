@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -47,8 +47,8 @@ namespace Arcade.Forms
             this.labelDescription = new System.Windows.Forms.Label();
             this.textBoxDescription = new Common.Forms.TextBox();
             this.textBoxName = new Common.Forms.TextBox();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
             this.checkBoxComplete = new System.Windows.Forms.CheckBox();
             this.checkBoxOriginal = new System.Windows.Forms.CheckBox();
             this.maskedTextBoxYearPrinted = new Common.Forms.MaskedTextBox();
@@ -319,8 +319,8 @@ namespace Arcade.Forms
         private System.Windows.Forms.Label labelDescription;
         private Common.Forms.TextBox textBoxDescription;
         private Common.Forms.TextBox textBoxName;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
         private System.Windows.Forms.CheckBox checkBoxComplete;
         private System.Windows.Forms.CheckBox checkBoxOriginal;
         private Common.Forms.MaskedTextBox maskedTextBoxYearPrinted;
@@ -328,5 +328,5 @@ namespace Arcade.Forms
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

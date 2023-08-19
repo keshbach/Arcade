@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -42,17 +42,17 @@ namespace Arcade.Forms
             this.labelPinouts = new System.Windows.Forms.Label();
             this.textBoxPinouts = new Common.Forms.TextBox();
             this.labelParts = new System.Windows.Forms.Label();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonClose = new System.Windows.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
             this.listViewKeywords = new Common.Forms.ListView();
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderDataSheets = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderInventory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonDatasheets = new System.Windows.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonDatasheets = new Arcade.Forms.Button();
             this.splitContainerPart = new System.Windows.Forms.SplitContainer();
-            this.buttonInventory = new System.Windows.Forms.Button();
+            this.buttonInventory = new Arcade.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerPart)).BeginInit();
             this.splitContainerPart.Panel1.SuspendLayout();
             this.splitContainerPart.Panel2.SuspendLayout();
@@ -327,17 +327,17 @@ namespace Arcade.Forms
         private System.Windows.Forms.Label labelPinouts;
         private System.Windows.Forms.Label labelParts;
         private Common.Forms.TextBox textBoxPinouts;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonDatasheets;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonDatasheets;
+        private Arcade.Forms.Button buttonClose;
         private System.Windows.Forms.SplitContainer splitContainerPart;
         private System.Windows.Forms.ColumnHeader columnHeaderInventory;
-        private System.Windows.Forms.Button buttonInventory;
+        private Arcade.Forms.Button buttonInventory;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

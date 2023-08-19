@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -37,11 +37,11 @@ namespace Arcade.Forms
             this.listViewBoards = new Common.Forms.ListView();
             this.columnHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonClose = new System.Windows.Forms.Button();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonParts = new System.Windows.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonParts = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelBoards
@@ -176,16 +176,16 @@ namespace Arcade.Forms
 
         private System.Windows.Forms.Label labelBoards;
         private Common.Forms.ListView listViewBoards;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonClose;
         private System.Windows.Forms.ColumnHeader columnHeaderType;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonParts;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonParts;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

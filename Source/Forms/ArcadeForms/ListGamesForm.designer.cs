@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -36,10 +36,10 @@ namespace Arcade.Forms
             this.labelGame = new System.Windows.Forms.Label();
             this.listViewGames = new Common.Forms.ListView();
             this.columnHeaderGame = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonClose = new System.Windows.Forms.Button();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelGame
@@ -156,14 +156,14 @@ namespace Arcade.Forms
 
         private System.Windows.Forms.Label labelGame;
         private Common.Forms.ListView listViewGames;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonClose;
         private System.Windows.Forms.ColumnHeader columnHeaderGame;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonDelete;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

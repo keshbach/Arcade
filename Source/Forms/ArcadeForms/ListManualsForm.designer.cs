@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -39,15 +39,15 @@ namespace Arcade.Forms
             this.columnHeaderPrintEdition = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderManufacturer = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderStorageBox = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
             this.labelKeyword = new System.Windows.Forms.Label();
             this.textBoxKeyword = new Common.Forms.TextBox();
-            this.buttonSearch = new System.Windows.Forms.Button();
-            this.buttonClear = new System.Windows.Forms.Button();
+            this.buttonSearch = new Arcade.Forms.Button();
+            this.buttonClear = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelManuals
@@ -238,18 +238,18 @@ namespace Arcade.Forms
         private System.Windows.Forms.ColumnHeader columnHeaderPrintEdition;
         private System.Windows.Forms.ColumnHeader columnHeaderManufacturer;
         private System.Windows.Forms.ColumnHeader columnHeaderStorageBox;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
         private System.Windows.Forms.Label labelKeyword;
         private Common.Forms.TextBox textBoxKeyword;
-        private System.Windows.Forms.Button buttonSearch;
-        private System.Windows.Forms.Button buttonClear;
+        private Arcade.Forms.Button buttonSearch;
+        private Arcade.Forms.Button buttonClear;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

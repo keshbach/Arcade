@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2014 Kevin Eshbach
+//  Copyright (C) 2009-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -40,8 +40,8 @@ namespace Arcade.Forms
             this.comboBoxColors = new System.Windows.Forms.ComboBox();
             this.labelOrientation = new System.Windows.Forms.Label();
             this.comboBoxOrientation = new System.Windows.Forms.ComboBox();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
             this.labelName = new System.Windows.Forms.Label();
             this.textBoxName = new Common.Forms.TextBox();
             this.SuspendLayout();
@@ -210,13 +210,13 @@ namespace Arcade.Forms
         private System.Windows.Forms.ComboBox comboBoxColors;
         private System.Windows.Forms.Label labelOrientation;
         private System.Windows.Forms.ComboBox comboBoxOrientation;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
         private System.Windows.Forms.Label labelName;
         private Common.Forms.TextBox textBoxName;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2014 Kevin Eshbach
+//  Copyright (C) 2009-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

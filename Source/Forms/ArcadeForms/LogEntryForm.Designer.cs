@@ -1,4 +1,8 @@
-﻿namespace Arcade.Forms
+﻿/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
+namespace Arcade.Forms
 {
     partial class LogEntryForm
     {
@@ -28,8 +32,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
             this.labelType = new System.Windows.Forms.Label();
             this.comboBoxType = new Common.Forms.ComboBox();
             this.labelDate = new System.Windows.Forms.Label();
@@ -152,8 +156,8 @@
 
         #endregion
 
-        private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
         private System.Windows.Forms.Label labelType;
         private Common.Forms.ComboBox comboBoxType;
         private System.Windows.Forms.Label labelDate;
@@ -162,3 +166,7 @@
         private System.Windows.Forms.DateTimePicker dateTimePickerLog;
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

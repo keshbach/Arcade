@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -35,8 +35,8 @@ namespace Arcade.Forms
         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewPartDatasheetsForm));
         this.listViewDatasheets = new Common.Forms.ListView();
         this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-        this.buttonView = new System.Windows.Forms.Button();
-        this.buttonClose = new System.Windows.Forms.Button();
+        this.buttonView = new Arcade.Forms.Button();
+        this.buttonClose = new Arcade.Forms.Button();
         this.labelDatasheets = new System.Windows.Forms.Label();
         this.SuspendLayout();
         // 
@@ -126,13 +126,13 @@ namespace Arcade.Forms
         #endregion
 
         private Common.Forms.ListView listViewDatasheets;
-        private System.Windows.Forms.Button buttonView;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonView;
+        private Arcade.Forms.Button buttonClose;
         private System.Windows.Forms.Label labelDatasheets;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

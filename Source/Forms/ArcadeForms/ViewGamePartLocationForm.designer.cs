@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -41,7 +41,7 @@ namespace Arcade.Forms
             this.listViewPositionsAndLocations = new Common.Forms.ListView();
             this.columnHeaderPosition = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderLocation = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonClose = new System.Windows.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
             this.checkBoxIncludeAllParts = new System.Windows.Forms.CheckBox();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
             this.splitContainerRight = new System.Windows.Forms.SplitContainer();
@@ -247,7 +247,7 @@ namespace Arcade.Forms
         private System.Windows.Forms.ColumnHeader columnHeaderBoardType;
         private Common.Forms.ListView listViewPositionsAndLocations;
         private System.Windows.Forms.ColumnHeader columnHeaderPosition;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonClose;
         private System.Windows.Forms.ColumnHeader columnHeaderCartridgeFlag;
         private System.Windows.Forms.ColumnHeader columnHeaderLocation;
         private System.Windows.Forms.CheckBox checkBoxIncludeAllParts;
@@ -258,5 +258,5 @@ namespace Arcade.Forms
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

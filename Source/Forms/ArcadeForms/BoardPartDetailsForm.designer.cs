@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -34,10 +34,10 @@ namespace Arcade.Forms
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BoardPartDetailsForm));
             this.labelBoardParts = new System.Windows.Forms.Label();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonClose = new System.Windows.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
             this.listViewBoardParts = new Common.Forms.ListView();
             this.columnHeaderPosition = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderKeyword = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -47,7 +47,7 @@ namespace Arcade.Forms
             this.columnHeaderLocation = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.labelSorting = new System.Windows.Forms.Label();
             this.comboBoxSorting = new System.Windows.Forms.ComboBox();
-            this.buttonExport = new System.Windows.Forms.Button();
+            this.buttonExport = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelBoardParts
@@ -233,17 +233,17 @@ namespace Arcade.Forms
         private System.Windows.Forms.ColumnHeader columnHeaderCategory;
         private System.Windows.Forms.ColumnHeader columnHeaderType;
         private System.Windows.Forms.ColumnHeader columnHeaderPackage;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonClose;
         private System.Windows.Forms.Label labelSorting;
         private System.Windows.Forms.ComboBox comboBoxSorting;
         private System.Windows.Forms.ColumnHeader columnHeaderLocation;
-        private System.Windows.Forms.Button buttonExport;
+        private Arcade.Forms.Button buttonExport;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

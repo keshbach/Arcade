@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2014 Kevin Eshbach
+//  Copyright (C) 2014-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -36,8 +36,8 @@ namespace Arcade.Forms
             this.textBoxKeyword = new Common.Forms.TextBox();
             this.listViewGames = new Common.Forms.ListView();
             this.columnHeaderGameName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonClose = new System.Windows.Forms.Button();
-            this.buttonSearch = new System.Windows.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
+            this.buttonSearch = new Arcade.Forms.Button();
             this.listViewBoard = new Common.Forms.ListView();
             this.columnHeaderCartridge = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -207,8 +207,8 @@ namespace Arcade.Forms
         private System.Windows.Forms.Label labelKeyword;
         private Common.Forms.TextBox textBoxKeyword;
         private Common.Forms.ListView listViewGames;
-        private System.Windows.Forms.Button buttonClose;
-        private System.Windows.Forms.Button buttonSearch;
+        private Arcade.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonSearch;
         private System.Windows.Forms.ColumnHeader columnHeaderGameName;
         private Common.Forms.ListView listViewBoard;
         private System.Windows.Forms.ColumnHeader columnHeaderCartridge;
@@ -219,5 +219,5 @@ namespace Arcade.Forms
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2014-2014 Kevin Eshbach
+//  Copyright (C) 2014-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

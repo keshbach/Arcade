@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -45,12 +45,12 @@ namespace Arcade.Forms
             this.columnHeaderPackage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.textBoxTimerFind = new Common.Forms.TextBoxTimer();
             this.labelFind = new System.Windows.Forms.Label();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.buttonFindPart = new System.Windows.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
+            this.buttonFindPart = new Arcade.Forms.Button();
             this.comboBoxLocation = new System.Windows.Forms.ComboBox();
             this.labelLocation = new System.Windows.Forms.Label();
-            this.buttonNewPart = new System.Windows.Forms.Button();
+            this.buttonNewPart = new Arcade.Forms.Button();
             this.splitContainerBoardPart = new System.Windows.Forms.SplitContainer();
             this.groupBoxPart.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerBoardPart)).BeginInit();
@@ -314,8 +314,8 @@ namespace Arcade.Forms
         private System.Windows.Forms.Label labelDescription;
         private Common.Forms.TextBox textBoxDescription;
         private System.Windows.Forms.GroupBox groupBoxPart;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
         private Common.Forms.ListView listViewParts;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
         private System.Windows.Forms.ColumnHeader columnHeaderCategory;
@@ -324,14 +324,14 @@ namespace Arcade.Forms
         private Common.Forms.TextBoxTimer textBoxTimerFind;
         private System.Windows.Forms.Label labelFind;
         private System.Windows.Forms.Label labelParts;
-        private System.Windows.Forms.Button buttonFindPart;
+        private Arcade.Forms.Button buttonFindPart;
         private System.Windows.Forms.ComboBox comboBoxLocation;
         private System.Windows.Forms.Label labelLocation;
-        private System.Windows.Forms.Button buttonNewPart;
+        private Arcade.Forms.Button buttonNewPart;
         private System.Windows.Forms.SplitContainer splitContainerBoardPart;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

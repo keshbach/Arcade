@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -40,8 +40,8 @@ namespace Arcade.Forms
             this.textBoxSize = new Common.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxDescription = new Common.Forms.TextBox();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelBoardType
@@ -184,11 +184,11 @@ namespace Arcade.Forms
         private Common.Forms.TextBox textBoxSize;
         private System.Windows.Forms.Label label3;
         private Common.Forms.TextBox textBoxDescription;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

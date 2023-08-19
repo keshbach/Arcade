@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -36,11 +36,11 @@ namespace Arcade.Forms
             this.labelData = new System.Windows.Forms.Label();
             this.listViewData = new Common.Forms.ListView();
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonClose = new System.Windows.Forms.Button();
-            this.buttonDetails = new System.Windows.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
+            this.buttonDetails = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelData
@@ -170,15 +170,15 @@ namespace Arcade.Forms
 
         private System.Windows.Forms.Label labelData;
         private Common.Forms.ListView listViewData;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonClose;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
-        private System.Windows.Forms.Button buttonDetails;
+        private Arcade.Forms.Button buttonDetails;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

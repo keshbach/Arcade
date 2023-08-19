@@ -1,4 +1,7 @@
-﻿
+﻿/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
 namespace Arcade.Forms
 {
     partial class ListPartInventoryForm
@@ -33,10 +36,10 @@ namespace Arcade.Forms
             this.listViewPartInventory = new Common.Forms.ListView();
             this.columnHeaderDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderCount = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonClose = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonAdd = new System.Windows.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelPartInventory
@@ -161,11 +164,15 @@ namespace Arcade.Forms
 
         private System.Windows.Forms.Label labelPartInventory;
         private Common.Forms.ListView listViewPartInventory;
-        private System.Windows.Forms.Button buttonClose;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonAdd;
         private System.Windows.Forms.ColumnHeader columnHeaderDate;
         private System.Windows.Forms.ColumnHeader columnHeaderCount;
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -33,16 +33,16 @@ namespace Arcade.Forms
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FindPartForm));
             this.textBoxKeyword = new Common.Forms.TextBox();
-            this.buttonSearch = new System.Windows.Forms.Button();
+            this.buttonSearch = new Arcade.Forms.Button();
             this.labelParts = new System.Windows.Forms.Label();
             this.listViewParts = new Common.Forms.ListView();
             this.columnHeaderKeyword = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderPackage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonDetails = new System.Windows.Forms.Button();
-            this.buttonClose = new System.Windows.Forms.Button();
-            this.buttonGames = new System.Windows.Forms.Button();
+            this.buttonDetails = new Arcade.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
+            this.buttonGames = new Arcade.Forms.Button();
             this.radioButtonKeyword = new System.Windows.Forms.RadioButton();
             this.radioButtonType = new System.Windows.Forms.RadioButton();
             this.comboBoxType = new Common.Forms.ComboBox();
@@ -236,16 +236,16 @@ namespace Arcade.Forms
         #endregion
 
         private Common.Forms.TextBox textBoxKeyword;
-        private System.Windows.Forms.Button buttonSearch;
+        private Arcade.Forms.Button buttonSearch;
         private System.Windows.Forms.Label labelParts;
         private Common.Forms.ListView listViewParts;
         private System.Windows.Forms.ColumnHeader columnHeaderKeyword;
         private System.Windows.Forms.ColumnHeader columnHeaderCategory;
         private System.Windows.Forms.ColumnHeader columnHeaderType;
         private System.Windows.Forms.ColumnHeader columnHeaderPackage;
-        private System.Windows.Forms.Button buttonDetails;
-        private System.Windows.Forms.Button buttonClose;
-        private System.Windows.Forms.Button buttonGames;
+        private Arcade.Forms.Button buttonDetails;
+        private Arcade.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonGames;
         private System.Windows.Forms.RadioButton radioButtonKeyword;
         private System.Windows.Forms.RadioButton radioButtonType;
         private Common.Forms.ComboBox comboBoxType;
@@ -254,5 +254,5 @@ namespace Arcade.Forms
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

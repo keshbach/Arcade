@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -35,10 +35,10 @@ namespace Arcade.Forms
             this.labelGameData = new System.Windows.Forms.Label();
             this.listViewGameData = new Common.Forms.ListView();
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelGameData
@@ -158,14 +158,14 @@ namespace Arcade.Forms
 
         private System.Windows.Forms.Label labelGameData;
         private Common.Forms.ListView listViewGameData;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

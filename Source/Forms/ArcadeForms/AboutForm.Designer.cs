@@ -1,5 +1,5 @@
 /***************************************************************************/
-/*  Copyright (C) 2006-2022 Kevin Eshbach                                  */
+/*  Copyright (C) 2006-2023 Kevin Eshbach                                  */
 /***************************************************************************/
 
 namespace Arcade.Forms
@@ -35,7 +35,7 @@ namespace Arcade.Forms
         this.labelProductVersion = new System.Windows.Forms.Label();
         this.labelProductCopyright = new System.Windows.Forms.Label();
         this.label4 = new System.Windows.Forms.Label();
-        this.buttonClose = new System.Windows.Forms.Button();
+        this.buttonClose = new Arcade.Forms.Button();
         this.SuspendLayout();
         // 
         // labelProductName
@@ -124,11 +124,11 @@ namespace Arcade.Forms
         private System.Windows.Forms.Label labelProductVersion;
         private System.Windows.Forms.Label labelProductCopyright;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonClose;
     }
 }
 
 /***************************************************************************/
-/*  Copyright (C) 2006-2022 Kevin Eshbach                                  */
+/*  Copyright (C) 2006-2023 Kevin Eshbach                                  */
 /***************************************************************************/
 

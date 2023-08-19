@@ -1,4 +1,7 @@
-﻿
+﻿/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
 namespace Arcade.Forms
 {
     partial class OptionsForm
@@ -33,8 +36,8 @@ namespace Arcade.Forms
             this.columnHeaderValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.labelDatabaseSettings = new System.Windows.Forms.Label();
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // listViewSettings
@@ -136,9 +139,13 @@ namespace Arcade.Forms
 
         private Common.Forms.ListView listViewSettings;
         private System.Windows.Forms.Label labelDatabaseSettings;
-        private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
         private System.Windows.Forms.ColumnHeader columnHeaderValue;
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

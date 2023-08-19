@@ -1,4 +1,7 @@
-﻿
+﻿/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
 namespace Arcade.Forms
 {
     partial class InventoryEntryForm
@@ -35,8 +38,8 @@ namespace Arcade.Forms
             this.dateTimePickerInventory = new System.Windows.Forms.DateTimePicker();
             this.numericUpDownInventory = new System.Windows.Forms.NumericUpDown();
             this.textBoxDescription = new Common.Forms.TextBox();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownInventory)).BeginInit();
             this.SuspendLayout();
             // 
@@ -168,7 +171,11 @@ namespace Arcade.Forms
         private System.Windows.Forms.DateTimePicker dateTimePickerInventory;
         private System.Windows.Forms.NumericUpDown numericUpDownInventory;
         private Common.Forms.TextBox textBoxDescription;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

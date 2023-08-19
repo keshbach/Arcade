@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -34,8 +34,8 @@ namespace Arcade.Forms
         {
             this.labelName = new System.Windows.Forms.Label();
             this.textBoxName = new Common.Forms.TextBox();
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
             this.SuspendLayout();
             // 
             // labelName
@@ -111,11 +111,11 @@ namespace Arcade.Forms
 
         private System.Windows.Forms.Label labelName;
         private Common.Forms.TextBox textBoxName;
-        private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

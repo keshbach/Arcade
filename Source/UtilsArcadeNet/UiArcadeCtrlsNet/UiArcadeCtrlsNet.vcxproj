@@ -289,6 +289,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Form.cpp" />
     <ClCompile Include="ImageStream.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -336,6 +337,7 @@
     <None Include="UiArcadeCtrlsNet64.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Form.h" />
     <ClInclude Include="ImageStream.h" />
     <ClInclude Include="resource.h" />

@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -49,15 +49,15 @@ namespace Arcade.Forms
             this.comboBoxCategory = new Common.Forms.ComboBox();
             this.comboBoxPackage = new Common.Forms.ComboBox();
             this.comboBoxType = new Common.Forms.ComboBox();
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
             this.splitContainerParts = new System.Windows.Forms.SplitContainer();
             this.groupBoxDatasheets = new System.Windows.Forms.GroupBox();
             this.listViewDatasheets = new Common.Forms.ListView();
             this.columnHeaderFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.buttonViewDatasheet = new System.Windows.Forms.Button();
-            this.buttonAddDatasheet = new System.Windows.Forms.Button();
-            this.buttonDeleteDatasheet = new System.Windows.Forms.Button();
+            this.buttonViewDatasheet = new Arcade.Forms.Button();
+            this.buttonAddDatasheet = new Arcade.Forms.Button();
+            this.buttonDeleteDatasheet = new Arcade.Forms.Button();
             this.checkBoxDefault = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerParts)).BeginInit();
             this.splitContainerParts.Panel1.SuspendLayout();
@@ -357,19 +357,19 @@ namespace Arcade.Forms
         private Common.Forms.ComboBox comboBoxCategory;
         private Common.Forms.ComboBox comboBoxPackage;
         private Common.Forms.ComboBox comboBoxType;
-        private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonCancel;
         private SplitContainer splitContainerParts;
         private GroupBox groupBoxDatasheets;
         private Common.Forms.ListView listViewDatasheets;
         private ColumnHeader columnHeaderFile;
-        private Button buttonViewDatasheet;
-        private Button buttonAddDatasheet;
-        private Button buttonDeleteDatasheet;
+        private Arcade.Forms.Button buttonViewDatasheet;
+        private Arcade.Forms.Button buttonAddDatasheet;
+        private Arcade.Forms.Button buttonDeleteDatasheet;
         private CheckBox checkBoxDefault;
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

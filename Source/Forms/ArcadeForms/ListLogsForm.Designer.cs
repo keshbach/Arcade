@@ -1,4 +1,8 @@
-﻿namespace Arcade.Forms
+﻿/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////
+
+namespace Arcade.Forms
 {
     partial class ListLogsForm
     {
@@ -29,10 +33,10 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListLogsForm));
-            this.buttonDelete = new System.Windows.Forms.Button();
-            this.buttonEdit = new System.Windows.Forms.Button();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonClose = new System.Windows.Forms.Button();
+            this.buttonDelete = new Arcade.Forms.Button();
+            this.buttonEdit = new Arcade.Forms.Button();
+            this.buttonAdd = new Arcade.Forms.Button();
+            this.buttonClose = new Arcade.Forms.Button();
             this.listViewLogs = new Common.Forms.ListView();
             this.columnHeaderDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -161,13 +165,17 @@
 
         #endregion
 
-        private System.Windows.Forms.Button buttonDelete;
-        private System.Windows.Forms.Button buttonEdit;
-        private System.Windows.Forms.Button buttonAdd;
-        private System.Windows.Forms.Button buttonClose;
+        private Arcade.Forms.Button buttonDelete;
+        private Arcade.Forms.Button buttonEdit;
+        private Arcade.Forms.Button buttonAdd;
+        private Arcade.Forms.Button buttonClose;
         private Common.Forms.ListView listViewLogs;
         private System.Windows.Forms.ColumnHeader columnHeaderDate;
         private System.Windows.Forms.Label labelLogs;
         private System.Windows.Forms.ColumnHeader columnHeaderType;
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//  Copyright (C) 2006-2023 Kevin Eshbach
+/////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-20022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 namespace Arcade.Forms
@@ -42,23 +42,23 @@ namespace Arcade.Forms
             this.labelDipSwitches = new System.Windows.Forms.Label();
             this.labelDescription = new System.Windows.Forms.Label();
             this.textBoxDescription = new Common.Forms.TextBox();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.buttonOK = new System.Windows.Forms.Button();
-            this.buttonBoards = new System.Windows.Forms.Button();
-            this.buttonManuals = new System.Windows.Forms.Button();
+            this.buttonCancel = new Arcade.Forms.Button();
+            this.buttonOK = new Arcade.Forms.Button();
+            this.buttonBoards = new Arcade.Forms.Button();
+            this.buttonManuals = new Arcade.Forms.Button();
             this.comboBoxWiringHarness = new System.Windows.Forms.ComboBox();
             this.labelWiringHarness = new System.Windows.Forms.Label();
-            this.buttonVideo = new System.Windows.Forms.Button();
-            this.buttonAudio = new System.Windows.Forms.Button();
-            this.buttonControls = new System.Windows.Forms.Button();
-            this.buttonDisplays = new System.Windows.Forms.Button();
+            this.buttonVideo = new Arcade.Forms.Button();
+            this.buttonAudio = new Arcade.Forms.Button();
+            this.buttonControls = new Arcade.Forms.Button();
+            this.buttonDisplays = new Arcade.Forms.Button();
             this.labelCocktail = new System.Windows.Forms.Label();
             this.comboBoxCocktail = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBoxNeedPowerOnReset = new System.Windows.Forms.CheckBox();
             this.checkBoxHaveWiringHarness = new System.Windows.Forms.CheckBox();
             this.checkBoxNotJAMMA = new System.Windows.Forms.CheckBox();
-            this.buttonLogs = new System.Windows.Forms.Button();
+            this.buttonLogs = new Arcade.Forms.Button();
             this.splitContainerTop = new System.Windows.Forms.SplitContainer();
             this.splitContainerBottom = new System.Windows.Forms.SplitContainer();
             this.splitContainerTopBottom = new System.Windows.Forms.SplitContainer();
@@ -508,23 +508,23 @@ namespace Arcade.Forms
         private System.Windows.Forms.Label labelDipSwitches;
         private System.Windows.Forms.Label labelDescription;
         private Common.Forms.TextBox textBoxDescription;
-        private System.Windows.Forms.Button buttonCancel;
-        private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Button buttonBoards;
-        private System.Windows.Forms.Button buttonManuals;
+        private Arcade.Forms.Button buttonCancel;
+        private Arcade.Forms.Button buttonOK;
+        private Arcade.Forms.Button buttonBoards;
+        private Arcade.Forms.Button buttonManuals;
         private System.Windows.Forms.ComboBox comboBoxWiringHarness;
         private System.Windows.Forms.Label labelWiringHarness;
-        private System.Windows.Forms.Button buttonVideo;
-        private System.Windows.Forms.Button buttonAudio;
-        private System.Windows.Forms.Button buttonControls;
-        private System.Windows.Forms.Button buttonDisplays;
+        private Arcade.Forms.Button buttonVideo;
+        private Arcade.Forms.Button buttonAudio;
+        private Arcade.Forms.Button buttonControls;
+        private Arcade.Forms.Button buttonDisplays;
         private System.Windows.Forms.Label labelCocktail;
         private System.Windows.Forms.ComboBox comboBoxCocktail;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox checkBoxNotJAMMA;
         private System.Windows.Forms.CheckBox checkBoxHaveWiringHarness;
         private System.Windows.Forms.CheckBox checkBoxNeedPowerOnReset;
-        private System.Windows.Forms.Button buttonLogs;
+        private Arcade.Forms.Button buttonLogs;
         private System.Windows.Forms.SplitContainer splitContainerTop;
         private System.Windows.Forms.SplitContainer splitContainerBottom;
         private System.Windows.Forms.SplitContainer splitContainerTopBottom;
@@ -532,5 +532,5 @@ namespace Arcade.Forms
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
