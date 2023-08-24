@@ -1,5 +1,5 @@
 /***************************************************************************/
-/*  Copyright (C) 2009-2014 Kevin Eshbach                                  */
+/*  Copyright (C) 2009-2023 Kevin Eshbach                                  */
 /***************************************************************************/
 
 using System.Reflection;
@@ -33,9 +33,9 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("3.2.0.0")]
-[assembly: AssemblyFileVersion("3.2.0.0")]
+[assembly: AssemblyVersion("3.3.0.0")]
+[assembly: AssemblyFileVersion("3.3.0.0")]
 
 /***************************************************************************/
-/*  Copyright (C) 2009-2014 Kevin Eshbach                                  */
+/*  Copyright (C) 2009-2023 Kevin Eshbach                                  */
 /***************************************************************************/

@@ -6,9 +6,9 @@
 #define UtVersion_H
 
 #define CUtMajorVersion 3
-#define CUtMinorVersion 2
+#define CUtMinorVersion 3
 
-#define CUtVersionString "3.20"
+#define CUtVersionString "3.30"
 
 #define CUtCopyrightString L"Copyright © 2006-2023 Kevin Eshbach. All rights reserved."
 
