@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2016 Kevin Eshbach
+//  Copyright (C) 2009-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -22,6 +22,7 @@
 #define CUserId L"Uid="
 #define CPassword L"Password="
 #define CDisablePooling L"Pooling=false;"
+#define CConnectTimeout L"Connect Timeout=10;"
 
 #define CSelectTableSchemaQueryStart \
     L"SELECT c.name AS column_name, " \
@@ -156,6 +157,7 @@ static LPCWSTR lAllocConnectionString(
 	lConnectionLen += ::lstrlenW(CUserId) + ::lstrlenW(pszUserName) + 1;
 	lConnectionLen += ::lstrlenW(CPassword) + ::lstrlenW(pszPassword) + 1;
     lConnectionLen += ::lstrlenW(CDisablePooling);
+    lConnectionLen += ::lstrlenW(CConnectTimeout);
 	lConnectionLen += 1;
 
     pszConnection = (LPWSTR)lAllocMem(sizeof(WCHAR) * lConnectionLen);
@@ -178,6 +180,7 @@ static LPCWSTR lAllocConnectionString(
 	::StringCchCatW(pszConnection, lConnectionLen, pszPassword);
 	::StringCchCatW(pszConnection, lConnectionLen, L";");
     ::StringCchCatW(pszConnection, lConnectionLen, CDisablePooling);
+    ::StringCchCatW(pszConnection, lConnectionLen, CConnectTimeout);
 
     return pszConnection;
 }
@@ -784,5 +787,5 @@ System::Boolean Common::Data::SQLServerAdo::GetProvideSnapshotIsolationSupported
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2016 Kevin Eshbach
+//  Copyright (C) 2009-2023 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
