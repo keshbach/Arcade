@@ -278,7 +278,7 @@ namespace Arcade.Forms
             this.buttonInventory.Name = "buttonInventory";
             this.buttonInventory.Size = new System.Drawing.Size(75, 23);
             this.buttonInventory.TabIndex = 5;
-            this.buttonInventory.Text = "&Inventory...";
+            this.buttonInventory.Text = "I&nventory...";
             this.buttonInventory.UseVisualStyleBackColor = true;
             this.buttonInventory.Click += new System.EventHandler(this.buttonInventory_Click);
             // 
