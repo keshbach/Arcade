@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-202 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -21,6 +21,7 @@
 #define CUserNameRegValueName L"UserName"
 #define CPasswordRegValueName L"Password"
 #define CConnectionModeRegValueName L"ConnectionMode"
+#define CLogStatementsRegValueName L"LogStatements"
 
 #define COleDbConnectionMode L"oledb"
 #define CODBCConnectionMode L"odbc"
@@ -38,7 +39,8 @@ System::Boolean Common::Data::DbAdapterSQLServer::ReadSettings(
   System::String^% sCatalog,
   System::String^% sUserName,
   System::String^% sPassword,
-  System::String^% sConnectionMode)
+  System::String^% sConnectionMode,
+  System::Int32% nLogStatements)
 {
     System::Collections::Generic::Dictionary<System::String^, System::Object^>^ SettingsDict;
     System::Collections::IDictionaryEnumerator^ DictEnum;
@@ -50,6 +52,7 @@ System::Boolean Common::Data::DbAdapterSQLServer::ReadSettings(
     sUserName = L"";
     sPassword = L"";
     sConnectionMode = L"";
+    nLogStatements = 0;
 
     if (!ReadSettings(RegKey, SettingsDict, sErrorMessage))
     {
@@ -84,6 +87,10 @@ System::Boolean Common::Data::DbAdapterSQLServer::ReadSettings(
         {
             sConnectionMode = (System::String^)DictEnum->Value;
         }
+        else if ((System::String^)DictEnum->Key == CLogStatementsRegValueName)
+        {
+            nLogStatements = (System::UInt16)DictEnum->Value;
+        }
     }
 
 	return true;
@@ -96,7 +103,8 @@ System::Boolean Common::Data::DbAdapterSQLServer::InitDatabase(
 	sErrorMessage = L"";
 
     if (false == ReadSettings(RegKey, m_sServer, m_nPort, m_sCatalog,
-                              m_sUserName, m_sPassword, m_sConnectionMode))
+                              m_sUserName, m_sPassword, m_sConnectionMode,
+                              m_nLogStatements))
 	{
 		sErrorMessage = L"Could not read the registry settings.";
 
@@ -117,6 +125,7 @@ System::Boolean Common::Data::DbAdapterSQLServer::UninitDatabase(
     m_sUserName = nullptr;
     m_sPassword = nullptr;
     m_sConnectionMode = nullptr;
+    m_nLogStatements = 0;
 
 	return true;
 }
@@ -201,9 +210,9 @@ System::Boolean Common::Data::DbAdapterSQLServer::ProvideSnapshotIsolationSuppor
     if (m_sConnectionMode == COleDbConnectionMode)
     {
         return SQLServerAdo::GetProvideSnapshotIsolationSupported(m_sServer, m_nPort,
-                                                                   m_sCatalog, m_sUserName,
-                                                                   m_sPassword,
-                                                                   bSnapshotSupported);
+                                                                  m_sCatalog, m_sUserName,
+                                                                  m_sPassword,
+                                                                  bSnapshotSupported);
     }
     else if (m_sConnectionMode == CODBCConnectionMode)
     {
@@ -301,6 +310,7 @@ System::Boolean Common::Data::DbAdapterSQLServer::ProvideReadSettings(
     MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CUserNameRegValueName, "");
     MDatabaseAdapterReadEncryptedDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CPasswordRegValueName, "");
     MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CConnectionModeRegValueName, CODBCConnectionMode);
+    MDatabaseAdapterReadDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CLogStatementsRegValueName, 0);
 
     return true;
 }
@@ -320,6 +330,7 @@ System::Boolean Common::Data::DbAdapterSQLServer::ProvideWriteSettings(
     MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CUserNameRegValueName, System::String, sErrorMessage)
     MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CPasswordRegValueName, System::String, sErrorMessage)
     MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CConnectionModeRegValueName, System::String, sErrorMessage)
+    MDatabaseAdapterVerifyWriteDictionarySetting(SettingsDict, CLogStatementsRegValueName, System::UInt16, sErrorMessage)
 
     Value = (System::String^)SettingsDict[CConnectionModeRegValueName];
 
@@ -338,10 +349,11 @@ System::Boolean Common::Data::DbAdapterSQLServer::ProvideWriteSettings(
     MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CUserNameRegValueName, sErrorMessage)
     MDatabaseAdapterWriteEncryptedDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CPasswordRegValueName, sErrorMessage)
     MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CConnectionModeRegValueName, sErrorMessage)
+    MDatabaseAdapterWriteDictionarySetting(SettingsDict, CSQLServerRegKeyName, RegKey, CLogStatementsRegValueName, sErrorMessage)
 
     return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

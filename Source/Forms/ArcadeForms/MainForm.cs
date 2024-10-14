@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -48,6 +48,9 @@ namespace Arcade.Forms
 
         private bool m_bAllowClose = true;
 
+        private System.Collections.Generic.List<System.String> m_MessageCacheList = new System.Collections.Generic.List<System.String>();
+        private System.Threading.Mutex m_MessageCacheMutex = new System.Threading.Mutex();
+
         private static System.Boolean s_bInitializeImages = true;
         #endregion
 
@@ -86,10 +89,7 @@ namespace Arcade.Forms
         {
             Common.Debug.Thread.IsWorkerThread();
 
-            RunOnUIThreadWait(() =>
-            {
-                LogMessage(sMessage);
-            });
+            AddCachedMessage(sMessage);
         }
         #endregion
 
@@ -108,6 +108,8 @@ namespace Arcade.Forms
 
             InitImageLists();
             InitImageKeys();
+
+            BeginUpdateTimer();
 
             Common.Threading.Thread.RunWorkerThread(() =>
             {
@@ -132,6 +134,14 @@ namespace Arcade.Forms
                 {
                     UninitDatabase();
                 }, "Main Form Uninitialize Database Thread");
+            }
+            else
+            {
+                EndUpdateTimer();
+
+                m_MessageCacheMutex.Close();
+
+                m_MessageCacheMutex = null;
             }
         }
 
@@ -175,9 +185,13 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(FindPart, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             FindPart.ShowDialog(this);
 
             FindPart.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuPartsNewPart_Click(object sender, EventArgs e)
@@ -190,6 +204,8 @@ namespace Arcade.Forms
             new Common.Forms.FormLocation(PartEntry, m_sFormLocationsRegistryKey);
 
             PartEntry.PartEntryFormType = Arcade.Forms.PartEntryForm.EPartEntryFormType.NewPart;
+
+            EndUpdateTimer();
 
             if (PartEntry.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
             {
@@ -220,6 +236,8 @@ namespace Arcade.Forms
                     });
                 }, "Main Form Adding New Part Thread");
             }
+
+            BeginUpdateTimer();
         }
 
         private void menuPartsCategoryList_Click(object sender, EventArgs e)
@@ -228,11 +246,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.PartCategoryData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuPartsTypeList_Click(object sender, EventArgs e)
@@ -241,11 +263,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.PartTypeData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuPartsPackageList_Click(object sender, EventArgs e)
@@ -254,11 +280,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.PartPackageData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuManualsFind_Click(object sender, EventArgs e)
@@ -267,9 +297,13 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListManuals, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListManuals.ShowDialog(this);
 
             ListManuals.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuManualsStorageBox_Click(object sender, EventArgs e)
@@ -278,11 +312,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.ManualStorageBox;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuManualsPrintEdition_Click(object sender, EventArgs e)
@@ -291,11 +329,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.ManualPrintEdition;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuManualsCondition_Click(object sender, EventArgs e)
@@ -304,11 +346,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.ManualCondition;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuManualsManufacturerList_Click(object sender, EventArgs e)
@@ -317,11 +363,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.ManufacturerData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesFind_Click(object sender, EventArgs e)
@@ -330,9 +380,13 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListGames, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListGames.ShowDialog(this);
 
             ListGames.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuItemGamesFindBoardName_Click(object sender, EventArgs e)
@@ -341,9 +395,13 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(FindGameBoard, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             FindGameBoard.ShowDialog(this);
 
             FindGameBoard.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesWiringHarnessList_Click(object sender, EventArgs e)
@@ -352,11 +410,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.GameWiringHarnessData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesCocktailList_Click(object sender, EventArgs e)
@@ -365,11 +427,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.GameCocktailData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesControlList_Click(object sender, EventArgs e)
@@ -378,11 +444,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.GameControlData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesBoardTypeList_Click(object sender, EventArgs e)
@@ -391,11 +461,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.GameBoardTypeData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesBoardPartLocationList_Click(object sender, EventArgs e)
@@ -404,11 +478,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.GameBoardPartLocation;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesManufacturerList_Click(object sender, EventArgs e)
@@ -417,11 +495,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.ManufacturerData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesVideoList_Click(object sender, EventArgs e)
@@ -430,11 +512,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.GameVideo;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuGamesAudioList_Click(object sender, EventArgs e)
@@ -443,11 +529,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.GameAudio;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuItemGamesLogTypeList_Click(object sender, EventArgs e)
@@ -456,11 +546,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.LogTypeData;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuDisplaysFind_Click(object sender, EventArgs e)
@@ -469,11 +563,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListDisplays, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListDisplays.ListDisplaysFormType = Arcade.Forms.ListDisplaysForm.EListDisplaysFormType.EditDisplays;
 
             ListDisplays.ShowDialog(this);
 
             ListDisplays.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuDisplaysTypeList_Click(object sender, EventArgs e)
@@ -482,11 +580,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.DisplayType;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuDisplaysResolutionList_Click(object sender, EventArgs e)
@@ -495,11 +597,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.DisplayResolution;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuDisplaysColorsList_Click(object sender, EventArgs e)
@@ -508,11 +614,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.DisplayColors;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuDisplaysOrientationList_Click(object sender, EventArgs e)
@@ -521,11 +631,15 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(ListData, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             ListData.ListDataFormType = Arcade.Forms.ListDataForm.EListDataFormType.DisplayOrientation;
 
             ListData.ShowDialog(this);
 
             ListData.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuToolsOptions_Click(object sender, EventArgs e)
@@ -533,6 +647,8 @@ namespace Arcade.Forms
             OptionsForm Options = new OptionsForm();
 
             new Common.Forms.FormLocation(Options, m_sFormLocationsRegistryKey);
+
+            EndUpdateTimer();
 
             if (Options.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
             {
@@ -543,6 +659,8 @@ namespace Arcade.Forms
             }
 
             Options.Dispose();
+
+            BeginUpdateTimer();
         }
 
         private void menuHelpAbout_Click(object sender, EventArgs e)
@@ -551,9 +669,13 @@ namespace Arcade.Forms
 
             new Common.Forms.FormLocation(About, m_sFormLocationsRegistryKey);
 
+            EndUpdateTimer();
+
             About.ShowDialog(this);
 
             About.Dispose();
+
+            BeginUpdateTimer();
         }
         #endregion
 
@@ -855,10 +977,78 @@ namespace Arcade.Forms
             textBoxMessages.SelectionStart = 0;
             textBoxMessages.SelectionLength = textBoxMessages.TextLength;
         }
+
+        private void AddCachedMessage(
+            System.String sMessage)
+        {
+            Common.Debug.Thread.IsWorkerThread();
+
+            m_MessageCacheMutex.WaitOne();
+
+            m_MessageCacheList.Add(sMessage);
+
+            m_MessageCacheMutex.ReleaseMutex();
+        }
+
+        private void FlushMessages()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            System.Int32 nLength = 0;
+
+            Common.Debug.Thread.IsUIThread();
+
+            m_MessageCacheMutex.WaitOne();
+
+            foreach (System.String sValue in m_MessageCacheList)
+            {
+                nLength += sValue.Length;
+                nLength += CEndOfLine.Length;
+            }
+
+            sb.EnsureCapacity(nLength);
+
+            foreach (System.String sValue in m_MessageCacheList)
+            {
+                sb.Append(sValue);
+                sb.Append(CEndOfLine);
+            }
+
+            m_MessageCacheList.Clear();
+
+            textBoxMessages.AppendText(sb.ToString());
+
+            m_MessageCacheMutex.ReleaseMutex();
+        }
+
+        private void BeginUpdateTimer()
+        {
+            Common.Debug.Thread.IsUIThread();
+
+            timerUpdater.Start();
+        }
+
+        private void EndUpdateTimer()
+        {
+            Common.Debug.Thread.IsUIThread();
+
+            timerUpdater.Stop();
+
+            FlushMessages();
+        }
+
+        #endregion
+
+        #region "Timer Event Handlers"
+        private void timerUpdater_Tick(object sender, EventArgs e)
+        {
+            Common.Debug.Thread.IsUIThread();
+
+            FlushMessages();
+        }
         #endregion
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

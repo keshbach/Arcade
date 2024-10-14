@@ -85,6 +85,7 @@ namespace Arcade.Forms
             this.contextMenuItemDelete = new Common.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.contextMenuItemSelectAll = new Common.Forms.ToolStripMenuItem();
+            this.timerUpdater = new System.Windows.Forms.Timer(this.components);
             this.menuAppStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.contextMenuMessageWindowStrip.SuspendLayout();
@@ -574,6 +575,11 @@ namespace Arcade.Forms
             this.contextMenuItemSelectAll.Text = "Select &All";
             this.contextMenuItemSelectAll.Click += new System.EventHandler(this.contextMenuItemSelectAll_Click);
             // 
+            // timerUpdater
+            // 
+            this.timerUpdater.Interval = 1000;
+            this.timerUpdater.Tick += new System.EventHandler(this.timerUpdater_Tick);
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -657,5 +663,6 @@ namespace Arcade.Forms
         private Common.Forms.ToolStripMenuItem menuItemToolsOptions;
         private System.Windows.Forms.ToolStripStatusLabel toolStripDatabaseModeStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel toolStripDatabaseConnectionStatusLabel;
+        private System.Windows.Forms.Timer timerUpdater;
     }
 }

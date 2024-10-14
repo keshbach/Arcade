@@ -1,8 +1,10 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
+using Common.Data;
 using System;
+using System.Collections.Generic;
 
 namespace Arcade
 {
@@ -80,16 +82,18 @@ namespace Arcade
 
         private static Common.Data.IDbAdapter s_DbAdapter = null;
 
-        private static Common.Collections.StringSortedList<System.Int32> s_ManufacturerList = new Common.Collections.StringSortedList<System.Int32>();
+        private static System.Boolean s_bLogStatements = false;
+
+        private static Common.Collections.StringSortedList<System.Int32> s_ManufacturerList = new Common.Collections.StringSortedList<System.Int32>(true);
         private static System.Threading.Mutex s_ManufacturerMutex = new System.Threading.Mutex();
 
-        private static Common.Collections.StringSortedList<System.Int32> s_BoardTypeList = new Common.Collections.StringSortedList<System.Int32>();
+        private static Common.Collections.StringSortedList<System.Int32> s_BoardTypeList = new Common.Collections.StringSortedList<System.Int32>(true);
         private static System.Threading.Mutex s_BoardTypeMutex = new System.Threading.Mutex();
 
-        private static Common.Collections.StringSortedList<System.Int32> s_BoardPartLocationList = new Common.Collections.StringSortedList<System.Int32>();
+        private static Common.Collections.StringSortedList<System.Int32> s_BoardPartLocationList = new Common.Collections.StringSortedList<System.Int32>(true);
         private static System.Threading.Mutex s_BoardPartLocationMutex = new System.Threading.Mutex();
 
-        private static Common.Collections.StringSortedList<System.Int32> s_LogTypeList = new Common.Collections.StringSortedList<System.Int32>();
+        private static Common.Collections.StringSortedList<System.Int32> s_LogTypeList = new Common.Collections.StringSortedList<System.Int32>(true);
         private static System.Threading.Mutex s_LogTypeMutex = new System.Threading.Mutex();
 
         private static System.String[] s_GameDataName = {CGameAudioName,
@@ -98,11 +102,11 @@ namespace Arcade
                                                          CGameVideoName,
                                                          CGameCocktailName};
         private static Common.Collections.StringSortedList<System.Int32>[] s_GameDataList = {
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>()};
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true)};
         private static System.Threading.Mutex[] s_GameDataMutex = {new System.Threading.Mutex(),
                                                                    new System.Threading.Mutex(),
                                                                    new System.Threading.Mutex(),
@@ -120,10 +124,10 @@ namespace Arcade
                                                             CDisplayColorsName,
                                                             CDisplayOrientationName};
         private static Common.Collections.StringSortedList<System.Int32>[] s_DisplayDataList = {
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>()};
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true)};
         private static System.Threading.Mutex[] s_DisplayDataMutex = {new System.Threading.Mutex(),
                                                                       new System.Threading.Mutex(),
                                                                       new System.Threading.Mutex(),
@@ -134,9 +138,9 @@ namespace Arcade
                                                          CPartTypeName,
                                                          CPartPackageName};
         private static Common.Collections.StringSortedList<System.Int32>[] s_PartDataList = {
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>()};
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true)};
         private static System.Threading.Mutex[] s_PartDataMutex = {new System.Threading.Mutex(),
                                                                    new System.Threading.Mutex(),
                                                                    new System.Threading.Mutex()};
@@ -146,9 +150,9 @@ namespace Arcade
                                                            CManualPrintEditionName,
                                                            CManualConditionName};
         private static Common.Collections.StringSortedList<System.Int32>[] s_ManualDataList = {
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>(),
-            new Common.Collections.StringSortedList<System.Int32>()};
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true),
+            new Common.Collections.StringSortedList<System.Int32>(true)};
         private static System.Threading.Mutex[] s_ManualDataMutex = {new System.Threading.Mutex(),
                                                                      new System.Threading.Mutex(),
                                                                      new System.Threading.Mutex()};
@@ -193,6 +197,7 @@ namespace Arcade
             Microsoft.Win32.RegistryKey RegKey;
             System.String sTmpErrorMessage;
             System.DateTime EndDateTime;
+            System.Collections.Generic.Dictionary<System.String, System.Object> SettingsDict;
 
             Common.Debug.Thread.IsWorkerThread();
 
@@ -237,6 +242,16 @@ namespace Arcade
                 RegKey.Close();
 
                 return true;
+            }
+
+            SettingsDict = null;
+
+            if (s_DbAdapter.ReadSettings(RegKey, ref SettingsDict, ref sErrorMessage))
+            {
+                if (SettingsDict.ContainsKey("LogStatements"))
+                {
+                    s_bLogStatements = (System.UInt16)SettingsDict["LogStatements"] > 0 ? true : false;
+                }
             }
 
             RegKey.Close();
@@ -915,7 +930,7 @@ namespace Arcade
         {
             Common.Debug.Thread.IsWorkerThread();
 
-            ManufacturerList = new Common.Collections.StringSortedList<System.Int32>();
+            ManufacturerList = new Common.Collections.StringSortedList<System.Int32>(true);
 
             s_ManufacturerMutex.WaitOne();
 
@@ -2207,6 +2222,11 @@ namespace Arcade
                 sb.Append("')) ");
                 sb.Append("ORDER BY Part.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartsMatchingKeyword SQL statement: {0}", sb.ToString()));
+                }
+
                 Command.CommandText = sb.ToString();
 
                 using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
@@ -2330,6 +2350,11 @@ namespace Arcade
                 sb.Append("       (PartPropertyValue.Name = ?)) ");
                 sb.Append("ORDER BY Part.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartsMatchingType SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartTypeName", CPartTypeName);
                 s_DbAdapter.AddCommandParameter(Command, "@PartType", sPartType);
 
@@ -2447,6 +2472,11 @@ namespace Arcade
                 sb.Append("WHERE Part.PartPinoutsID = ? ");
                 sb.Append("ORDER BY Part.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartsWithSamePinouts SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartPinoutsID", nPartPinoutsId);
  
                 Command.CommandText = sb.ToString();
@@ -2544,6 +2574,11 @@ namespace Arcade
                 sb.Append("SELECT PartPinouts.PartPinoutsID, PartPinouts.Description ");
                 sb.Append("FROM PartPinouts INNER JOIN Part ON PartPinouts.PartPinoutsID = Part.PartPinoutsID ");
                 sb.Append("WHERE Part.PartID = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartPinouts SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
 
@@ -3145,6 +3180,11 @@ namespace Arcade
                 sb.Append("WHERE BoardPart.PartID = ? ");
                 sb.Append("ORDER BY Game.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGamesWithPart SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
 
                 Command.CommandText = sb.ToString();
@@ -3338,6 +3378,11 @@ namespace Arcade
                 sb.Append("     Manufacturer.ManufacturerID = Game.ManufacturerID ");
                 sb.Append("ORDER BY Game.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGames SQL statement: {0}", sb.ToString()));
+                }
+
                 Command.CommandText = sb.ToString();
 
                 using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
@@ -3522,6 +3567,11 @@ namespace Arcade
                 sb.Append("WHERE (GameDisplay.GameID = ?) ");
                 sb.Append("ORDER BY Display.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDisplaysForGame SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@GameID", nGameId);
 
                 Command.CommandText = sb.ToString();
@@ -3622,6 +3672,11 @@ namespace Arcade
                 sb.Append("    ON BoardType.BoardTypeID = Board.BoardTypeID ");
                 sb.Append("WHERE GameBoard.GameID = ? ");
                 sb.Append("ORDER BY BoardType.Name, Board.Name;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetBoardsForGame SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@GameID", nGameId);
 
@@ -3731,6 +3786,11 @@ namespace Arcade
                 sb.Append("     INNER JOIN BoardPart ON Board.BoardID = BoardPart.BoardID ");
                 sb.Append("WHERE (GameBoard.GameID = ?) AND ");
                 sb.Append("      (BoardPart.PartID = ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetBoardsWithPart SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@GameID", nGameId);
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
@@ -3901,6 +3961,11 @@ namespace Arcade
                 sb.Append("WHERE (BoardPart.BoardID = ?) AND ");
                 sb.Append("      (BoardPart.PartID = ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetBoardPartLocations SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@BoardID", nBoardId);
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
 
@@ -4063,6 +4128,11 @@ namespace Arcade
                 sb.Append("         BoardType.Name, ");
                 sb.Append("         Board.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGameBoardsMatchingKeyword SQL statement: {0}", sb.ToString()));
+                }
+
                 Command.CommandText = sb.ToString();
 
                 using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
@@ -4178,6 +4248,11 @@ namespace Arcade
                 sb.Append("     ON Manufacturer.ManufacturerID = Manual.ManufacturerID ");
                 sb.Append("WHERE GameManual.GameID = ? ");
                 sb.Append("ORDER BY Manual.Name;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetManualsForGame SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@GameID", nGameId);
 
@@ -4316,6 +4391,11 @@ namespace Arcade
                 sb.Append("FROM LogType INNER JOIN Log ON LogType.LogTypeID = Log.LogTypeID ");
                 sb.Append("WHERE Log.GameID = ? ");
                 sb.Append("ORDER BY Log.DateTime DESC;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetLogsForGame SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@GameID", nGameId);
 
@@ -5740,6 +5820,11 @@ namespace Arcade
                 sb.Append("WHERE BoardPart.BoardID = ? ");
                 sb.Append("ORDER BY BoardPartLocation.Name, BoardPart.[Position];");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGameBoardParts SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@BoardID", nBoardId);
 
                 Command.CommandText = sb.ToString();
@@ -5889,6 +5974,11 @@ namespace Arcade
 
                 sb.Append("ORDER BY Manual.Name, ");
                 sb.Append("         Manufacturer.Name;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetManuals SQL statement: {0}", sb.ToString()));
+                }
 
                 Command.CommandText = sb.ToString();
 
@@ -6334,6 +6424,11 @@ namespace Arcade
                 sb.Append("FROM Display ");
                 sb.Append("ORDER BY Display.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDisplays SQL statement: {0}", sb.ToString()));
+                }
+
                 Command.CommandText = sb.ToString();
 
                 using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
@@ -6764,6 +6859,11 @@ namespace Arcade
                 sb.Append("WHERE PartInventory.PartID = ? ");
                 sb.Append("ORDER BY Inventory.DateTime DESC;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetInventoryForPart SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
 
                 Command.CommandText = sb.ToString();
@@ -7171,6 +7271,11 @@ namespace Arcade
                 sb.Append("WHERE (Part.PartPinoutsID = ?) AND ");
                 sb.Append("      (Part.Name = ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DoesPartNameExist SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartPinoutsID", nPartPinoutsId);
                 s_DbAdapter.AddCommandParameter(Command, "@PartName", sPartName);
 
@@ -7226,6 +7331,11 @@ namespace Arcade
             {
                 sb.Append("INSERT INTO Part (Name, PartPinoutsID, IsDefault) ");
                 sb.Append("VALUES (?, ?, ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPart SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@Name", sName);
                 s_DbAdapter.AddCommandParameter(Command, "@PartPinoutsID", nPartPinoutsId);
@@ -7293,6 +7403,11 @@ namespace Arcade
                 sb.Append("WHERE ((Part.PartPinoutsID = ?) AND ");
                 sb.Append("       (Part.PartID <> ?)) ");
                 sb.Append("ORDER BY Part.Name;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetFirstAvailablePart SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@PartPinoutsID", nPartPinoutsId);
                 s_DbAdapter.AddCommandParameter(Command, "@SkipPartID", nSkipPartId);
@@ -7365,6 +7480,11 @@ namespace Arcade
                 sb.Append("      (SELECT Part.PartPinoutsID ");
                 sb.Append("       FROM Part ");
                 sb.Append("       WHERE Part.PartID = ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDefaultPart SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
 
@@ -7445,6 +7565,11 @@ namespace Arcade
 
                     sb.Append("INSERT INTO PartPartProperty (PartID, PartPropertyID) ");
                     sb.Append("VALUES (?, ?);");
+
+                    if (s_bLogStatements)
+                    {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartDatasheets SQL statement: {0}", sb.ToString()));
+                    }
 
                     s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
                     s_DbAdapter.AddCommandParameter(Command, "@PartPropertyID", nPartPropertyId);
@@ -7573,6 +7698,11 @@ namespace Arcade
                     sb.Append("     WHERE ((PartProperty.PartPropertyNameID = ?) AND ");
                     sb.Append("(PartPropertyValue.Name = ?)));");
 
+                    if (s_bLogStatements)
+                    {
+                        s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartDatasheets SQL statement: {0}", sb.ToString()));
+                    }
+
                     s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
                     s_DbAdapter.AddCommandParameter(Command, "@PartPropertyNameID",
                                                     s_PartPropertyNameDictionary[CPartDatasheetName]);
@@ -7628,6 +7758,11 @@ namespace Arcade
                 sb.Append("PartPartProperty.PartPropertyID IN ");
                 sb.Append("    (SELECT PartProperty.PartPropertyID FROM PartProperty ");
                 sb.Append("     WHERE PartProperty.PartPropertyNameID = ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartDatasheets SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
                 s_DbAdapter.AddCommandParameter(Command, "@PartPropertyNameID",
@@ -7712,6 +7847,11 @@ namespace Arcade
             {
                 sb.Append("INSERT INTO PartPinouts (Description) VALUES (?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartPinouts SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartPinouts", sPartPinouts);
 
                 Command.CommandText = sb.ToString();
@@ -7763,6 +7903,11 @@ namespace Arcade
                 sb.Append("SET PartPinouts.Description = ? ");
                 sb.Append("WHERE PartPinouts.PartPinoutsID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdatePartPinouts SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartPinouts", sPartPinouts);
                 s_DbAdapter.AddCommandParameter(Command, "@PartPinoutsID", nPartPinoutsId);
 
@@ -7813,6 +7958,11 @@ namespace Arcade
                 sb.Append("    Part.IsDefault = ? ");
                 sb.Append("WHERE Part.PartID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdatePart SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartName", sPartName);
                 s_DbAdapter.AddCommandParameter(Command, "@IsDefaultPart", bIsDefaultPart);
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
@@ -7861,6 +8011,11 @@ namespace Arcade
                 sb.Append("UPDATE Part ");
                 sb.Append("SET Part.IsDefault = ? ");
                 sb.Append("WHERE Part.PartID = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateIsDefaultPartFlag SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@IsDefaultPart", bIsDefaultPart);
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
@@ -7928,6 +8083,11 @@ namespace Arcade
                 sb.Append("INNER JOIN PartInventory ON PartInventory.InventoryID = Inventory.InventoryID ");
                 sb.Append("WHERE PartInventory.PartID = ?");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartInventoryTotal SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
 
                 Command.CommandText = sb.ToString();
@@ -7994,6 +8154,11 @@ namespace Arcade
                 sb.Append("FROM PartInventory ");
                 sb.Append("WHERE PartInventory.PartID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartInventoryIds SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
 
                 Command.CommandText = sb.ToString();
@@ -8054,6 +8219,11 @@ namespace Arcade
                 sb.Append("    Pinouts, DipSwitches, HaveWiringHarness, ");
                 sb.Append("    NeedPowerOnReset, ManufacturerID) ");
                 sb.Append("VALUES (?, ?, ?, ?, ?, ?, ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGame SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@GameName", sGameName);
                 s_DbAdapter.AddCommandParameter(Command, "@GameDescription", sGameDescription);
@@ -8127,6 +8297,11 @@ namespace Arcade
                 sb.Append("    Game.ManufacturerID = ? ");
                 sb.Append("WHERE Game.GameID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateGame SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@Name", sGameName);
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sGameDescription);
                 s_DbAdapter.AddCommandParameter(Command, "@Pinouts", sGamePinouts);
@@ -8185,6 +8360,11 @@ namespace Arcade
             {
                 sb.Append("INSERT INTO Board (Name, Description, [Size], BoardTypeID) ");
                 sb.Append("VALUES (?, ?, ?, ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddBoard SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@BoardName", sBoardName);
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
@@ -8246,6 +8426,11 @@ namespace Arcade
                 sb.Append("    Board.BoardTypeID = ? ");
                 sb.Append("WHERE Board.BoardID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateGameBoard SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@BoardName", sBoardName);
                 s_DbAdapter.AddCommandParameter(Command, "@BoardDescription", sBoardDescription);
                 s_DbAdapter.AddCommandParameter(Command, "@BoardSize", sBoardSize);
@@ -8301,6 +8486,11 @@ namespace Arcade
                 sb.Append("INSERT INTO BoardPart ([Position], Description, BoardID, ");
                 sb.Append("    BoardPartLocationID, PartID) ");
                 sb.Append("VALUES (?, ?, ?, ?, ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddGameBoardPart SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@Position", sPosition);
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
@@ -8364,6 +8554,11 @@ namespace Arcade
                 sb.Append("    BoardPart.PartID = ? ");
                 sb.Append("WHERE BoardPart.BoardPartID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateGameBoardPart SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@Position", sPosition);
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
                 s_DbAdapter.AddCommandParameter(Command, "@BoardPartLocationID",
@@ -8415,6 +8610,11 @@ namespace Arcade
                 sb.Append("DELETE FROM GameManual ");
                 sb.Append("WHERE (GameManual.GameID = ? AND ");
                 sb.Append("       GameManual.ManualID = ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteGameManual SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@GameID", nGameId);
                 s_DbAdapter.AddCommandParameter(Command, "@ManualID", nManualId);
@@ -8485,6 +8685,11 @@ namespace Arcade
                 }
 
                 sb.Append(");");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddManual SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@ManualName", sManualName);
                 s_DbAdapter.AddCommandParameter(Command, "@ManualPartNumber", sManualPartNumber);
@@ -8563,6 +8768,11 @@ namespace Arcade
                 sb.Append("    Manual.Description = ?, ");
                 sb.Append("    Manual.ManufacturerID = ? ");
                 sb.Append("WHERE Manual.ManualID = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateManual SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@ManualName", sManualName);
                 s_DbAdapter.AddCommandParameter(Command, "@ManualPartNumber", sManualPartNumber);
@@ -8670,6 +8880,11 @@ namespace Arcade
                 sb.Append("FROM GameBoard ");
                 sb.Append("WHERE GameBoard.GameID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetGameBoardIds SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@GameID", nGameId);
 
                 Command.CommandText = sb.ToString();
@@ -8770,6 +8985,11 @@ namespace Arcade
                 sb.Append("INSERT INTO Log ([DateTime], Description, LogTypeID, GameID) ");
                 sb.Append("VALUES (?, ?, ?, ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddLog SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@DateTime", DateTime.ToShortDateString());
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
                 s_DbAdapter.AddCommandParameter(Command, "@LogTypeID", nLogTypeId);
@@ -8828,6 +9048,11 @@ namespace Arcade
                 sb.Append("LogTypeID = ? ");
                 sb.Append("WHERE LogID = ?");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("EditLog SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@DateTime", DateTime.ToShortDateString());
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
                 s_DbAdapter.AddCommandParameter(Command, "@LogTypeID", nLogTypeId);
@@ -8875,6 +9100,11 @@ namespace Arcade
             {
                 sb.Append("DELETE FROM Log WHERE LogID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteLog SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@LogID", nLogId);
 
                 Command.CommandText = sb.ToString();
@@ -8921,6 +9151,11 @@ namespace Arcade
                 sb.Append("INSERT INTO PartInventory ([PartID], [InventoryID]) ");
                 sb.Append("VALUES (?, ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddPartInventory SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartID", nPartId);
                 s_DbAdapter.AddCommandParameter(Command, "@InventoryID", nInventoryId);
 
@@ -8966,6 +9201,11 @@ namespace Arcade
             {
                 sb.Append("DELETE FROM PartInventory ");
                 sb.Append("WHERE [InventoryID] = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeletePartInventory SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@InventoryID", nInventoryId);
 
@@ -9015,6 +9255,11 @@ namespace Arcade
             {
                 sb.Append("INSERT INTO Inventory ([Count], [Description], [DateTime]) ");
                 sb.Append("VALUES (?, ?, ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddInventory SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@Count", nCount);
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
@@ -9073,6 +9318,11 @@ namespace Arcade
                 sb.Append("[Count] = ? ");
                 sb.Append("WHERE InventoryID = ?");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("EditInventory SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@DateTime", DateTime.ToShortDateString());
                 s_DbAdapter.AddCommandParameter(Command, "@Description", sDescription);
                 s_DbAdapter.AddCommandParameter(Command, "@Count", nCount);
@@ -9120,6 +9370,11 @@ namespace Arcade
             {
                 sb.Append("DELETE FROM Inventory ");
                 sb.Append("WHERE InventoryID = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteInventory SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@InventoryID", nInventoryId);
 
@@ -9188,6 +9443,11 @@ namespace Arcade
                 sb.Append("SELECT Part.PartID ");
                 sb.Append("FROM Part ");
                 sb.Append("WHERE Part.Name = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartId SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@PartName", sPartName);
 
@@ -9284,6 +9544,11 @@ namespace Arcade
                 sb.Append("WHERE (PartPropertyName.Name = ?) AND ");
                 sb.Append("      (PartPropertyValue.Name = ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetPartPropertyId SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PartPropertyName", sPartPropertyName);
                 s_DbAdapter.AddCommandParameter(Command, "@PartPropertyValue", sPartPropertyValue);
 
@@ -9335,6 +9600,11 @@ namespace Arcade
             {
                 sb.Append("DELETE FROM BoardPart ");
                 sb.Append("WHERE (BoardPart.BoardID = ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteBoardParts SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@BoardID", nBoardId);
 
@@ -9497,6 +9767,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("PropertyValue.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetTableProperties SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@TableID", nTableId);
                 s_DbAdapter.AddCommandParameter(Command, "@PropertyNameID", nPropertyNameId);
 
@@ -9558,6 +9833,11 @@ namespace Arcade
                 sb.Append(sTable2Name);
                 sb.Append("ID) VALUES (?, ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTable1Table2Value SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@Table1Id", nTable1Id);
                 s_DbAdapter.AddCommandParameter(Command, "@Table2Id", nTable2Id);
 
@@ -9614,6 +9894,11 @@ namespace Arcade
                 sb.Append("ID, ");
                 sb.Append(sTable2Name);
                 sb.Append("ID) VALUES (?, ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTable1Table2Value SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@Table1Id", nTable1Id);
                 s_DbAdapter.AddCommandParameter(Command, "@Table2Id", nTable2Id);
@@ -9767,6 +10052,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("PropertyValueID) VALUES (?, ");
                 sb.Append("?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTableProperty SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@PropertyNameId",
                                                 nPropertyNameId);
@@ -9931,6 +10221,11 @@ namespace Arcade
                 sb.Append("PropertyID = ");
                 sb.Append(s_DbAdapter.GetUpdateWithParameterizedSubQuerySupported() ? "?" : nPropertyId.ToString());
                 sb.Append(");");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateTableProperty SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@PropertyValue",
                                                 sPropertyValue);
@@ -10166,6 +10461,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("ID = ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetTablePropertyValues SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PropertyName", sPropertyName);
                 s_DbAdapter.AddCommandParameter(Command, "@TableID", nTableId);
 
@@ -10280,6 +10580,11 @@ namespace Arcade
                 sb.Append("ORDER BY ");
                 sb.Append(sTableName);
                 sb.Append(".Name;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("GetDataForPropertyNameAndValue SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@" + sTableName + "PropertyNameID", nPropertyNameId);
                 s_DbAdapter.AddCommandParameter(Command, "@" + sTableName + "PropertyValue", sPropertyValue);
@@ -10417,6 +10722,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append(" (Name) VALUES (?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddNameToTable SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@NewName", sNewName);
 
                 Command.CommandText = sb.ToString();
@@ -10473,6 +10783,11 @@ namespace Arcade
                 sb.Append("ID, ");
                 sb.Append(sTableName);
                 sb.Append("PropertyID) VALUES (?, ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("AddTableTableProperty SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@TableID", nTableId);
                 s_DbAdapter.AddCommandParameter(Command, "@TablePropertyID", nTablePropertyId);
@@ -10540,6 +10855,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("PropertyID = ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateTableTableProperty SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@NewTablePropertyID", nNewTablePropertyId);
                 s_DbAdapter.AddCommandParameter(Command, "@TableID", nTableId);
                 s_DbAdapter.AddCommandParameter(Command, "@OriginalTablePropertyID", nOriginalTablePropertyId);
@@ -10594,6 +10914,11 @@ namespace Arcade
                 sb.Append("Property.");
                 sb.Append(sTableName);
                 sb.Append("ID = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTableTableProperties SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@TableID", nTableId);
 
@@ -10729,6 +11054,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("ID = ?;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("UpdateNameOfTable SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@Name", sNameValue);
                 s_DbAdapter.AddCommandParameter(Command, "@NameID", nNameId);
 
@@ -10783,7 +11113,12 @@ namespace Arcade
                 sb.Append(".");
                 sb.Append(sTable1Name);
                 sb.Append("ID = ?;");
-                
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTable1Table2ByTable1Id SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@Table1ID", nTable1Id);
 
                 Command.CommandText = sb.ToString();
@@ -10870,6 +11205,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("Property);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteUnusedFromTableProperty SQL statement: {0}", sb.ToString()));
+                }
+
                 Command.CommandText = sb.ToString();
 
                 Command.ExecuteNonQuery();
@@ -10924,6 +11264,11 @@ namespace Arcade
                 sb.Append("PropertyNameID FROM ");
                 sb.Append(sTableName);
                 sb.Append("Property);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteUnusedFromTablePropertyName SQL statement: {0}", sb.ToString()));
+                }
 
                 Command.CommandText = sb.ToString();
 
@@ -10980,6 +11325,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("Property);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteUnusedFromTablePropertyValue SQL statement: {0}", sb.ToString()));
+                }
+
                 Command.CommandText = sb.ToString();
 
                 Command.ExecuteNonQuery();
@@ -11031,6 +11381,11 @@ namespace Arcade
                 sb.Append(".");
                 sb.Append(sTable2Name);
                 sb.Append("ID = ?;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTable1Table2ByTable2Id SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@Table2ID", nTable2Id);
 
@@ -11162,6 +11517,11 @@ namespace Arcade
                 sb.Append(".");
                 sb.Append(sTableName);
                 sb.Append("ID = ?);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteNameFromTable SQL statement: {0}", sb.ToString()));
+                }
 
                 s_DbAdapter.AddCommandParameter(Command, "@NameID", nNameId);
 
@@ -11296,6 +11656,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("PropertyID = ?);");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTablePropertyName SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@PropertyID", nPropertyNameId);
 
                 Command.CommandText = sb.ToString();
@@ -11351,6 +11716,11 @@ namespace Arcade
                 sb.Append("PropertyValueID FROM ");
                 sb.Append(sTableName);
                 sb.Append("Property);");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("DeleteTablePropertyValues SQL statement: {0}", sb.ToString()));
+                }
 
                 Command.CommandText = sb.ToString();
 
@@ -11442,6 +11812,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append("PropertyValue.Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("InitTablePropertyValues SQL statement: {0}", sb.ToString()));
+                }
+
                 s_DbAdapter.AddCommandParameter(Command, "@" + sTableName + "PropertyName", sPropertyName);
 
                 Command.CommandText = sb.ToString();
@@ -11516,6 +11891,11 @@ namespace Arcade
                 sb.Append(sTableName);
                 sb.Append(".Name;");
 
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("InitTableDataList SQL statement: {0}", sb.ToString()));
+                }
+
                 Command.CommandText = sb.ToString();
 
                 using (System.Data.Common.DbDataReader DataReader = Command.ExecuteReader())
@@ -11584,6 +11964,11 @@ namespace Arcade
                 sb.Append("PropertyName.Name FROM ");
                 sb.Append(sTableName);
                 sb.Append("PropertyName;");
+
+                if (s_bLogStatements)
+                {
+                    s_DatabaseLogging.DatabaseMessage(System.String.Format("InitTablePropertyNames SQL statement: {0}", sb.ToString()));
+                }
 
                 Command.CommandText = sb.ToString();
 
@@ -11656,5 +12041,5 @@ namespace Arcade
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2006-2022 Kevin Eshbach
+//  Copyright (C) 2006-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -53,7 +53,8 @@ namespace Common
                                          System::String^% sCatalog,
                                          System::String^% sUserName,
                                          System::String^% sPassword,
-                                         System::String^% sConnectionMode);
+                                         System::String^% sConnectionMode,
+                                         System::Int32% nLogStatements);
 
         private:
             System::String^ m_sServer;
@@ -62,10 +63,11 @@ namespace Common
             System::String^ m_sUserName;
             System::String^ m_sPassword;
             System::String^ m_sConnectionMode;
+            System::Int32 m_nLogStatements;
         };
     }
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////

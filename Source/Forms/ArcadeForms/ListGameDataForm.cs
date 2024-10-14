@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
@@ -196,7 +196,7 @@ namespace Arcade.Forms
 
         private void InitializeControls()
         {
-            Common.Collections.StringSortedList<System.Int32> GameDataList = new Common.Collections.StringSortedList<System.Int32>();
+            Common.Collections.StringSortedList<System.Int32> GameDataList = new Common.Collections.StringSortedList<System.Int32>(true);
             System.Collections.Generic.List<DatabaseDefs.TDisplay> DisplayList = new System.Collections.Generic.List<DatabaseDefs.TDisplay>();
             System.String sErrorMessage;
 
@@ -290,5 +290,5 @@ namespace Arcade.Forms
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  Copyright (C) 2009-2022 Kevin Eshbach
+//  Copyright (C) 2009-2024 Kevin Eshbach
 /////////////////////////////////////////////////////////////////////////////
