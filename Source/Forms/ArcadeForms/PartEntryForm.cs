@@ -39,6 +39,8 @@ namespace Arcade.Forms
         private Common.Collections.StringSortedList<System.Int32> m_PartPackageList = null;
 
         private System.Boolean m_IgnoreChange = false;
+
+        private System.Int32 m_nMaxPartDatasheetLen = 0;
         #endregion
 
         #region "Constructor"
@@ -245,20 +247,30 @@ namespace Arcade.Forms
 
                 if (bStringFound == false)
                 {
-                    listViewDatasheets.Enabled = true;
+                    if (OpenFileDlg.FileName.Length <= m_nMaxPartDatasheetLen)
+                    {
+                        listViewDatasheets.Enabled = true;
 
-                    Item = listViewDatasheets.Items.Add(OpenFileDlg.FileName);
+                        Item = listViewDatasheets.Items.Add(OpenFileDlg.FileName);
 
-                    m_PartDatasheetColl.Add(OpenFileDlg.FileName);
+                        m_PartDatasheetColl.Add(OpenFileDlg.FileName);
 
-                    Item.Selected = true;
-                    Item.Focused = true;
+                        Item.Selected = true;
+                        Item.Focused = true;
 
-                    Item.EnsureVisible();
+                        Item.EnsureVisible();
 
-                    listViewDatasheets.AutosizeColumns();
+                        listViewDatasheets.AutosizeColumns();
 
-                    UpdateOKButton();
+                        UpdateOKButton();
+                    }
+                    else
+                    {
+                        Common.Forms.MessageBox.Show(this,
+                            System.String.Format("This datasheet file path is to long.  (Maximum path length is {0} characters.)", m_nMaxPartDatasheetLen),
+                            System.Windows.Forms.MessageBoxButtons.OK,
+                            System.Windows.Forms.MessageBoxIcon.Information);
+                    }
                 }
                 else
                 {
@@ -580,6 +592,8 @@ namespace Arcade.Forms
                 {
                     textBoxName.MaxLength = PartLens.nPartNameLen;
                     textBoxPartPinouts.MaxLength = PartLens.nPartPinoutsLen;
+
+                    m_nMaxPartDatasheetLen = PartLens.nPartDatasheetLen;
                 }
 
                 m_IgnoreChange = false;
