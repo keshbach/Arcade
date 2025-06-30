@@ -79,20 +79,23 @@ namespace Arcade.Forms
             this.statusStrip = new Common.Forms.StatusStrip();
             this.toolStripDatabaseModeStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripDatabaseConnectionStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.textBoxMessages = new System.Windows.Forms.TextBox();
+            this.textBoxMessages = new Common.Forms.TextBoxMessages();
             this.contextMenuMessageWindowStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.contextMenuItemCopy = new Common.Forms.ToolStripMenuItem();
-            this.contextMenuItemDelete = new Common.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.contextMenuItemSelectAll = new Common.Forms.ToolStripMenuItem();
             this.timerUpdater = new System.Windows.Forms.Timer(this.components);
+            this.toolStripContainerMain = new System.Windows.Forms.ToolStripContainer();
+            this.toolStripEdit = new System.Windows.Forms.ToolStrip();
             this.menuAppStrip.SuspendLayout();
             this.statusStrip.SuspendLayout();
-            this.contextMenuMessageWindowStrip.SuspendLayout();
+            this.toolStripContainerMain.BottomToolStripPanel.SuspendLayout();
+            this.toolStripContainerMain.ContentPanel.SuspendLayout();
+            this.toolStripContainerMain.TopToolStripPanel.SuspendLayout();
+            this.toolStripContainerMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuAppStrip
             // 
+            this.menuAppStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.menuAppStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
             this.menuAppStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemFile,
             this.menuItemEdit,
@@ -104,9 +107,8 @@ namespace Arcade.Forms
             this.menuItemHelp});
             this.menuAppStrip.Location = new System.Drawing.Point(0, 0);
             this.menuAppStrip.Name = "menuAppStrip";
-            this.menuAppStrip.Size = new System.Drawing.Size(430, 24);
+            this.menuAppStrip.Size = new System.Drawing.Size(428, 24);
             this.menuAppStrip.TabIndex = 0;
-            this.menuAppStrip.Text = "menuAppStrip";
             // 
             // menuItemFile
             // 
@@ -136,7 +138,6 @@ namespace Arcade.Forms
             this.menuItemEdit.Name = "menuItemEdit";
             this.menuItemEdit.Size = new System.Drawing.Size(39, 20);
             this.menuItemEdit.Text = "&Edit";
-            this.menuItemEdit.DropDownOpening += new System.EventHandler(this.menuItemEdit_DropDownOpening);
             // 
             // menuItemEditCopy
             // 
@@ -497,12 +498,13 @@ namespace Arcade.Forms
             // statusStrip
             // 
             this.statusStrip.ActiveGroup = "";
+            this.statusStrip.Dock = System.Windows.Forms.DockStyle.None;
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDatabaseModeStatusLabel,
             this.toolStripDatabaseConnectionStatusLabel});
-            this.statusStrip.Location = new System.Drawing.Point(0, 159);
+            this.statusStrip.Location = new System.Drawing.Point(0, 0);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(430, 22);
+            this.statusStrip.Size = new System.Drawing.Size(428, 22);
             this.statusStrip.TabIndex = 2;
             // 
             // toolStripDatabaseModeStatusLabel
@@ -522,71 +524,65 @@ namespace Arcade.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxMessages.ContextMenuStrip = this.contextMenuMessageWindowStrip;
             this.textBoxMessages.HideSelection = false;
-            this.textBoxMessages.Location = new System.Drawing.Point(12, 27);
+            this.textBoxMessages.Location = new System.Drawing.Point(8, 8);
             this.textBoxMessages.MaxLength = 2000000000;
             this.textBoxMessages.Multiline = true;
             this.textBoxMessages.Name = "textBoxMessages";
             this.textBoxMessages.ReadOnly = true;
             this.textBoxMessages.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxMessages.Size = new System.Drawing.Size(406, 122);
+            this.textBoxMessages.Size = new System.Drawing.Size(412, 92);
             this.textBoxMessages.TabIndex = 1;
             this.textBoxMessages.WordWrap = false;
+            this.textBoxMessages.TextSelected += new Common.Forms.TextBoxMessages.TextSelectedHandler(this.textBoxMessages_TextSelected);
+            this.textBoxMessages.TextChanged += new System.EventHandler(this.textBoxMessages_TextChanged);
             // 
             // contextMenuMessageWindowStrip
             // 
-            this.contextMenuMessageWindowStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.contextMenuItemCopy,
-            this.contextMenuItemDelete,
-            this.toolStripSeparator3,
-            this.contextMenuItemSelectAll});
             this.contextMenuMessageWindowStrip.Name = "contextMenuMessageWindowStrip";
-            this.contextMenuMessageWindowStrip.Size = new System.Drawing.Size(165, 76);
-            this.contextMenuMessageWindowStrip.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuMessageWindowStrip_Opening);
-            // 
-            // contextMenuItemCopy
-            // 
-            this.contextMenuItemCopy.HelpText = "Copy the selected message(s) into the clipboard.";
-            this.contextMenuItemCopy.Name = "contextMenuItemCopy";
-            this.contextMenuItemCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.contextMenuItemCopy.Size = new System.Drawing.Size(164, 22);
-            this.contextMenuItemCopy.Text = "&Copy";
-            this.contextMenuItemCopy.Click += new System.EventHandler(this.contextMenuItemCopy_Click);
-            // 
-            // contextMenuItemDelete
-            // 
-            this.contextMenuItemDelete.HelpText = "Remove all messages.";
-            this.contextMenuItemDelete.Name = "contextMenuItemDelete";
-            this.contextMenuItemDelete.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.contextMenuItemDelete.Size = new System.Drawing.Size(164, 22);
-            this.contextMenuItemDelete.Text = "&Delete";
-            this.contextMenuItemDelete.Click += new System.EventHandler(this.contextMenuItemDelete_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(161, 6);
-            // 
-            // contextMenuItemSelectAll
-            // 
-            this.contextMenuItemSelectAll.HelpText = "Select all messages.";
-            this.contextMenuItemSelectAll.Name = "contextMenuItemSelectAll";
-            this.contextMenuItemSelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.contextMenuItemSelectAll.Size = new System.Drawing.Size(164, 22);
-            this.contextMenuItemSelectAll.Text = "Select &All";
-            this.contextMenuItemSelectAll.Click += new System.EventHandler(this.contextMenuItemSelectAll_Click);
+            this.contextMenuMessageWindowStrip.Size = new System.Drawing.Size(61, 4);
             // 
             // timerUpdater
             // 
             this.timerUpdater.Interval = 1000;
             this.timerUpdater.Tick += new System.EventHandler(this.timerUpdater_Tick);
             // 
+            // toolStripContainerMain
+            // 
+            this.toolStripContainerMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            // 
+            // toolStripContainerMain.BottomToolStripPanel
+            // 
+            this.toolStripContainerMain.BottomToolStripPanel.Controls.Add(this.statusStrip);
+            // 
+            // toolStripContainerMain.ContentPanel
+            // 
+            this.toolStripContainerMain.ContentPanel.Controls.Add(this.textBoxMessages);
+            this.toolStripContainerMain.ContentPanel.Size = new System.Drawing.Size(428, 107);
+            this.toolStripContainerMain.Location = new System.Drawing.Point(0, 0);
+            this.toolStripContainerMain.Name = "toolStripContainerMain";
+            this.toolStripContainerMain.Size = new System.Drawing.Size(428, 178);
+            this.toolStripContainerMain.TabIndex = 4;
+            // 
+            // toolStripContainerMain.TopToolStripPanel
+            // 
+            this.toolStripContainerMain.TopToolStripPanel.Controls.Add(this.menuAppStrip);
+            this.toolStripContainerMain.TopToolStripPanel.Controls.Add(this.toolStripEdit);
+            // 
+            // toolStripEdit
+            // 
+            this.toolStripEdit.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStripEdit.Location = new System.Drawing.Point(3, 24);
+            this.toolStripEdit.Name = "toolStripEdit";
+            this.toolStripEdit.Size = new System.Drawing.Size(111, 25);
+            this.toolStripEdit.TabIndex = 0;
+            // 
             // MainForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(430, 181);
-            this.Controls.Add(this.textBoxMessages);
-            this.Controls.Add(this.statusStrip);
-            this.Controls.Add(this.menuAppStrip);
+            this.Controls.Add(this.toolStripContainerMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuAppStrip;
             this.MinimumSize = new System.Drawing.Size(430, 220);
@@ -600,9 +596,15 @@ namespace Arcade.Forms
             this.menuAppStrip.PerformLayout();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
-            this.contextMenuMessageWindowStrip.ResumeLayout(false);
+            this.toolStripContainerMain.BottomToolStripPanel.ResumeLayout(false);
+            this.toolStripContainerMain.BottomToolStripPanel.PerformLayout();
+            this.toolStripContainerMain.ContentPanel.ResumeLayout(false);
+            this.toolStripContainerMain.ContentPanel.PerformLayout();
+            this.toolStripContainerMain.TopToolStripPanel.ResumeLayout(false);
+            this.toolStripContainerMain.TopToolStripPanel.PerformLayout();
+            this.toolStripContainerMain.ResumeLayout(false);
+            this.toolStripContainerMain.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -654,15 +656,13 @@ namespace Arcade.Forms
         private Common.Forms.ToolStripMenuItem menuItemGamesFindBoardName;
         private Common.Forms.ToolStripMenuItem menuItemGamesLogTypeList;
         private Common.Forms.ToolStripMenuItem menuItemTools;
-        private System.Windows.Forms.TextBox textBoxMessages;
+        private Common.Forms.TextBoxMessages textBoxMessages;
         private System.Windows.Forms.ContextMenuStrip contextMenuMessageWindowStrip;
-        private Common.Forms.ToolStripMenuItem contextMenuItemCopy;
-        private Common.Forms.ToolStripMenuItem contextMenuItemDelete;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private Common.Forms.ToolStripMenuItem contextMenuItemSelectAll;
         private Common.Forms.ToolStripMenuItem menuItemToolsOptions;
         private System.Windows.Forms.ToolStripStatusLabel toolStripDatabaseModeStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel toolStripDatabaseConnectionStatusLabel;
         private System.Windows.Forms.Timer timerUpdater;
+        private System.Windows.Forms.ToolStripContainer toolStripContainerMain;
+        private System.Windows.Forms.ToolStrip toolStripEdit;
     }
 }

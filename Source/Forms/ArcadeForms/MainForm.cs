@@ -37,6 +37,22 @@ namespace Arcade.Forms
         }
         #endregion
 
+        #region "Structures"
+        private struct TToolStripData
+        {
+            public TToolStripData(
+                Common.Forms.ToolStripMenuItem ToolStripMenuItem,
+                System.Windows.Forms.ToolStrip ToolStrip)
+            {
+                this.ToolStripMenuItem = ToolStripMenuItem;
+                this.ToolStrip = ToolStrip;
+            }
+
+            public Common.Forms.ToolStripMenuItem ToolStripMenuItem;
+            public System.Windows.Forms.ToolStrip ToolStrip;
+        };
+        #endregion
+
         #region "Member Variables"
         private System.String m_sRegistryKey;
         private System.String m_sFormLocationsRegistryKey;
@@ -109,6 +125,10 @@ namespace Arcade.Forms
             InitImageLists();
             InitImageKeys();
 
+            InitToolStripItems();
+
+            InitContextMenuStripItems();
+
             BeginUpdateTimer();
 
             Common.Threading.Thread.RunWorkerThread(() =>
@@ -147,36 +167,42 @@ namespace Arcade.Forms
 
         private void MainForm_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
         {
-            contextMenuMessageWindowStrip.ImageList = null;
-            menuAppStrip.ImageList = null;
+            UninitImageLists();
+
+            UninitToolStripItems();
+
+            UninitContextMenuStripItems();
         }
         #endregion
 
         #region "MenuItem Event Handlers"
         private void menuExit_Click(object sender, EventArgs e)
         {
-            Close();
-        }
+            Common.Debug.Thread.IsUIThread();
 
-        private void menuItemEdit_DropDownOpening(object sender, EventArgs e)
-        {
-            UpdateEditMenu(menuItemEditCopy, menuItemEditDelete,
-                           menuItemEditSelectAll);
+            Close();
         }
 
         private void menuItemEditCopy_Click(object sender, EventArgs e)
         {
-            ExecuteCopy();
+            Common.Debug.Thread.IsUIThread();
+
+            System.Windows.Forms.Clipboard.SetText(textBoxMessages.SelectedText);
         }
 
         private void menuItemEditDelete_Click(object sender, EventArgs e)
         {
-            ExecuteDelete();
+            Common.Debug.Thread.IsUIThread();
+
+            textBoxMessages.Text = "";
         }
 
         private void menuItemEditSelectAll_Click(object sender, EventArgs e)
         {
-            ExecuteSelectAll();
+            Common.Debug.Thread.IsUIThread();
+
+            textBoxMessages.SelectionStart = 0;
+            textBoxMessages.SelectionLength = textBoxMessages.TextLength;
         }
 
         private void menuPartsFind_Click(object sender, EventArgs e)
@@ -679,29 +705,6 @@ namespace Arcade.Forms
         }
         #endregion
 
-        #region "ContextMenu Event Handlers"
-        private void contextMenuMessageWindowStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            UpdateEditMenu(contextMenuItemCopy, contextMenuItemDelete,
-                            contextMenuItemSelectAll);
-        }
-
-        private void contextMenuItemCopy_Click(object sender, EventArgs e)
-        {
-            ExecuteCopy();
-        }
-
-        private void contextMenuItemDelete_Click(object sender, EventArgs e)
-        {
-            ExecuteDelete();
-        }
-
-        private void contextMenuItemSelectAll_Click(object sender, EventArgs e)
-        {
-            ExecuteSelectAll();
-        }
-        #endregion
-
         #region "Internal Functions"
         private void UpdateState(
             State State)
@@ -902,6 +905,11 @@ namespace Arcade.Forms
 
         private void InitImageLists()
         {
+            System.Windows.Forms.ToolStrip[] ToolStrips = {
+                    menuAppStrip,
+                    contextMenuMessageWindowStrip,
+                    toolStripEdit};
+
             Common.Debug.Thread.IsUIThread();
 
             if (s_bInitializeImages)
@@ -911,21 +919,79 @@ namespace Arcade.Forms
                 s_bInitializeImages = false;
             }
 
-            contextMenuMessageWindowStrip.ImageList = Common.Forms.ImageManager.ToolbarSmallImageList;
-            menuAppStrip.ImageList = Common.Forms.ImageManager.ToolbarSmallImageList;
+            foreach (System.Windows.Forms.ToolStrip ToolStrip in ToolStrips)
+            {
+                ToolStrip.ImageList = Common.Forms.ImageManager.ToolbarSmallImageList;
+            }
+
+            menuAppStrip.RefreshToolStripItemsImageList();
+        }
+
+        private void UninitImageLists()
+        {
+            System.Windows.Forms.ToolStrip[] ToolStrips = {
+                    menuAppStrip,
+                    contextMenuMessageWindowStrip,
+                    toolStripEdit};
+
+            Common.Debug.Thread.IsUIThread();
+
+            foreach (System.Windows.Forms.ToolStrip ToolStrip in ToolStrips)
+            {
+                ToolStrip.ImageList = null;
+            }
+
+            menuAppStrip.RefreshToolStripItemsImageList();
         }
 
         private void InitImageKeys()
         {
             Common.Debug.Thread.IsUIThread();
 
-            contextMenuItemCopy.ImageKey = Common.Forms.ToolbarImageKey.Copy;
-            contextMenuItemDelete.ImageKey = Common.Forms.ToolbarImageKey.Delete;
-            contextMenuItemSelectAll.ImageKey = Common.Forms.ToolbarImageKey.Select;
-
             menuItemEditCopy.ImageKey = Common.Forms.ToolbarImageKey.Copy;
             menuItemEditDelete.ImageKey = Common.Forms.ToolbarImageKey.Delete;
             menuItemEditSelectAll.ImageKey = Common.Forms.ToolbarImageKey.Select;
+        }
+
+        private void InitToolStripItems()
+        {
+            TToolStripData[] ToolStripDataArray = {
+                new TToolStripData(menuItemEdit, toolStripEdit)};
+
+            Common.Debug.Thread.IsUIThread();
+
+            foreach (TToolStripData ToolStripData in ToolStripDataArray)
+            {
+                InitToolStripItems(ToolStripData.ToolStripMenuItem,
+                                   ToolStripData.ToolStrip);
+            }
+        }
+
+        private void UninitToolStripItems()
+        {
+            System.Windows.Forms.ToolStrip[] ToolStrips = {
+                toolStripEdit};
+
+            Common.Debug.Thread.IsUIThread();
+
+            foreach (System.Windows.Forms.ToolStrip ToolStrip in ToolStrips)
+            {
+                UninitToolStripItems(ToolStrip);
+            }
+        }
+
+        private void InitContextMenuStripItems()
+        {
+            Common.Debug.Thread.IsUIThread();
+
+            InitContextMenuItems(menuItemEdit, contextMenuMessageWindowStrip);
+        }
+
+        private void UninitContextMenuStripItems()
+        {
+            Common.Debug.Thread.IsUIThread();
+
+            UninitContextMenuItems(contextMenuMessageWindowStrip);
         }
 
         private void UpdateEditMenu(
@@ -954,28 +1020,6 @@ namespace Arcade.Forms
             {
                 menuItemCopy.Enabled = false;
             }
-        }
-
-        private void ExecuteCopy()
-        {
-            Common.Debug.Thread.IsUIThread();
-
-            System.Windows.Forms.Clipboard.SetText(textBoxMessages.SelectedText);
-        }
-
-        private void ExecuteDelete()
-        {
-            Common.Debug.Thread.IsUIThread();
-
-            textBoxMessages.Text = "";
-        }
-
-        private void ExecuteSelectAll()
-        {
-            Common.Debug.Thread.IsUIThread();
-
-            textBoxMessages.SelectionStart = 0;
-            textBoxMessages.SelectionLength = textBoxMessages.TextLength;
         }
 
         private void AddCachedMessage(
@@ -1035,7 +1079,6 @@ namespace Arcade.Forms
 
             FlushMessages();
         }
-
         #endregion
 
         #region "Timer Event Handlers"
@@ -1044,6 +1087,27 @@ namespace Arcade.Forms
             Common.Debug.Thread.IsUIThread();
 
             FlushMessages();
+        }
+        #endregion
+
+        #region "Text Box Messages Event Handlers"
+        private void textBoxMessages_TextChanged(object sender, EventArgs e)
+        {
+            if (textBoxMessages.Text.Length > 0)
+            {
+                menuItemEditDelete.Enabled = true;
+                menuItemEditSelectAll.Enabled = true;
+            }
+            else
+            {
+                menuItemEditDelete.Enabled = false;
+                menuItemEditSelectAll.Enabled = false;
+            }
+        }
+
+        private void textBoxMessages_TextSelected(object sender, Common.Forms.TextBoxMessagesTextSelectedEventArgs e)
+        {
+            menuItemEditCopy.Enabled = e.TextSelected;
         }
         #endregion
     }
