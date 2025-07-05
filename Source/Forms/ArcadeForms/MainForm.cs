@@ -1100,6 +1100,7 @@ namespace Arcade.Forms
             }
             else
             {
+                menuItemEditCopy.Enabled = false;
                 menuItemEditDelete.Enabled = false;
                 menuItemEditSelectAll.Enabled = false;
             }
