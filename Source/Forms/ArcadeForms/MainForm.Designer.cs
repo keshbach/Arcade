@@ -499,12 +499,15 @@ namespace Arcade.Forms
             // 
             this.statusStrip.ActiveGroup = "";
             this.statusStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.statusStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDatabaseModeStatusLabel,
             this.toolStripDatabaseConnectionStatusLabel});
+            this.statusStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.statusStrip.Location = new System.Drawing.Point(0, 0);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(428, 22);
+            this.statusStrip.SizingGrip = false;
             this.statusStrip.TabIndex = 2;
             // 
             // toolStripDatabaseModeStatusLabel
