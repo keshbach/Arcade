@@ -2,7 +2,7 @@
 
 Application for tracking arcade game boards and their associated electronic components, controls and display information.
 
-Copyright (C) 2006-2023 Kevin Eshbach  
+Copyright (C) 2006-2026 Kevin Eshbach  
 
 ## Requirements
 
@@ -20,3 +20,4 @@ The application requires either a Microsoft Access or SQL Server database.
 ## Programming Languages
 
 The application is a combination of C, Managed C++ and C#.
+
