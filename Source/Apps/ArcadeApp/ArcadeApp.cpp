@@ -25,7 +25,7 @@
 
 // Command Line Arguments definitions
 
-#define CDisableDPIArgument L"/disabledpi"
+#define CDPIAwareArgument L"/dpiaware"
 #define CAccessDatabaseArgument L"/accessdatabase"
 
 #pragma endregion
@@ -336,7 +336,7 @@ INT ArcadeAppExecute(
 	HANDLE hThread;
 	DWORD dwThreadId, dwExitCode;
 	INT nArgIndex;
-	BOOL bDisableDPI, bDisplayHelp;
+	BOOL bDPIAware, bDisplayHelp;
 
 	if (!IsWindows7OrGreater())
 	{
@@ -350,14 +350,14 @@ INT ArcadeAppExecute(
 	::ZeroMemory(pArcadeAppData, sizeof(TArcadeAppData));
 
 	nArgIndex = 1;
-	bDisableDPI = FALSE;
+	bDPIAware = FALSE;
 	bDisplayHelp = FALSE;
 
 	while (nArgIndex < nTotalArgs && bDisplayHelp == FALSE)
 	{
-		if (::lstrcmpi(ppszArgs[nArgIndex], CDisableDPIArgument) == 0)
+		if (::lstrcmpi(ppszArgs[nArgIndex], CDPIAwareArgument) == 0)
 		{
-			bDisableDPI = TRUE;
+			bDPIAware = TRUE;
 
 			++nArgIndex;
 		}
@@ -382,7 +382,7 @@ INT ArcadeAppExecute(
 		return 1;
 	}
 
-	if (bDisableDPI == FALSE)
+	if (bDPIAware == TRUE)
 	{
 		lEnableDPIAwareness();
 	}
