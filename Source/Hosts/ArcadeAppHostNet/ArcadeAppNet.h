@@ -21,7 +21,7 @@ namespace Arcade
             Startup();
 
         public:
-            System::UInt32 Execute(EDatabaseMode DatabaseMode);
+            System::UInt32 Execute(EDatabaseMode DatabaseMode, System::Boolean bReset);
         };
     }
 }

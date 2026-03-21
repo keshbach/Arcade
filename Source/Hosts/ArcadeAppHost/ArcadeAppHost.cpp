@@ -405,6 +405,7 @@ MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostUninitialize(VOID)
 
 MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(
   _In_ INT nDatabaseMode,
+  _In_ BOOL bReset,
   _Out_ LPDWORD pdwExitCode)
 {
     DWORD dwAppDomainId = 0;
@@ -426,6 +427,8 @@ MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(
             l_ArcadeAppHostData.nDatabaseMode = CArcadeAppHostDataSQLServerDatabaseMode;
             break;
     }
+
+    l_ArcadeAppHostData.bReset = bReset;
 
     l_ArcadeAppHostRuntimeData.pCLRRuntimeHost->GetCurrentAppDomainId(&dwAppDomainId);
 

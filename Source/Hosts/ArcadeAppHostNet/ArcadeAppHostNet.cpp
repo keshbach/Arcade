@@ -13,6 +13,7 @@ static VOID lExecuteArcadeApp(
 {
     Arcade::Application::Startup^ Startup = gcnew Arcade::Application::Startup();
     Arcade::Application::Startup::EDatabaseMode DatabaseMode;
+    System::Boolean bReset = pArcadeAppHostData->bReset ? true : false;
 
     switch (pArcadeAppHostData->nDatabaseMode)
     {
@@ -25,7 +26,7 @@ static VOID lExecuteArcadeApp(
             break;
     }
 
-    pArcadeAppHostData->dwExitCode = Startup->Execute(DatabaseMode);
+    pArcadeAppHostData->dwExitCode = Startup->Execute(DatabaseMode, bReset);
 }
 
 extern "C"

@@ -21,12 +21,40 @@
 
 #pragma endregion
 
+static System::Boolean lReset(void)
+{
+    System::Boolean bResult = false;
+    Microsoft::Win32::RegistryKey^ RegKey = Common::Registry::OpenCurrentUserRegKey(CRegistryKey, true);
+
+    if (RegKey == nullptr)
+    {
+        return true;
+    }
+
+    try
+    {
+        for each (System::String^ sSubKeyName in RegKey->GetSubKeyNames())
+        {
+            RegKey->DeleteSubKeyTree(sSubKeyName);
+        }
+
+        bResult = true;
+    }
+    finally
+    {
+        RegKey->Close();
+    }
+
+    return bResult;
+}
+
 Arcade::Application::Startup::Startup()
 {
 }
 
 System::UInt32 Arcade::Application::Startup::Execute(
-  EDatabaseMode DatabaseMode)
+  EDatabaseMode DatabaseMode,
+  System::Boolean bReset)
 {
     System::String^ sFormLocationsRegistryKey = System::String::Format(L"{0}\\{1}", CRegistryKey, CFormLocationsName);
     System::String^ sDatabaseRegistryKey = System::String::Format(L"{0}\\{1}", CRegistryKey, CDatabaseName);
@@ -42,6 +70,11 @@ System::UInt32 Arcade::Application::Startup::Execute(
         default:
             MainFormDatabaseMode = Arcade::Forms::MainForm::DatabaseMode::SQLServer;
             break;
+    }
+
+    if (bReset)
+    {
+        return lReset() ? 0 : 1;
     }
 
     if (!Common::IO::TempFileManager::Initialize())

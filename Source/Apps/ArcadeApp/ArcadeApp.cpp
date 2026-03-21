@@ -26,6 +26,7 @@
 // Command Line Arguments definitions
 
 #define CDPIAwareArgument L"/dpiaware"
+#define CResetArgument L"/reset"
 #define CAccessDatabaseArgument L"/accessdatabase"
 
 #pragma endregion
@@ -40,7 +41,7 @@ typedef BOOL (WINAPI* TSetProcessDpiAwarenessContext)(DPI_AWARENESS_CONTEXT valu
 
 typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostInitializeFunc)(VOID);
 typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostUninitializeFunc)(VOID);
-typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostExecuteFunc)(_In_ INT nDatabaseMode, _Out_ LPDWORD pdwExitCode);
+typedef BOOL (ARCADEAPPHOSTAPI* TArcadeAppHostExecuteFunc)(_In_ INT nDatabaseMode, _In_ BOOL bReset, _Out_ LPDWORD pdwExitCode);
 
 typedef VOID (STDAPICALLTYPE *TPathRemoveExtensionWFunc)(_Inout_ LPWSTR pszPath);
 typedef BOOL (STDAPICALLTYPE *TPathRemoveFileSpecWFunc)(_Inout_ LPWSTR pszPath);
@@ -336,7 +337,7 @@ INT ArcadeAppExecute(
 	HANDLE hThread;
 	DWORD dwThreadId, dwExitCode;
 	INT nArgIndex;
-	BOOL bDPIAware, bDisplayHelp;
+	BOOL bDPIAware, bReset, bDisplayHelp;
 
 	if (!IsWindows7OrGreater())
 	{
@@ -351,6 +352,7 @@ INT ArcadeAppExecute(
 
 	nArgIndex = 1;
 	bDPIAware = FALSE;
+	bReset = FALSE;
 	bDisplayHelp = FALSE;
 
 	while (nArgIndex < nTotalArgs && bDisplayHelp == FALSE)
@@ -358,6 +360,12 @@ INT ArcadeAppExecute(
 		if (::lstrcmpi(ppszArgs[nArgIndex], CDPIAwareArgument) == 0)
 		{
 			bDPIAware = TRUE;
+
+			++nArgIndex;
+		}
+		else if (::lstrcmpi(ppszArgs[nArgIndex], CResetArgument) == 0)
+		{
+			bReset = TRUE;
 
 			++nArgIndex;
 		}
@@ -376,6 +384,8 @@ INT ArcadeAppExecute(
 	if (bDisplayHelp == TRUE)
 	{
 		UtFreeMem(pArcadeAppData);
+
+		lEnableDPIAwareness();
 
 		lDisplayCommandLineHelp();
 
@@ -430,7 +440,7 @@ INT ArcadeAppExecute(
 		return 1;
     }
 
-    pArcadeAppData->AppHostModuleData.pExecute(nDatabaseMode, &dwExitCode);
+    pArcadeAppData->AppHostModuleData.pExecute(nDatabaseMode, bReset, &dwExitCode);
 
 	lUninitializeArcadeAppHostModuleData(&pArcadeAppData->AppHostModuleData);
 

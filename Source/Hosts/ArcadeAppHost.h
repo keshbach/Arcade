@@ -16,7 +16,7 @@ MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostInitialize(VOID);
 
 MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostUninitialize(VOID);
 
-MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(_In_ INT nDatabaseMode, _Out_ LPDWORD pdwExitCode);
+MExternC BOOL ARCADEAPPHOSTAPI ArcadeAppHostExecute(_In_ INT nDatabaseMode, _In_ BOOL bReset, _Out_ LPDWORD pdwExitCode);
 
 #endif /* end of ArcadeAppHost_H */
 
